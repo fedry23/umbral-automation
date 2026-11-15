@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""UMBRAL: generador gratuito de Reels con voz neuronal."""
+"""UMBRAL: generador de Reels de terror con Kokoro TTS."""
 
 import datetime as dt
 import json
@@ -96,9 +96,15 @@ def make_slide(text, index, date_tag, dest, intro=False):
             glow = max(0, 1 - d) ** 2
             grain = rng.randint(-3, 3)
 
-            red = max(0, min(255, int(7 + 61 * glow + grain)))
-            green = max(0, min(255, int(8 + 4 * glow + grain)))
-            blue = max(0, min(255, int(12 + 3 * glow + grain)))
+            red = max(
+                0, min(255, int(7 + 61 * glow + grain))
+            )
+            green = max(
+                0, min(255, int(8 + 4 * glow + grain))
+            )
+            blue = max(
+                0, min(255, int(12 + 3 * glow + grain))
+            )
 
             px[x, y] = (red, green, blue)
 
@@ -175,33 +181,74 @@ def make_slide(text, index, date_tag, dest, intro=False):
 
 
 def generate_voice(text):
-    """Genera narracion neuronal masculina española."""
+    """Narrador masculino en español mediante Kokoro TTS."""
 
-    voice_mp3 = OUT / "voice.mp3"
+    import numpy as np
+    import soundfile as sf
+    from kokoro import KPipeline
 
-    run(
-        "edge-tts",
-        "--voice", "es-ES-AlvaroNeural",
-        "--rate=-7%",
-        "--pitch=-12Hz",
-        "--text", text,
-        "--write-media", str(voice_mp3)
+    voice = os.getenv("UMBRAL_VOICE", "em_alex")
+
+    if voice not in {"em_alex", "em_santa"}:
+        raise ValueError(
+            f"Voz Kokoro desconocida: {voice}"
+        )
+
+    pipeline = KPipeline(
+        lang_code="e",
+        repo_id="hexgrad/Kokoro-82M",
+        device="cpu"
     )
 
-    return voice_mp3
+    audio_parts = []
+
+    for _, _, chunk in pipeline(
+        text,
+        voice=voice,
+        speed=1.0
+    ):
+        if chunk is not None:
+            audio_parts.append(chunk.cpu().numpy())
+
+            # Breve pausa entre fragmentos.
+            audio_parts.append(
+                np.zeros(2400, dtype=np.float32)
+            )
+
+    if not audio_parts:
+        raise RuntimeError(
+            "Kokoro no ha generado audio"
+        )
+
+    voice_wav = OUT / "voice.wav"
+
+    sf.write(
+        voice_wav,
+        np.concatenate(audio_parts),
+        24000
+    )
+
+    return voice_wav
 
 
 def render():
     stories = json.loads(
-        (BASE / "stories.json").read_text(encoding="utf-8")
+        (BASE / "stories.json").read_text(
+            encoding="utf-8"
+        )
     )
 
     if not stories:
-        raise RuntimeError("No hay relatos en stories.json")
+        raise RuntimeError(
+            "No hay relatos en stories.json"
+        )
 
     start_date = dt.date(2026, 11, 15)
 
-    position = (DATE - start_date).days % len(stories)
+    position = (
+        DATE - start_date
+    ).days % len(stories)
+
     story = stories[position]
 
     print(
@@ -213,23 +260,29 @@ def render():
 
     OUT.mkdir(exist_ok=True)
 
-    # NUEVA VOZ NEURONAL
-    voice_mp3 = generate_voice(story["narration"])
+    # Generar voz neuronal local.
+    voice_wav = generate_voice(
+        story["narration"]
+    )
 
     info = subprocess.check_output(
         [
             "ffprobe",
             "-v", "error",
             "-show_entries", "format=duration",
-            "-of", "default=nokey=1:noprint_wrappers=1",
-            str(voice_mp3)
+            "-of",
+            "default=nokey=1:noprint_wrappers=1",
+            str(voice_wav)
         ],
         text=True
     )
 
     voice_length = float(info.strip())
 
-    body = blocks(story["narration"], count=5)
+    body = blocks(
+        story["narration"],
+        count=5
+    )
 
     page_texts = [
         story["title"].upper()
@@ -277,12 +330,15 @@ def render():
     )
 
     outfile = OUT / (
-        "umbral_" + DATE.strftime("%Y%m%d") + ".mp4"
+        "umbral_"
+        + DATE.strftime("%Y%m%d")
+        + ".mp4"
     )
 
     filter_graph = (
         "[0:v]fps=24,scale=720:1280,"
-        "zoompan=z='min(zoom+0.00012,1.04)':"
+        "zoompan="
+        "z='min(zoom+0.00012,1.04)':"
         "d=1:"
         "x='iw/2-(iw/zoom/2)':"
         "y='ih/2-(ih/zoom/2)':"
@@ -308,7 +364,7 @@ def render():
         "-safe", "0",
         "-f", "concat",
         "-i", str(OUT / "slides.txt"),
-        "-i", str(voice_mp3),
+        "-i", str(voice_wav),
         "-f", "lavfi",
         "-i",
         "anoisesrc=color=brown:"
