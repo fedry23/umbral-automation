@@ -8,6 +8,7 @@ from PIL import Image, ImageChops
 
 from scripts.brand_cards import make_brand_cards
 from scripts.thumbnail import make_thumbnail
+from scripts.stage_daily_reel import validate_cover
 
 
 class CoverAndCardsTests(unittest.TestCase):
@@ -33,6 +34,7 @@ class CoverAndCardsTests(unittest.TestCase):
                 self.assertEqual(image.format, "JPEG")
                 self.assertEqual(image.mode, "RGB")
             self.assertLess(cover.stat().st_size, 8_000_000)
+            self.assertTrue(validate_cover(cover))
 
     def test_number_is_required_and_empty_scene_list_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
