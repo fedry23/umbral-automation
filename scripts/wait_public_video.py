@@ -34,13 +34,30 @@ def main():
                     "https://fedry23.github.io/umbral-automation/reels/" + date + ".mp4")
     if not url.startswith("https://fedry23.github.io/umbral-automation/reels/"):
         raise ValueError("URL del Reel fuera del sitio oficial de GitHub Pages")
+    cover_required = os.getenv("UMBRAL_COVER_REQUIRED") == "1"
+    cover_path = Path(os.getenv("UMBRAL_COVER_FILE",
+                             "docs/reels/" + date + ".jpg"))
+    cover_url = os.getenv("UMBRAL_COVER_URL",
+                        "https://fedry23.github.io/umbral-automation/reels/"
+                        + date + ".jpg")
+    if cover_required:
+        if not cover_path.is_file():
+            raise RuntimeError("Falta portada del día; no se publica sin cover")
+        if not cover_url.startswith("https://fedry23.github.io/umbral-automation/reels/"):
+            raise ValueError("La portada debe estar en GitHub Pages oficial")
     for _ in range(60):
-        if check_remote(path, url):
-            print("GitHub Pages listo; identidad SHA256 del vídeo comprobada")
+        video_ready = check_remote(path, url)
+        cover_ready = not cover_required or check_remote(cover_path, cover_url)
+        if video_ready and cover_ready:
+            print("GitHub Pages listo; SHA256 del vídeo"
+                  + (" y portada" if cover_required else "") + " comprobado")
+            Path("staged").mkdir(exist_ok=True)
             (Path("staged") / "public_video_url.txt").write_text(url)
+            if cover_required:
+                (Path("staged") / "public_cover_url.txt").write_text(cover_url)
             return
         time.sleep(12)
-    raise RuntimeError("GitHub Pages no ofreció la copia exacta del vídeo; no publicar")
+    raise RuntimeError("GitHub Pages no ofreció los archivos exactos (MP4/JPEG); no publicar")
 
 
 if __name__ == "__main__":
