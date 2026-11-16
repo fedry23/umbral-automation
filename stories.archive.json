@@ -118,5 +118,35 @@
     "hook": "Dentro del pan apareció un papel todavía caliente.",
     "narration": "Cada madrugada compro pan en la misma tienda. Hoy encontré un papel enrollado dentro de la barra. Decía: no vengas mañana. Se lo enseñé al panadero. Se puso pálido y me pidió que saliera. Antes de irme vi que todos los hornos estaban apagados. Sin embargo, olía a pan recién hecho. Por la noche me llegó un mensaje suyo: mañana no abriré. Cuando amaneció, pasé por delante. Había una cola enorme, pero nadie se movía. Todos miraban al escaparate. Detrás del cristal, una mano escribía mensajes en el vaho del horno, desde dentro.",
     "caption": "Algunos mensajes vienen horneados desde el otro lado. 🍞"
+  },
+  {
+    "publish_date": "2026-11-16",
+    "title": "Objetos perdidos",
+    "hook": "En objetos perdidos encontré mis propias llaves. Todavía las llevaba en el bolsillo.",
+    "narration": "Trabajo en la oficina de objetos perdidos de una estación. Anoche, justo antes de cerrar, llegó una caja sin remitente. Dentro había un reloj roto, una bufanda húmeda y un llavero con mi nombre. Busqué mis llaves. Seguían en mi bolsillo. En el registro apareció una ficha nueva, fechada al día siguiente. Decía que todos esos objetos se habían encontrado junto a la vía seis, después de un accidente. Me reí nervioso y llamé al vigilante. Su teléfono sonó dentro de la caja. Entonces vi otra ficha debajo de la primera. Llevaba mi fotografía, pero en ella tenía los ojos cerrados. En la casilla de reclamante ponía: «Nadie». Al fondo del pasillo escuché arrastrar una maleta. La puerta estaba cerrada con llave. Al mirar por la mirilla vi a un hombre empapado que sujetaba mi abrigo. Levantó la cabeza. Era yo, y estaba llamando para recoger mis cosas.",
+    "caption": "¿Y si tus objetos perdidos aparecieran antes de perderlos? 🧳 UMBRAL presenta: Objetos perdidos. ¿Abrirías esa caja?",
+    "scenes": [
+      "Photorealistic 35mm psychological horror film still of a deserted Spanish railway station lost-and-found office at 2 AM, wooden counter and metal shelves, fluorescent lights flickering, open unmarked cardboard box on desk, deep shadows, portrait 9:16, no readable letters or text",
+      "Cinematic close shot of an unmarked box containing a broken antique wristwatch, soaked grey scarf and a ring of old keys, unsettling night office setting with eerie blue fluorescent glow, dark moody realism, vertical portrait 9:16, no lettering",
+      "A lonely railway lost-property clerk seen from behind examining a paper registry under a stark office lamp, blurred dark train platforms beyond dirty window, palpable silent dread, photorealistic film still, vertical 9:16, no readable words",
+      "Surreal close view of an anonymous ID photo on old paper showing the same exhausted man with closed eyes, box of personal belongings nearby, harsh red emergency light from empty station corridor, eerie grounded psychological horror, portrait 9:16, no legible text",
+      "Abandoned railway office hallway after midnight, a wet rolling suitcase tracks across dusty tile floor toward a locked door, lonely sodium lights and long uncanny shadows, photorealistic cinematic horror, vertical 9:16, no words",
+      "From inside a locked lost-and-found office looking through a narrow peephole into darkness, soaked human double holding a black coat, indistinct face emerging from the shadows, shocking final cinematic horror frame, dramatic low light, vertical 9:16, no writing"
+    ]
+  },
+  {
+    "publish_date": "2026-11-16",
+    "title": "El público de las tres",
+    "hook": "Anoche escuché aplaudir en un teatro cerrado desde hacía veinte años.",
+    "narration": "Me contrataron para revisar la instalación eléctrica de un teatro abandonado. El dueño me advirtió que no encendiera las luces del escenario después de las tres. Pensé que era una superstición. A las tres y un minuto, las butacas empezaron a crujir, una detrás de otra, como si alguien estuviera sentándose. Alumbré con la linterna. No había nadie. Entonces sonó una ovación. Se apagó mi linterna y una voz salió de los altavoces: «Que salga el protagonista». El telón se abrió solo. Sobre las tablas había una silla y un espejo cubierto por una sábana. Me acerqué. Bajo la tela alguien respiraba. Tiré de ella y vi mi reflejo, sentado en la silla, con una cuerda alrededor del cuello. En ese momento se encendieron las luces de la sala. Todas las butacas estaban ocupadas por personas inmóviles, con mi misma cara. Una de ellas se levantó y dijo: «Otra vez desde el principio».",
+    "caption": "El teatro llevaba veinte años cerrado. El público nunca se fue. 🎭 UMBRAL: El público de las tres.",
+    "scenes": [
+      "Photorealistic wide atmospheric shot of abandoned ornate Spanish theatre auditorium at night, red velvet seats covered in dust, ruined golden balconies, emergency exit glow and deep black stage, very cinematic 35mm horror, portrait 9:16, no lettering",
+      "An electrician in dark work clothes holding a flashlight inside the empty old theatre aisle at 3am, rows of red seats creaking in dim cool moonlight, strong chiaroscuro lighting, psychological horror cinematic still, vertical 9:16, no words",
+      "The huge red velvet theatre curtain opening by itself on a dusty stage with no actors, a single wooden chair at the center and a standing mirror hidden beneath a white sheet, eerie spotlight, photorealistic cinematic horror, portrait 9:16, no readable text",
+      "Close cinematic suspense shot of a white sheet draped over an antique mirror on an abandoned theatre stage, fabric rising as though someone is breathing beneath it, worn timber floor and dramatic black surroundings, grounded terror, vertical 9:16, no text",
+      "Uncanny antique theatre mirror reflecting a frightened workman sitting motionless on a wooden stage chair while the real chair is empty, red curtain behind, disturbing supernatural realistic film frame, portrait 9:16, no writing",
+      "Terrifying empty old theatre suddenly crowded with rows of pale still audience members who all share the same man's face, a single figure rising from the red seats, high contrast cinematic psychological horror scene, portrait 9:16, no lettering"
+    ]
   }
 ]
