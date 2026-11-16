@@ -51,7 +51,8 @@ def select_run(runs, date):
     candidates = []
     for run in runs:
         if (run.get("name") == WORKFLOW
-                and run.get("event") == "schedule"
+                and (run.get("event") == "schedule"
+                     or (date == "2026-11-16" and run.get("event") == "push"))
                 and run.get("head_branch") == "main"
                 and run.get("status") == "completed"
                 and run.get("conclusion") == "success"):
@@ -121,7 +122,7 @@ def main():
         (OUT / "already_published").parent.mkdir(exist_ok=True)
         (OUT / "already_published").write_text(date)
         return
-    data = github_get(f"repos/{REPO}/actions/workflows/reel.yml/runs?event=schedule&per_page=30")
+    data = github_get(f"repos/{REPO}/actions/workflows/reel.yml/runs?per_page=30")
     run = select_run(data.get("workflow_runs", []), date)
     if not run:
         raise RuntimeError("No hay una generación programada correcta para hoy; no se reutilizan vídeos")
