@@ -27,10 +27,13 @@ def check_remote(path, url):
 
 def main():
     date = dt.datetime.now(ZoneInfo("Europe/Madrid")).date().isoformat()
-    path = Path("docs/reels") / (date + ".mp4")
-    if not path.is_file():
-        raise RuntimeError("El vídeo aún no está en docs/reels")
-    url = "https://fedry23.github.io/umbral-automation/reels/" + date + ".mp4"
+    path = Path(os.getenv("UMBRAL_VIDEO_FILE", "docs/reels/" + date + ".mp4"))
+    if not path.is_file() or path.suffix.lower() != ".mp4":
+        raise RuntimeError("Falta el vídeo MP4 previsto en GitHub Pages")
+    url = os.getenv("UMBRAL_VIDEO_URL",
+                    "https://fedry23.github.io/umbral-automation/reels/" + date + ".mp4")
+    if not url.startswith("https://fedry23.github.io/umbral-automation/reels/"):
+        raise ValueError("URL del Reel fuera del sitio oficial de GitHub Pages")
     for _ in range(60):
         if check_remote(path, url):
             print("GitHub Pages listo; identidad SHA256 del vídeo comprobada")
