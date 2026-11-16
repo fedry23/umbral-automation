@@ -105,13 +105,20 @@ def read_story(day):
     return story, caption
 
 
-def prepare(day, video_url):
+def prepare(day, video_url, cover_url=None):
     if now_local().date().isoformat() != day:
         raise ValueError("La fecha programada no es la fecha local de hoy")
     if now_local() >= target_time(day) and not one_time_late_allowed(day):
         raise RuntimeError("La preparación empezó demasiado tarde; no publicar fuera de hora")
     if not video_url.startswith("https://"):
         raise ValueError("Instagram requiere una URL HTTPS pública")
+    if cover_url:
+        from urllib.parse import urlsplit
+        parsed = urlsplit(cover_url)
+        if (parsed.scheme != "https" or parsed.netloc != "fedry23.github.io"
+                or not parsed.path.startswith("/umbral-automation/reels/")
+                or not parsed.path.endswith(".jpg")):
+            raise ValueError("La portada debe ser un JPEG público de GitHub Pages")
     story, caption = read_story(day)
     previous = already_published(day)
     if previous:
@@ -119,9 +126,11 @@ def prepare(day, video_url):
         (OUT / "prepared.json").write_text(json.dumps(status))
         print("Un Reel del mismo día ya existe; omitiendo preparación")
         return
-    res = api("POST", f"{ACCOUNT}/media",
-              {"media_type": "REELS", "video_url": video_url,
-               "caption": full_caption(caption, day), "share_to_feed": "true"})
+    payload = {"media_type": "REELS", "video_url": video_url,
+               "caption": full_caption(caption, day), "share_to_feed": "true"}
+    if cover_url:
+        payload["cover_url"] = cover_url
+    res = api("POST", f"{ACCOUNT}/media", payload)
     container = res["id"]
     print("Contenedor creado, esperando procesado")
     # Meta can need several minutes; never publish unfinished media.
@@ -195,11 +204,12 @@ def main():
     parser.add_argument("command", choices=["prepare", "publish"])
     parser.add_argument("--date", required=True)
     parser.add_argument("--video-url")
+    parser.add_argument("--cover-url", help="JPEG 9:16 público de portada, si existe")
     args = parser.parse_args()
     if args.command == "prepare":
         if not args.video_url:
             parser.error("--video-url es obligatorio")
-        prepare(args.date, args.video_url)
+        prepare(args.date, args.video_url, cover_url=args.cover_url)
     else:
         publish(args.date)
 
