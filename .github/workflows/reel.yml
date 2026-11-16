@@ -6,7 +6,11 @@ on:
     - cron: '0 18 * * *'
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: umbral-publish
+  cancel-in-progress: false
 
 jobs:
   generar:
@@ -14,20 +18,19 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Instalar herramientas
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
           python -m pip install -r requirements.txt
-
       - name: Crear Reel
         run: python render.py
-
-      - name: Guardar video
+      - name: Guardar artefacto
         uses: actions/upload-artifact@v4
         with:
           name: umbral-reel
@@ -36,3 +39,40 @@ jobs:
             output/caption.txt
             output/story_used.json
           retention-days: 7
+      - name: Preparar vídeo público para Meta
+        if: ${{ vars.IG_PUBLISH_ENABLED == 'true' }}
+        run: |
+          mkdir -p docs
+          cp output/*.mp4 docs/reel.mp4
+          printf 'UMBRAL\n' > docs/index.html
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/reel.mp4 docs/index.html
+          git commit -m "Update Reel for Instagram" || true
+          git push
+      - name: Esperar vídeo público en GitHub Pages
+        if: ${{ vars.IG_PUBLISH_ENABLED == 'true' }}
+        env:
+          REEL_URL: https://fedry23.github.io/umbral-automation/reel.mp4
+        run: |
+          for i in $(seq 1 36); do
+            if curl -fsSL --max-time 20 "$REEL_URL" -o /tmp/reel.mp4 && cmp -s /tmp/reel.mp4 docs/reel.mp4; then
+              echo "Vídeo público actualizado"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "GitHub Pages no ha actualizado el vídeo" >&2
+          exit 1
+      - name: Publicar en Instagram
+        if: ${{ vars.IG_PUBLISH_ENABLED == 'true' }}
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_PUBLISH_DRY_RUN: "false"
+          REEL_VIDEO_URL: https://fedry23.github.io/umbral-automation/reel.mp4
+        run: |
+          test -n "$IG_USER_ID"
+          test -n "$IG_ACCESS_TOKEN"
+          export REEL_CAPTION="$(cat output/caption.txt)"
+          python publish_reel.py
