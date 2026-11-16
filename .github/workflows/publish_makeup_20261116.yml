@@ -1,0 +1,142 @@
+name: UMBRAL - Recuperación excepcional 16 Nov
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ops/makeup-20261116.txt'
+
+permissions:
+  contents: write
+  actions: read
+  pages: write
+
+concurrency:
+  group: umbral-instagram-21
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    # ÚNICA excepción solicitada: publicar el Reel del 2026-11-16 ahora.
+    # Mantiene el bloqueo manual global y no afecta a los siguientes días.
+    if: ${{ github.event_name == 'push' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      UMBRAL_ONE_TIME_LATE_DATE: '2026-11-16'
+    steps:
+      - name: Código y autorización
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar ffprobe
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+
+      - name: Comprobar credenciales sin mostrarlas
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$IG_ACCESS_TOKEN" ]; then
+            echo "::error::Falta GitHub Actions Secret IG_ACCESS_TOKEN; publicación no habilitada"
+            exit 1
+          fi
+
+      - name: Comprobar día, hora y duplicados
+        id: guard
+        shell: bash
+        run: |
+          DAY="$(TZ=Europe/Madrid date +%F)"
+          HHMM="$(TZ=Europe/Madrid date +%H%M)"
+          echo "date=$DAY" >> "$GITHUB_OUTPUT"
+          if [ -f "docs/published/$DAY.json" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "UMBRAL ya tiene recibo para $DAY, no duplicar"
+          elif [[ "$DAY" != "2026-11-16" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::error::Excepción caducada: no se puede publicar fuera del 16/11/2026"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "Recuperación puntual del 16/11/2026 autorizada por el propietario"
+          fi
+
+      - name: Recuperar y verificar Reel generado de madrugada
+        if: steps.guard.outputs.skip == 'false'
+        run: python scripts/stage_daily_reel.py
+
+      - name: Guardar la copia pública HTTPS de hoy
+        if: steps.guard.outputs.skip == 'false'
+        shell: bash
+        run: |
+          DAY="${{ steps.guard.outputs.date }}"
+          if [ -f staged/already_published ]; then exit 0; fi
+          mkdir -p docs/reels
+          cp "staged/umbral_${DAY//-/}.mp4" "docs/reels/$DAY.mp4"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "docs/reels/$DAY.mp4"
+          if ! git diff --cached --quiet; then
+            git commit -m "UMBRAL: preparar Reel original $DAY"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Solicitar explícitamente el despliegue de GitHub Pages
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          # Los pushes hechos por GITHUB_TOKEN no desencadenan Pages automáticamente.
+          # API oficial: POST /repos/{owner}/{repo}/pages/builds (pages:write)
+          gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
+          echo "Actualización de Pages solicitada para el vídeo del día"
+
+      - name: Verificar que GitHub Pages sirve exactamente el MP4 esperado
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          python scripts/wait_public_video.py
+
+      - name: Preparar el contenedor de Instagram para recuperación
+        if: steps.guard.outputs.skip == 'false'
+        shell: bash
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          python scripts/publish_daily.py prepare \
+            --date "${{ steps.guard.outputs.date }}" \
+            --video-url "$(cat staged/public_video_url.txt)"
+
+      - name: Publicar el Reel pendiente con la excepción autorizada
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          python scripts/publish_daily.py publish --date "${{ steps.guard.outputs.date }}"
+
+      - name: Registrar ID y fecha, evitando futuras publicaciones duplicadas
+        if: steps.guard.outputs.skip == 'false'
+        shell: bash
+        run: |
+          DAY="${{ steps.guard.outputs.date }}"
+          if [ ! -f staged/published.json ]; then exit 0; fi
+          mkdir -p docs/published
+          cp staged/published.json "docs/published/$DAY.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "docs/published/$DAY.json"
+          git commit -m "UMBRAL: publicación Instagram confirmada $DAY" || true
+          git pull --rebase origin main
+          git push origin HEAD:main
