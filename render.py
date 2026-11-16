@@ -171,7 +171,7 @@ def render():
     OUT.mkdir(exist_ok=True)
     started = time.monotonic()
     cues, duration = generate_voice(story['narration'], OUT)
-    from audio_engine import generate_ambient_score
+    from music_engine import generate_ambient_score
     generate_ambient_score(duration, cues, OUT, seed=7300 + date.toordinal() % 10000)
     voiced = time.monotonic()
     write_subtitles(cues, OUT / 'subtitles.ass')
