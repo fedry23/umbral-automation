@@ -142,10 +142,23 @@ def encode(out, images, duration, outfile):
         lines.extend([f"file '{image.name}'", f'duration {duration / len(images):.6f}'])
     lines.append(f"file '{images[-1].name}'")
     (out / 'scenes.txt').write_text('\n'.join(lines) + '\n')
+    # Movimiento lento de cámara Ken Burns y ambiente original sintetizado con FFmpeg.
+    # Sin bibliotecas de música, material de terceros ni servicios de pago.
+    vf = ("[0:v]scale=720:1280:force_original_aspect_ratio=increase,"
+          "crop=720:1280,setsar=1,fps=24,"
+          "zoompan=z='min(zoom+0.000055,1.08)':"
+          "x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
+          "d=1:s=720x1280:fps=24,ass=subtitles.ass[v]")
+    fade_at = max(0.0, duration - 2.5)
+    af = (f"[1:a]volume=0.97[voice];"
+          f"[2:a]volume=0.015,afade=t=in:st=0:d=2,"
+          f"afade=t=out:st={fade_at:.3f}:d=2[room];"
+          f"[voice][room]amix=inputs=2:duration=first:normalize=0[mixed]")
     run('ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-f', 'concat',
         '-safe', '1', '-i', 'scenes.txt', '-i', 'voice.wav',
-        '-vf', 'scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280,setsar=1,fps=24,ass=subtitles.ass',
-        '-map', '0:v:0', '-map', '1:a:0', '-t', f'{duration:.6f}',
+        '-f', 'lavfi', '-i', 'sine=frequency=62:sample_rate=24000',
+        '-filter_complex', vf + ';' + af,
+        '-map', '[v]', '-map', '[mixed]', '-t', f'{duration:.6f}',
         '-c:v', 'libx264', '-threads', '2', '-preset', 'veryfast', '-crf', '23',
         '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k',
         '-movflags', '+faststart', outfile.name, cwd=out)
@@ -170,8 +183,8 @@ def load_stories():
     for story in stories:
         if not 140 <= len(story['narration'].split()) <= 170:
             raise ValueError(f"Longitud incorrecta: {story['title']}")
-        if len(story['scenes']) < 3:
-            raise ValueError('Se requieren al menos tres escenas')
+        if not 3 <= len(story['scenes']) <= 8:
+            raise ValueError('Se requieren de tres a ocho escenas')
     return stories
 
 
