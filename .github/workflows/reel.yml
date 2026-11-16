@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   # Programación diaria preparada, desactivada hasta autorización expresa:
   schedule:
-    - cron: '17 17 * * *' # Generar antes de las 21:00 Europe/Madrid
+    - cron: '17 2 * * *' # Generar de madrugada, listo antes de las 21:00 Europe/Madrid
   pull_request:
     branches: [main]
 
