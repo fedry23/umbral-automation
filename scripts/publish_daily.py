@@ -33,6 +33,13 @@ def daily_marker(day):
     return "🩸 UMBRAL · " + day
 
 
+def one_time_late_allowed(day):
+    """Explicit owner-approved 16 Nov exception; no effect on future dates."""
+    return (os.getenv("UMBRAL_ONE_TIME_LATE_DATE") == "2026-11-16"
+            and day == "2026-11-16"
+            and now_local().date().isoformat() == "2026-11-16")
+
+
 def full_caption(text, day):
     text = text.strip()
     marker = daily_marker(day)
@@ -91,7 +98,7 @@ def read_story(day):
 def prepare(day, video_url):
     if now_local().date().isoformat() != day:
         raise ValueError("La fecha programada no es la fecha local de hoy")
-    if now_local() >= target_time(day):
+    if now_local() >= target_time(day) and not one_time_late_allowed(day):
         raise RuntimeError("La preparación empezó demasiado tarde; no publicar fuera de hora")
     if not video_url.startswith("https://"):
         raise ValueError("Instagram requiere una URL HTTPS pública")
@@ -108,8 +115,10 @@ def prepare(day, video_url):
     container = res["id"]
     print("Contenedor creado, esperando procesado")
     # Meta can need several minutes; never publish unfinished media.
-    deadline = min(target_time(day) - dt.timedelta(seconds=25),
-                   now_local() + dt.timedelta(minutes=35))
+    deadline = (now_local() + dt.timedelta(minutes=35)
+                if one_time_late_allowed(day)
+                else min(target_time(day) - dt.timedelta(seconds=25),
+                         now_local() + dt.timedelta(minutes=35)))
     while now_local() < deadline:
         status = api("GET", container, {"fields": "status_code,status"})
         code = status.get("status_code")
@@ -147,7 +156,8 @@ def publish(day):
         return
     if data["status"] != "prepared":
         raise ValueError("No existe contenedor terminado")
-    wait_until_target(day)
+    if not one_time_late_allowed(day):
+        wait_until_target(day)
     previous = already_published(day)
     if previous:
         print("Encontrado Reel del día en Instagram; no se duplica")
