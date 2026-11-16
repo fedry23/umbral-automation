@@ -1,0 +1,41 @@
+name: UMBRAL - Verificar Reel especial 16 Nov sin publicar
+
+on:
+  workflow_run:
+    workflows: ["UMBRAL - Generación para revisión"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validar:
+    if: ${{ github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == 'a6cdf4fc8e5188e1b2a9344afd14dc751b933e2c' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar FFprobe
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Verificar que la API permite recuperar el Reel original de hoy
+        run: |
+          python scripts/stage_daily_reel.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          story=json.loads(Path("staged/story_used.json").read_text())
+          assert story["date"]=="2026-11-16"
+          assert story["publish_date"]=="2026-11-16"
+          assert story["title"]=="La costura"
+          assert Path("staged/umbral_20261116.mp4").stat().st_size > 100000
+          print("REEL_ESPECIAL_VALIDADO: fecha, título, música, formato y artefacto correctos")
+          PY
