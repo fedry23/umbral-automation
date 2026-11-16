@@ -21,6 +21,22 @@ Las imágenes son generativas: los detalles y las caras pueden variar entre esce
 
 La composición incorpora un zoom de cámara muy suave y una banda sonora original de terror compuesta por código: drones graves, cuerdas oscuras, melodía inquietante de piano/caja de música, ruido ambiental y pulsos lejanos. La pista está normalizada para oírse en móviles, sin tapar la voz. La música baja automáticamente durante la voz y sube ligeramente en los silencios, sin música ajena, bancos de audio ni servicios de pago.
 
+## Episodios con intro, outro y miniatura de marca
+
+Cada nuevo Reel de UMBRAL tiene tres tramos visuales **independientes**:
+
+- **Intro:** pantalla de marca granate/rojo con un umbral luminoso, número del episodio (fijo) y título; narrador con voz ~3 semitonos más grave.
+- **Historia:** seis escenas AI originales del guion, con la **voz masculina habitual sin alterar**, subtítulos y música tétrica propia.
+- **Outro:** pantalla azul-negro con puerta entreabierta, el cierre **«Has cruzado el umbral. Y ahora... no mires atrás»** y voz grave, distinta de la historia y de la intro.
+
+El motor calcula los límites de audio exactos en `output/branding_timing.json` y ensambla `intro_card.png` + escenas + `outro_card.png` para que nunca aparezcan las ilustraciones del relato detrás de la intro o la outro.
+
+Cada Reel recibe `output/cover.jpg` **JPEG RGB de 1080×1920**, basada en una escena del propio episodio y sobreimpresa con UMBRAL, número y título en la zona central legible también en la cuadrícula del perfil. El publicador diario recupera la portada desde los artefactos, valida JPEG y tamaño, copia MP4 y JPEG a GitHub Pages, comprueba SHA-256 de ambos archivos y envía `cover_url` a Meta en el contenedor REELS antes de publicar. Si falta una portada válida o se rechaza el contenedor, el flujo falla explícitamente en lugar de publicar a ciegas.
+
+El generador hace un control final H.264, yuv420p, 9:16, 23–60 FPS y AAC a 48 kHz; el publicador conserva una reparación automática y segura de audio para material antiguo. No requiere API gráfica de pago ni imágenes ajenas.
+
+`quality_gate.yml` valida en GitHub Actions sintaxis, portada, tarjetas, voz, formatos y duplicados sin conectar a Meta ni publicar. Las publicaciones ya realizadas **no se modifican retroactivamente** por estos cambios.
+
 ## Generar
 
 En Ubuntu con Python 3.11:
