@@ -1,0 +1,143 @@
+name: UMBRAL - Publicación a las 21:00 (preparada)
+
+on:
+  # Dos lanzamientos con margen, antes de las 21:00 Europe/Madrid.
+  # La segunda llamada es respaldo: nunca publica si la primera ya lo hizo.
+  schedule:
+    - cron: '17 17 * * *'
+    - cron: '17 18 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+  pages: write
+
+concurrency:
+  group: umbral-instagram-21
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    # IMPORTANTE: no se activa hasta que Meta esté configurada con credenciales
+    # válidas en Actions y se haya desactivado la tarea antigua de ChatGPT.
+    if: ${{ vars.UMBRAL_META_PUBLISH_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Código y autorización
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar ffprobe
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+
+      - name: Comprobar credenciales sin mostrarlas
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$IG_ACCESS_TOKEN" ]; then
+            echo "::error::Falta GitHub Actions Secret IG_ACCESS_TOKEN; publicación no habilitada"
+            exit 1
+          fi
+
+      - name: Comprobar día, hora y duplicados
+        id: guard
+        shell: bash
+        run: |
+          DAY="$(TZ=Europe/Madrid date +%F)"
+          HHMM="$(TZ=Europe/Madrid date +%H%M)"
+          echo "date=$DAY" >> "$GITHUB_OUTPUT"
+          if [ -f "docs/published/$DAY.json" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "UMBRAL ya tiene recibo para $DAY, no duplicar"
+          elif [[ "$HHMM" > "2040" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::La ejecución empezó demasiado tarde para publicar puntualmente"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "Generación comprobable y publicación preparada antes de las 21:00"
+          fi
+
+      - name: Recuperar y verificar Reel generado de madrugada
+        if: steps.guard.outputs.skip == 'false'
+        run: python scripts/stage_daily_reel.py
+
+      - name: Guardar la copia pública HTTPS de hoy
+        if: steps.guard.outputs.skip == 'false'
+        shell: bash
+        run: |
+          DAY="${{ steps.guard.outputs.date }}"
+          if [ -f staged/already_published ]; then exit 0; fi
+          mkdir -p docs/reels
+          cp "staged/umbral_${DAY//-/}.mp4" "docs/reels/$DAY.mp4"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "docs/reels/$DAY.mp4"
+          if ! git diff --cached --quiet; then
+            git commit -m "UMBRAL: preparar Reel original $DAY"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Solicitar explícitamente el despliegue de GitHub Pages
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          # Los pushes hechos por GITHUB_TOKEN no desencadenan Pages automáticamente.
+          # API oficial: POST /repos/{owner}/{repo}/pages/builds (pages:write)
+          gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
+          echo "Actualización de Pages solicitada para el vídeo del día"
+
+      - name: Verificar que GitHub Pages sirve exactamente el MP4 esperado
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          python scripts/wait_public_video.py
+
+      - name: Preparar el contenedor de Instagram con tiempo
+        if: steps.guard.outputs.skip == 'false'
+        shell: bash
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          python scripts/publish_daily.py prepare \
+            --date "${{ steps.guard.outputs.date }}" \
+            --video-url "$(cat staged/public_video_url.txt)"
+
+      - name: Publicar exactamente a las 21:00 hora peninsular
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          python scripts/publish_daily.py publish --date "${{ steps.guard.outputs.date }}"
+
+      - name: Registrar ID y fecha, evitando futuras publicaciones duplicadas
+        if: steps.guard.outputs.skip == 'false'
+        shell: bash
+        run: |
+          DAY="${{ steps.guard.outputs.date }}"
+          if [ ! -f staged/published.json ]; then exit 0; fi
+          mkdir -p docs/published
+          cp staged/published.json "docs/published/$DAY.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "docs/published/$DAY.json"
+          git commit -m "UMBRAL: publicación Instagram confirmada $DAY" || true
+          git pull --rebase origin main
+          git push origin HEAD:main
