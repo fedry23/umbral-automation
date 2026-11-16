@@ -38,7 +38,7 @@ class BrandingTests(unittest.TestCase):
             self.assertEqual([c[2] for c in cues],
                              ['Intro', 'Relato original', 'Outro'])
             # Story starts after the lowered intro and 0.50 s pause.
-            start_story = int((cues[1][0] - 0.05) * sr)
+            start_story = round((cues[1][0] - 0.05) * sr)
             original = (0.2 * np.sin(2 * np.pi * 180 * np.arange(sr) / sr))
             self.assertLess(float(np.max(np.abs(audio[start_story:start_story+sr] - original))), 0.0002)
             def strongest_frequency(segment):
