@@ -66,6 +66,11 @@ jobs:
                               print("TOKEN_EXPIRACION: sin vencimiento declarado")
                           print("TOKEN_TIPO: " + str(kind))
                           print("PUBLISH_SCOPE_PRESENTE: " + str("instagram_content_publish" in perms))
+                          if "instagram_content_publish" not in perms:
+                              raise SystemExit("PUBLICACION_NO_AUTORIZADA: Falta scope instagram_content_publish")
+                          if expires and expires - datetime.now(timezone.utc).timestamp() < 10 * 86400:
+                              raise SystemExit("TOKEN_DEMASIADO_CORTO: Ampliar token antes de activar cron")
+                          print("TOKEN_VALIDO_PARA_AUTOMATIZACION: SÍ")
                       except urllib.error.HTTPError as e:
                           print("TOKEN_EXPIRACION_NO_CONSULTABLE: HTTP " + str(e.code))
                       except Exception:
@@ -98,6 +103,11 @@ jobs:
                               print("TOKEN_EXPIRACION: sin vencimiento declarado")
                           print("TOKEN_TIPO: " + str(kind))
                           print("PUBLISH_SCOPE_PRESENTE: " + str("instagram_content_publish" in perms))
+                          if "instagram_content_publish" not in perms:
+                              raise SystemExit("PUBLICACION_NO_AUTORIZADA: Falta scope instagram_content_publish")
+                          if expires and expires - datetime.now(timezone.utc).timestamp() < 10 * 86400:
+                              raise SystemExit("TOKEN_DEMASIADO_CORTO: Ampliar token antes de activar cron")
+                          print("TOKEN_VALIDO_PARA_AUTOMATIZACION: SÍ")
                       except urllib.error.HTTPError as e:
                           print("TOKEN_EXPIRACION_NO_CONSULTABLE: HTTP " + str(e.code))
                       except Exception:
