@@ -45,12 +45,22 @@ jobs:
               if data and str(data.get("username","")).casefold() == target:
                   print("CONEXION_OK: host=" + host + " cuenta=@" + target)
                   print("IDENTIFICADOR_IG_VERIFICADO: " + str(data.get("id","")))
-                  raise SystemExit(0)
+                  quota, quota_code = get(host, account + "/content_publishing_limit", "quota_usage")
+                  if quota_code == 200 and quota is not None:
+                      print("PERMISO_PUBLICACION_VERIFICADO: lectura de cuota permitida")
+                      raise SystemExit(0)
+                  print("PERMISO_PUBLICACION_NO_CONFIRMADO: código HTTP " + str(quota_code))
+                  raise SystemExit(2)
               me, code = get(host, "me", "id,username")
               if me and str(me.get("username","")).casefold() == target:
                   print("CONEXION_OK: host=" + host + " cuenta=@" + target)
                   print("IDENTIFICADOR_IG_VERIFICADO: " + str(me.get("id","")))
-                  raise SystemExit(0)
+                  quota, quota_code = get(host, str(me.get("id","")) + "/content_publishing_limit", "quota_usage")
+                  if quota_code == 200 and quota is not None:
+                      print("PERMISO_PUBLICACION_VERIFICADO: lectura de cuota permitida")
+                      raise SystemExit(0)
+                  print("PERMISO_PUBLICACION_NO_CONFIRMADO: código HTTP " + str(quota_code))
+                  raise SystemExit(2)
               results.append(host + "=" + str(status) + ",me=" + str(code))
           print("NO_VALIDADO: Token presente, pero no se pudo comprobar acceso a @umbral.terror. Resultados: " + " ; ".join(results))
           raise SystemExit(1)
