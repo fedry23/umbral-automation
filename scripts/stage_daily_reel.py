@@ -93,7 +93,7 @@ def validate_cover(path):
     if not (10_000 <= path.stat().st_size <= 8_000_000):
         raise ValueError('La portada JPEG no cumple el tamaño requerido')
     data = path.read_bytes()
-    if not (data.startswith(b'\\xff\\xd8') and data.endswith(b'\\xff\\xd9')):
+    if not (data.startswith(b'\xff\xd8') and data.endswith(b'\xff\xd9')):
         raise ValueError('Portada no es un JPEG válido')
     info = json.loads(subprocess.check_output(
         ['ffprobe', '-v', 'error', '-show_streams', '-of', 'json', str(path)],
