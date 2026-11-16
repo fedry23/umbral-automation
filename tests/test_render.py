@@ -60,6 +60,18 @@ class RenderTests(unittest.TestCase):
             self.assertAlmostEqual(duration, 3.3)
             self.assertTrue(all(c[1] == {'voice': 'em_alex', 'speed': 0.82} for c in calls))
 
+    def test_publication_stays_disabled(self):
+        import yaml
+        workflow = yaml.load((render.BASE / '.github/workflows/reel.yml').read_text(), Loader=yaml.BaseLoader)
+        self.assertNotIn('schedule', workflow['on'])
+        self.assertEqual(workflow['permissions']['contents'], 'read')
+        steps = workflow['jobs']['generar']['steps']
+        blocked = [step for step in steps if step.get('name') in {
+            'Preparar vídeo público para Meta', 'Esperar vídeo público en GitHub Pages', 'Publicar en Instagram'}]
+        self.assertEqual(len(blocked), 3)
+        self.assertTrue(all(step['if'] == '${{ false }}' for step in blocked))
+        self.assertTrue((render.BASE / 'publish_reel.py').is_file())
+
     def test_real_encoding(self):
         # Fixture técnica sin red; el workflow ejecuta después el render neuronal real.
         import numpy as np
