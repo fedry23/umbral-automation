@@ -1,413 +1,205 @@
 #!/usr/bin/env python3
-"""UMBRAL: generador de Reels de terror con Kokoro TTS."""
-
+"""Render local de UMBRAL. No contiene llamadas a redes sociales."""
 import datetime as dt
 import json
 import os
-import random
+from pathlib import Path
 import re
 import subprocess
-from pathlib import Path
-
-from PIL import Image, ImageDraw, ImageFont
+import time
 
 BASE = Path(__file__).resolve().parent
-OUT = BASE / "output"
+OUT = BASE / 'output'
 WIDTH, HEIGHT = 720, 1280
-
-DATE = dt.date.fromisoformat(
-    os.getenv(
-        "UMBRAL_DATE",
-        dt.datetime.now(dt.timezone.utc).date().isoformat()
-    )
-)
+RATE = 24000
 
 
 def run(*args, **kwargs):
-    subprocess.run(args, check=True, **kwargs)
+    subprocess.run([str(a) for a in args], check=True, **kwargs)
 
 
-def font(size, bold=False):
-    name = "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"
-    path = "/usr/share/fonts/truetype/dejavu/" + name
-    return ImageFont.truetype(path, size)
+def subtitle_lines(text):
+    from PIL import ImageFont
+    font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 38)
+    words = text.split()
+    if font.getlength(text) <= 550:
+        return [text]
+    options = [(' '.join(words[:i]), ' '.join(words[i:])) for i in range(1, len(words))]
+    if not options:
+        raise ValueError('Palabra demasiado larga para el subtítulo')
+    lines = min(options, key=lambda pair: max(font.getlength(line) for line in pair))
+    if max(font.getlength(line) for line in lines) > 550:
+        raise ValueError('Subtítulo demasiado largo')
+    return list(lines)
 
 
-def wrap_words(draw, phrase, fnt, max_width):
-    out = []
-    current = ""
-
-    for word in phrase.split():
-        candidate = (current + " " + word).strip()
-
-        if current and draw.textbbox(
-            (0, 0), candidate, font=fnt
-        )[2] > max_width:
-            out.append(current)
-            current = word
-        else:
-            current = candidate
-
-    if current:
-        out.append(current)
-
-    return out
-
-
-def blocks(text, count=5):
-    sentences = re.split(
-        r"(?<=[.!?…])\s+(?=[A-ZÁÉÍÓÚÜÑ«¿¡])",
-        text.strip()
-    )
-
-    groups = ["" for _ in range(count)]
-    total = sum(len(s.split()) for s in sentences)
-    i = 0
-    words = 0
-
-    for sentence in sentences:
-        if i < count - 1 and words >= (i + 1) * total / count:
-            i += 1
-
-        groups[i] = (groups[i] + " " + sentence).strip()
-        words += len(sentence.split())
-
-    return [g for g in groups if g]
+def phrases(text):
+    """Unidades cortas que caben en dos líneas, medidas con la fuente real."""
+    result = []
+    for sentence in re.split(r'(?<=[.!?…;,:])\s+', text.strip()):
+        current = []
+        for word in sentence.split():
+            candidate = ' '.join(current + [word])
+            try:
+                subtitle_lines(candidate)
+                fits = len(current) < 7
+            except ValueError:
+                fits = False
+            if current and not fits:
+                result.append(' '.join(current))
+                current = []
+            current.append(word)
+        if current:
+            result.append(' '.join(current))
+    return result
 
 
-def make_slide(text, index, date_tag, dest, intro=False):
-    rng = random.Random(
-        int(date_tag.replace("-", "")) * 100 + index
-    )
-
-    im = Image.new("RGB", (WIDTH, HEIGHT), "#06070a")
-    px = im.load()
-
-    glow_x = (500 + index * 37) % WIDTH
-    glow_y = 380 + (index % 3) * 140
-
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
-            d = (
-                ((x - glow_x) / 500) ** 2
-                + ((y - glow_y) / 570) ** 2
-            )
-
-            glow = max(0, 1 - d) ** 2
-            grain = rng.randint(-3, 3)
-
-            red = max(
-                0, min(255, int(7 + 61 * glow + grain))
-            )
-            green = max(
-                0, min(255, int(8 + 4 * glow + grain))
-            )
-            blue = max(
-                0, min(255, int(12 + 3 * glow + grain))
-            )
-
-            px[x, y] = (red, green, blue)
-
-    draw = ImageDraw.Draw(im)
-
-    draw.rectangle(
-        (45, 70, 52, 1210),
-        fill=(143, 19, 32)
-    )
-
-    draw.text(
-        (84, 96),
-        "U M B R A L",
-        font=font(31, True),
-        fill="#dc3449"
-    )
-
-    draw.text(
-        (85, 1182),
-        "@umbral.terror",
-        font=font(22),
-        fill="#8c8e97"
-    )
-
-    draw.text(
-        (594, 1182),
-        f"{index:02}",
-        font=font(22),
-        fill="#8c8e97"
-    )
-
-    max_width = 535
-    font_size = 58 if intro else 40
-
-    while True:
-        selected_font = font(font_size, bold=intro)
-        lines = []
-
-        for paragraph in text.split("\n"):
-            if paragraph:
-                lines.extend(
-                    wrap_words(
-                        draw,
-                        paragraph,
-                        selected_font,
-                        max_width
-                    )
-                )
-            else:
-                lines.append("")
-
-        line_height = int(font_size * 1.43)
-
-        if (
-            len(lines) * line_height < 720
-            and len(lines) <= (8 if intro else 15)
-        ) or font_size <= 26:
-            break
-
-        font_size -= 2
-
-    y = (HEIGHT - len(lines) * line_height) // 2
-
-    for line in lines:
-        draw.text(
-            (86, y),
-            line,
-            font=selected_font,
-            fill="#f2edf0"
-        )
-        y += line_height
-
-    im.save(dest, optimize=True)
-
-
-def generate_voice(text):
-    """Narrador masculino en español mediante Kokoro TTS."""
-
+def generate_voice(text, out):
+    import torch
+    torch.set_num_threads(min(4, os.cpu_count() or 1))
     import numpy as np
     import soundfile as sf
     from kokoro import KPipeline
+    speed = float(os.getenv('UMBRAL_SPEED', '0.86'))
+    if not 0.5 <= speed <= 1.2:
+        raise ValueError('UMBRAL_SPEED debe estar entre 0.5 y 1.2')
+    pipeline = KPipeline(lang_code='e', repo_id='hexgrad/Kokoro-82M', device='cpu')
+    parts, cues, cursor = [], [], 0
+    units = phrases(text)
+    for index, phrase in enumerate(units, 1):
+        chunks = [audio.cpu().numpy() for _, _, audio in pipeline(
+            phrase, voice='em_alex', speed=speed) if audio is not None]
+        if not chunks:
+            raise RuntimeError('Kokoro no ha generado audio')
+        audio = np.concatenate(chunks)
+        cues.append((cursor / RATE, (cursor + len(audio)) / RATE, phrase))
+        parts.append(audio)
+        cursor += len(audio)
+        pause = int(RATE * (0.65 if phrase[-1] in '.!?…' else
+                            0.3 if phrase[-1] in ',;:' else 0.06))
+        parts.append(np.zeros(pause, dtype=np.float32))
+        cursor += pause
+        print(f'Voz: {index}/{len(units)} fragmentos', flush=True)
+    sf.write(out / 'voice.wav', np.concatenate(parts), RATE)
+    return cues, cursor / RATE
 
-    voice = os.getenv("UMBRAL_VOICE", "em_alex")
 
-    if voice not in {"em_alex", "em_santa"}:
-        raise ValueError(
-            f"Voz Kokoro desconocida: {voice}"
-        )
+def ass_time(seconds):
+    ticks = round(seconds * 100)
+    return f'{ticks // 360000}:{ticks // 6000 % 60:02}:{ticks // 100 % 60:02}.{ticks % 100:02}'
 
-    pipeline = KPipeline(
-        lang_code="e",
-        repo_id="hexgrad/Kokoro-82M",
-        device="cpu"
-    )
 
-    audio_parts = []
+def write_subtitles(cues, dest):
+    header = '''[Script Info]
+ScriptType: v4.00+
+PlayResX: 720
+PlayResY: 1280
+WrapStyle: 0
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,DejaVu Sans,38,&H00FFFFFF,&H00FFFFFF,&H00101010,&H90000000,1,0,0,0,100,100,0,0,1,3,1,2,65,95,235,1
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+'''
+    events = []
+    for start, end, text in cues:
+        # No se permiten comandos ASS procedentes del relato.
+        text = text.replace('\\', '').replace('{', '').replace('}', '')
+        text = r'\N'.join(subtitle_lines(text))
+        events.append(f'Dialogue: 0,{ass_time(start)},{ass_time(end)},Default,,0,0,0,,{text}')
+    dest.write_text(header + '\n'.join(events) + '\n', encoding='utf-8')
 
-    for _, _, chunk in pipeline(
-        text,
-        voice=voice,
-        speed=1.0
-    ):
-        if chunk is not None:
-            audio_parts.append(chunk.cpu().numpy())
 
-            # Breve pausa entre fragmentos.
-            audio_parts.append(
-                np.zeros(2400, dtype=np.float32)
-            )
+def generate_images(story, out):
+    import torch
+    from diffusers import AutoPipelineForText2Image
+    torch.set_num_threads(min(4, os.cpu_count() or 1))
+    pipe = AutoPipelineForText2Image.from_pretrained(
+        'stabilityai/sd-turbo', torch_dtype=torch.float32)
+    pipe.enable_attention_slicing()
+    paths = []
+    for i, scene in enumerate(story['scenes']):
+        prompt = ('Cinematic realistic psychological horror film still, vertical composition, '
+                  '35mm photography, dim practical lighting, detailed environment, no lettering. ' + scene)
+        image = pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0.0,
+                     height=896, width=512,
+                     generator=torch.Generator('cpu').manual_seed(7300 + i)).images[0]
+        path = out / f'scene_{i:02}.png'
+        image.save(path)
+        print(f'Imagen: {i + 1}/{len(story["scenes"])}', flush=True)
+        paths.append(path)
+    return paths
 
-    if not audio_parts:
-        raise RuntimeError(
-            "Kokoro no ha generado audio"
-        )
 
-    voice_wav = OUT / "voice.wav"
+def encode(out, images, duration, outfile):
+    if not images:
+        raise ValueError('Se necesitan imágenes para renderizar')
+    # Rutas relativas controladas; subprocess nunca utiliza shell.
+    lines = []
+    for image in images:
+        if image.parent.resolve() != out.resolve() or "'" in image.name:
+            raise ValueError('Las escenas deben estar en output')
+        lines.extend([f"file '{image.name}'", f'duration {duration / len(images):.6f}'])
+    lines.append(f"file '{images[-1].name}'")
+    (out / 'scenes.txt').write_text('\n'.join(lines) + '\n')
+    run('ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-f', 'concat',
+        '-safe', '1', '-i', 'scenes.txt', '-i', 'voice.wav',
+        '-vf', 'scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280,setsar=1,fps=24,ass=subtitles.ass',
+        '-map', '0:v:0', '-map', '1:a:0', '-t', f'{duration:.6f}',
+        '-c:v', 'libx264', '-threads', '2', '-preset', 'veryfast', '-crf', '23',
+        '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k',
+        '-movflags', '+faststart', outfile.name, cwd=out)
+    validate_video(outfile, duration)
 
-    sf.write(
-        voice_wav,
-        np.concatenate(audio_parts),
-        24000
-    )
 
-    return voice_wav
+def validate_video(path, expected):
+    info = json.loads(subprocess.check_output([
+        'ffprobe', '-v', 'error', '-show_streams', '-show_format', '-of', 'json', str(path)]))
+    video = next(s for s in info['streams'] if s['codec_type'] == 'video')
+    audio = next(s for s in info['streams'] if s['codec_type'] == 'audio')
+    assert (video['width'], video['height']) == (WIDTH, HEIGHT)
+    assert video['codec_name'] == 'h264' and audio['codec_name'] == 'aac'
+    assert abs(float(info['format']['duration']) - expected) < 0.3
+    run('ffmpeg', '-v', 'error', '-i', path, '-f', 'null', '-')
+
+
+def load_stories():
+    stories = json.loads((BASE / 'stories.json').read_text(encoding='utf-8'))
+    if not stories:
+        raise ValueError('No hay relatos')
+    for story in stories:
+        if not 140 <= len(story['narration'].split()) <= 170:
+            raise ValueError(f"Longitud incorrecta: {story['title']}")
+        if len(story['scenes']) < 3:
+            raise ValueError('Se requieren al menos tres escenas')
+    return stories
 
 
 def render():
-    stories = json.loads(
-        (BASE / "stories.json").read_text(
-            encoding="utf-8"
-        )
-    )
-
-    if not stories:
-        raise RuntimeError(
-            "No hay relatos en stories.json"
-        )
-
-    start_date = dt.date(2026, 11, 15)
-
-    position = (
-        DATE - start_date
-    ).days % len(stories)
-
-    story = stories[position]
-
-    print(
-        f"Fecha: {DATE} | "
-        f"Relato {position + 1}/{len(stories)}: "
-        f"{story['title']}",
-        flush=True
-    )
-
+    date = dt.date.fromisoformat(os.getenv('UMBRAL_DATE', dt.datetime.now(dt.timezone.utc).date().isoformat()))
+    stories = load_stories()
+    daily = next((s for s in stories if s.get('publish_date') == date.isoformat()), None)
+    if os.getenv('UMBRAL_REQUIRE_DATED_STORY') == '1' and daily is None:
+        raise ValueError('Falta un relato original fechado para ' + date.isoformat())
+    story = daily if daily is not None else stories[(date - dt.date(2026, 11, 15)).days % len(stories)]
     OUT.mkdir(exist_ok=True)
-
-    # Generar voz neuronal local.
-    voice_wav = generate_voice(
-        story["narration"]
-    )
-
-    info = subprocess.check_output(
-        [
-            "ffprobe",
-            "-v", "error",
-            "-show_entries", "format=duration",
-            "-of",
-            "default=nokey=1:noprint_wrappers=1",
-            str(voice_wav)
-        ],
-        text=True
-    )
-
-    voice_length = float(info.strip())
-
-    body = blocks(
-        story["narration"],
-        count=5
-    )
-
-    page_texts = [
-        story["title"].upper()
-        + "\n\n"
-        + story["hook"]
-    ] + body
-
-    for i, page in enumerate(page_texts, 1):
-        make_slide(
-            page,
-            i,
-            DATE.isoformat(),
-            OUT / f"slide_{i:02}.png",
-            intro=(i == 1)
-        )
-
-    intro_len = 1.8
-    available = max(voice_length, 4)
-
-    total_words = max(
-        1,
-        sum(len(t.split()) for t in body)
-    )
-
-    lengths = [intro_len] + [
-        available * len(s.split()) / total_words
-        for s in body
-    ]
-
-    concat = []
-
-    for i, seconds in enumerate(lengths, 1):
-        concat.extend([
-            f"file 'slide_{i:02}.png'",
-            f"duration {seconds:.5f}"
-        ])
-
-    concat.append(
-        f"file 'slide_{len(page_texts):02}.png'"
-    )
-
-    (OUT / "slides.txt").write_text(
-        "\n".join(concat) + "\n",
-        encoding="utf-8"
-    )
-
-    outfile = OUT / (
-        "umbral_"
-        + DATE.strftime("%Y%m%d")
-        + ".mp4"
-    )
-
-    filter_graph = (
-        "[0:v]fps=24,scale=720:1280,"
-        "zoompan="
-        "z='min(zoom+0.00012,1.04)':"
-        "d=1:"
-        "x='iw/2-(iw/zoom/2)':"
-        "y='ih/2-(ih/zoom/2)':"
-        "s=720x1280:fps=24,"
-        "noise=alls=3:allf=t+u,"
-        "format=yuv420p[v];"
-        "[1:a]adelay=1800:all=1,"
-        "apad=pad_dur=0.4,"
-        "volume=1.05[voice];"
-        "[2:a]lowpass=f=230,"
-        "volume=0.05[wind];"
-        "[voice][wind]"
-        "amix=inputs=2:duration=first:"
-        "dropout_transition=0,"
-        "alimiter=limit=0.94[a]"
-    )
-
-    run(
-        "ffmpeg",
-        "-hide_banner",
-        "-loglevel", "error",
-        "-y",
-        "-safe", "0",
-        "-f", "concat",
-        "-i", str(OUT / "slides.txt"),
-        "-i", str(voice_wav),
-        "-f", "lavfi",
-        "-i",
-        "anoisesrc=color=brown:"
-        "amplitude=0.08:sample_rate=22050",
-        "-filter_complex", filter_graph,
-        "-map", "[v]",
-        "-map", "[a]",
-        "-r", "24",
-        "-c:v", "libx264",
-        "-preset", "veryfast",
-        "-crf", "25",
-        "-pix_fmt", "yuv420p",
-        "-c:a", "aac",
-        "-b:a", "128k",
-        "-movflags", "+faststart",
-        "-shortest",
-        str(outfile)
-    )
-
-    (OUT / "caption.txt").write_text(
-        story["caption"]
-        + "\n\n"
-        + "#UmbralTerror #RelatosDeTerror "
-        + "#MicroTerror #HistoriasDeMiedo "
-        + "#ReelsDeTerror\n",
-        encoding="utf-8"
-    )
-
-    (OUT / "story_used.json").write_text(
-        json.dumps(
-            {"date": DATE.isoformat(), **story},
-            ensure_ascii=False,
-            indent=2
-        ),
-        encoding="utf-8"
-    )
-
-    print(
-        f"Vídeo generado: {outfile.name} "
-        f"({voice_length:.1f}s de narración)",
-        flush=True
-    )
+    started = time.monotonic()
+    cues, duration = generate_voice(story['narration'], OUT)
+    voiced = time.monotonic()
+    write_subtitles(cues, OUT / 'subtitles.ass')
+    images = generate_images(story, OUT)
+    illustrated = time.monotonic()
+    outfile = OUT / f'umbral_{date:%Y%m%d}.mp4'
+    encode(OUT, images, duration, outfile)
+    timings = {'voice_seconds': voiced - started, 'images_seconds': illustrated - voiced,
+               'encoding_seconds': time.monotonic() - illustrated,
+               'total_seconds': time.monotonic() - started}
+    (OUT / 'timings.json').write_text(json.dumps(timings, indent=2))
+    print(json.dumps(timings), flush=True)
+    (OUT / 'story_used.json').write_text(json.dumps({'date': str(date), **story}, ensure_ascii=False, indent=2))
+    (OUT / 'caption.txt').write_text(story['caption'] + '\n#UmbralTerror #RelatosDeTerror\n', encoding='utf-8')
+    print(f'Vídeo verificado: {outfile} ({duration:.2f}s)')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     render()
