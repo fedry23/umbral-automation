@@ -50,11 +50,9 @@ cuotas gratuitas y a la configuración de facturación de la cuenta.
 
 ## Generación diaria y publicación segura
 
-`publish_reel.py` se conserva sin ejecutar. Los tres pasos de preparación pública,
-espera en Pages y publicación en Instagram tienen `if: ${{ false }}`. La generación diaria está programada en GitHub Actions a las 02:17 UTC para que el vídeo esté listo muchas horas antes de las 21:00 (Europe/Madrid). La publicación en GitHub Actions sigue bloqueada; un proceso aparte publicará usando la conexión Windsor.ai del propietario, si dispone del vídeo y relato correctos para ese mismo día. No se leen secretos de Meta durante la generación.
-El token del workflow solo tiene lectura y checkout no conserva credenciales.
+`reel.yml` genera los vídeos y nunca publica Instagram: sus tres antiguos pasos de preparación pública, Pages y publicación permanecen en `if: ${{ false }}`. Su cron sigue a las 02:17 UTC, y también admite un disparo de respaldo por `push` limitado a `ops/generate-kick.txt`. La publicación real se realiza mediante el workflow INDEPENDIENTE `publish_daily.yml` y la API oficial de Meta (véase abajo). No se leen secretos de Meta durante la generación. El token del workflow de generación solo tiene lectura y checkout no conserva credenciales.
 
-El relato del día siguiente se prepara por la tarde del día anterior. Los relatos destinados a la generación programada deben llevar `publish_date` con la fecha peninsular del día (`AAAA-MM-DD`) y el generador se detiene si falta el relato fechado. Se evita así publicar inadvertidamente una historia repetida. La programación diaria de GitHub solo genera el MP4 y sus artefactos: **nunca publica en Instagram**. La publicación se orquesta externamente mediante Windsor.ai/Dropbox a las 21:00 Europe/Madrid, con control de duplicados y verificación del artefacto. Cambiar `IG_PUBLISH_ENABLED` no activa publicación directa desde Actions.
+El relato del día siguiente se prepara por la tarde del día anterior. Los relatos destinados a la generación programada deben llevar `publish_date` con la fecha peninsular del día (`AAAA-MM-DD`) y el generador se detiene si falta el relato fechado. Se evita así publicar inadvertidamente una historia repetida. El workflow `reel.yml` genera el MP4 y sus artefactos: **nunca publica en Instagram**. `publish_daily.yml` lo recupera y publica mediante la API oficial de Meta a las 21:00 Europe/Madrid, comprobando fecha, formato, URL pública y duplicados. Cambiar `IG_PUBLISH_ENABLED` no activa publicación directa en el generador.
 
 
 ## Publicación puntual a las 21:00 (Meta API oficial)
@@ -119,3 +117,14 @@ configurados los permisos correspondientes.
   la publicación se detiene en lugar de salir tarde.
 
 La publicación directa heredada del generador `reel.yml` continúa bloqueada.
+
+## Respaldo contra omisiones del cron de GitHub (desde 16/11/2026)
+
+Los horarios `schedule` pueden retrasarse u omitirse. Para no depender de ellos como única vía, ambos workflows permiten un disparo `push` limitado a su propio archivo `ops/*-kick.txt` en `main`:
+
+- `reel.yml`: `ops/generate-kick.txt` (no publica en Instagram).
+- `publish_daily.yml`: `ops/publish-kick.txt` (prepara el contenedor y espera hasta las 21:00 locales; nunca publica tarde).
+
+La automatización ChatGPT existente **UMBRAL · Respaldos y verificación** comprueba a las **06:20** si falta la generación del día, a las **18:20** si falta el arranque del publicador y a las **21:20** si consta un recibo de publicación (siempre hora Europe/Madrid). Solo modifica el archivo disparador correspondiente cuando faltan sus requisitos. No se deben activar publicaciones alternativas ni repetir Reels a ciegas. El recibo `docs/published/AAAA-MM-DD.json` y la consulta a Instagram son la protección contra duplicados.
+
+El 16/11/2026 se verificó con un push de prueba que `publish_daily.yml` arranca y respeta la guarda que impide publicar después de las 20:40 si no estaba preparado. También se comprobó el arranque del generador por push; la ejecución completa y la primera publicación autónoma deben seguir validándose a partir de sus runs y recibos reales.
