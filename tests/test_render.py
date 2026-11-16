@@ -60,6 +60,12 @@ class RenderTests(unittest.TestCase):
             self.assertAlmostEqual(duration, 3.3)
             self.assertTrue(all(c[1] == {'voice': 'em_alex', 'speed': 0.82} for c in calls))
 
+    def test_new_reels_have_six_scenes(self):
+        stories = render.load_stories()
+        dated = [s for s in stories if s.get('publish_date') == '2026-11-17']
+        self.assertEqual(len(dated), 1)
+        self.assertEqual(len(dated[0]['scenes']), 6)
+
     def test_publication_stays_disabled(self):
         import yaml
         workflow = yaml.load((render.BASE / '.github/workflows/reel.yml').read_text(), Loader=yaml.BaseLoader)
