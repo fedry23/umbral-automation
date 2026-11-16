@@ -55,3 +55,53 @@ espera en Pages y publicación en Instagram tienen `if: ${{ false }}`. La genera
 El token del workflow solo tiene lectura y checkout no conserva credenciales.
 
 El relato del día siguiente se prepara por la tarde del día anterior. Los relatos destinados a la generación programada deben llevar `publish_date` con la fecha peninsular del día (`AAAA-MM-DD`) y el generador se detiene si falta el relato fechado. Se evita así publicar inadvertidamente una historia repetida. La programación diaria de GitHub solo genera el MP4 y sus artefactos: **nunca publica en Instagram**. La publicación se orquesta externamente mediante Windsor.ai/Dropbox a las 21:00 Europe/Madrid, con control de duplicados y verificación del artefacto. Cambiar `IG_PUBLISH_ENABLED` no activa publicación directa desde Actions.
+
+
+## Publicación puntual a las 21:00 (Meta API oficial)
+
+El generador nocturno del Reel está programado a las **02:17 UTC**, con mucha
+antelación. La publicación autónoma va en el workflow independiente
+`.github/workflows/publish_daily.yml` y se activa solo cuando estén
+configurados los permisos correspondientes.
+
+- Preparación: 17:17 UTC, con respaldo a las 18:17 UTC. Se lanza **antes**
+  de las 21:00 tanto en invierno como en verano. Los dos lanzamientos
+  comparten bloqueo y un registro de publicación; no deben duplicar Reels.
+- El workflow verifica un Reel generado hoy, la fecha del relato, el archivo
+  H.264/AAC, los subtítulos y la música de fondo original. No utiliza
+  vídeos de ayer ni historias sin fecha.
+- Publica un MP4 **con nombre único por día** en GitHub Pages para que Meta
+  lo descargue. Comprueba que la URL sirve exactamente el archivo generado
+  (SHA-256), crea el contenedor con tiempo, espera el estado FINISHED y
+  lanza la orden de publicación al llegar a las **21:00 Europe/Madrid**.
+- Consulta los Reels recientes mediante Instagram Graph API, adjunta una
+  marca de fecha única al pie de foto y guarda recibo en
+  `docs/published/AAAA-MM-DD.json`. Nunca reintenta a ciegas una
+  publicación ambigua. Si se supera la ventana puntual, aborta y avisa;
+  no publica un Reel tarde.
+- Se necesita la **API oficial de Instagram** y un token válido autorizado
+  para publicar en @umbral.terror. No se usa un navegador ni un servicio
+  de pago para publicar.
+
+### Activación segura (pendiente de completar)
+
+1. En el repositorio GitHub, abre **Settings → Secrets and variables → Actions**.
+   Guarda **IG_ACCESS_TOKEN** como *Repository secret*, nunca en un archivo
+   del repositorio ni pegándolo en una conversación. Debe ser un token de acceso
+   válido de Meta con permisos para publicar Reels en la cuenta vinculada
+   (Instagram/Facebook Login con los permisos correspondientes).
+2. En **Variables** crea **UMBRAL_META_PUBLISH_ENABLED** con valor `true`.
+   Hasta entonces el flujo está preparado, pero se **omite**: no hay tokens
+   ni autorización implícitos.
+3. Antes de la primera publicación real verifica la conexión a Meta y la
+   generación nocturna con un día fechado. Cuando la prueba oficial funcione,
+   **desactiva la tarea antigua «UMBRAL · Publicar Reel diario» de ChatGPT**;
+   de otro modo ambos sistemas podrían intentar publicar el mismo día.
+4. Verifica el primer Reel a las 21:00 y el recibo de ese día. El programa
+   tolera horarios de verano/invierno y hace dos intentos de arranque.
+   No se puede garantizar precisión absoluta al segundo: GitHub puede retrasar
+   o descartar un cron y Meta puede tardar en mostrar el Reel. La publicación
+   preparada con antelación reduce mucho esos riesgos.
+
+La publicación directa heredada del generador `reel.yml` continúa bloqueada.
+Solo `publish_daily.yml` publica cuando su variable de activación se habilita.
