@@ -1,0 +1,1 @@
+2026-11-16 | prueba de activación del respaldo después de las 21:00 Europe/Madrid. La protección de horario debe impedir publicar.
