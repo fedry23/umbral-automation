@@ -1,9 +1,12 @@
 # UMBRAL
 
 Generación gratuita en CPU de vídeo vertical 720×1280 con voz masculina española
-Kokoro `em_alex`, velocidad 0,86, pausas y subtítulos quemados. Cada subtítulo
-se sintetiza por separado: sus tiempos se calculan a partir de las muestras de
-ese mismo audio, incluidas las pausas; no se estiman por número de palabras.
+Kokoro `em_alex`, velocidad 1,08, frases completas y subtítulos quemados. La voz
+se sintetiza por frases enteras y conserva su prosodia: no se corta en cada
+subtítulo, no introduce pausas arbitrarias y solo hay pausas breves al final
+de las frases. Los subtítulos se distribuyen por duración de voz y longitud
+de texto con detección de silencio; son estimaciones, no alineación fonética
+exacta. Conviene revisar visualmente el resultado.
 Se muestran como máximo dos líneas breves, con contorno y margen inferior de
 235 px para dejar espacio a los controles. Los subtítulos ocupan una zona reducida;
 conviene revisar visualmente cada vídeo antes de usarlo.
@@ -16,7 +19,7 @@ falla explícitamente en vez de sustituir las escenas por tarjetas de texto.
 Revisar las condiciones de licencia de los modelos antes de distribuir contenido.
 Las imágenes son generativas: los detalles y las caras pueden variar entre escenas.
 
-La composición incorpora un zoom de cámara muy suave y una nota ambiental original y tenue sintetizada por FFmpeg, sin música ajena ni servicios de pago.
+La composición incorpora un zoom de cámara muy suave y una banda sonora original de terror compuesta por código: drones graves, armonías disonantes, ruido ambiental y pulsos lejanos. La música baja automáticamente durante la voz y sube ligeramente en los silencios, sin música ajena, bancos de audio ni servicios de pago.
 
 ## Generar
 
@@ -31,13 +34,13 @@ python render.py
 ```
 
 `UMBRAL_DATE=2026-11-15` selecciona de forma reproducible el primer relato.
-`UMBRAL_SPEED` permite cambiar el ritmo (predeterminado 0,86).
+`UMBRAL_SPEED` permite cambiar el ritmo (predeterminado 1,08).
 Los tres relatos nuevos tienen 140–170 palabras; los veinte anteriores se
 conservan íntegros en `stories.archive.json` para revisión y futuras ampliaciones.
 Los relatos nuevos admiten seis descripciones de escenas para mayor dinamismo; los anteriores conservan cuatro.
 
 El workflow valida un MP4 real en cada PR y admite ejecución manual. Su artefacto
-incluye MP4 H.264/AAC, voz, imágenes, subtítulos ASS, relato y descripción.
+incluye MP4 H.264/AAC, voz, música original, imágenes, subtítulos ASS, relato y descripción.
 La comprobación usa ffprobe (dimensiones, pistas y duración) y decodifica el vídeo
 completo con FFmpeg. La prueba unitaria de codificación usa imágenes y tono de
 prueba; el paso posterior ejecuta los modelos reales sin esas sustituciones.

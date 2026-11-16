@@ -35,7 +35,7 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Crear Reel
         env:
-          UMBRAL_SPEED: '0.86'
+          UMBRAL_SPEED: '1.08'
           UMBRAL_REQUIRE_DATED_STORY: ${{ github.event_name == 'schedule' && '1' || '0' }}
         run: /usr/bin/time -v python -u render.py
       - name: Guardar artefacto
@@ -48,6 +48,7 @@ jobs:
             output/subtitles.ass
             output/scene_*.png
             output/voice.wav
+            output/music.wav
             output/caption.txt
             output/story_used.json
           retention-days: 7

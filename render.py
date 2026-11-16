@@ -55,33 +55,8 @@ def phrases(text):
 
 
 def generate_voice(text, out):
-    import torch
-    torch.set_num_threads(min(4, os.cpu_count() or 1))
-    import numpy as np
-    import soundfile as sf
-    from kokoro import KPipeline
-    speed = float(os.getenv('UMBRAL_SPEED', '0.86'))
-    if not 0.5 <= speed <= 1.2:
-        raise ValueError('UMBRAL_SPEED debe estar entre 0.5 y 1.2')
-    pipeline = KPipeline(lang_code='e', repo_id='hexgrad/Kokoro-82M', device='cpu')
-    parts, cues, cursor = [], [], 0
-    units = phrases(text)
-    for index, phrase in enumerate(units, 1):
-        chunks = [audio.cpu().numpy() for _, _, audio in pipeline(
-            phrase, voice='em_alex', speed=speed) if audio is not None]
-        if not chunks:
-            raise RuntimeError('Kokoro no ha generado audio')
-        audio = np.concatenate(chunks)
-        cues.append((cursor / RATE, (cursor + len(audio)) / RATE, phrase))
-        parts.append(audio)
-        cursor += len(audio)
-        pause = int(RATE * (0.65 if phrase[-1] in '.!?…' else
-                            0.3 if phrase[-1] in ',;:' else 0.06))
-        parts.append(np.zeros(pause, dtype=np.float32))
-        cursor += pause
-        print(f'Voz: {index}/{len(units)} fragmentos', flush=True)
-    sf.write(out / 'voice.wav', np.concatenate(parts), RATE)
-    return cues, cursor / RATE
+    from audio_engine import generate_narration
+    return generate_narration(text, out, phrases)
 
 
 def ass_time(seconds):
@@ -149,14 +124,12 @@ def encode(out, images, duration, outfile):
           "zoompan=z='min(zoom+0.000055,1.08)':"
           "x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
           "d=1:s=720x1280:fps=24,ass=subtitles.ass[v]")
-    fade_at = max(0.0, duration - 2.5)
-    af = (f"[1:a]volume=0.97[voice];"
-          f"[2:a]volume=0.015,afade=t=in:st=0:d=2,"
-          f"afade=t=out:st={fade_at:.3f}:d=2[room];"
-          f"[voice][room]amix=inputs=2:duration=first:normalize=0[mixed]")
+    af = ("[1:a]volume=1[voice];[2:a]volume=1[music];"
+          "[voice][music]amix=inputs=2:duration=first:normalize=0,"
+          "alimiter=limit=0.92[mixed]")
     run('ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-f', 'concat',
         '-safe', '1', '-i', 'scenes.txt', '-i', 'voice.wav',
-        '-f', 'lavfi', '-i', 'sine=frequency=62:sample_rate=24000',
+        '-i', 'music.wav',
         '-filter_complex', vf + ';' + af,
         '-map', '[v]', '-map', '[mixed]', '-t', f'{duration:.6f}',
         '-c:v', 'libx264', '-threads', '2', '-preset', 'veryfast', '-crf', '23',
@@ -198,6 +171,8 @@ def render():
     OUT.mkdir(exist_ok=True)
     started = time.monotonic()
     cues, duration = generate_voice(story['narration'], OUT)
+    from audio_engine import generate_ambient_score
+    generate_ambient_score(duration, cues, OUT, seed=7300 + date.toordinal() % 10000)
     voiced = time.monotonic()
     write_subtitles(cues, OUT / 'subtitles.ass')
     images = generate_images(story, OUT)
