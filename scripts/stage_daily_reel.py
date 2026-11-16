@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import subprocess
 import urllib.request
+import urllib.parse
 import zipfile
 from zoneinfo import ZoneInfo
 
@@ -19,6 +20,18 @@ def local_day(now=None):
     return (now or dt.datetime.now(ZoneInfo("Europe/Madrid"))).date().isoformat()
 
 
+class SafeRedirect(urllib.request.HTTPRedirectHandler):
+    """Never forward our GitHub Actions token to artifact CDN redirects."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        new_req = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if (new_req is not None
+                and urllib.parse.urlsplit(req.full_url).netloc
+                != urllib.parse.urlsplit(newurl).netloc):
+            new_req.remove_header("Authorization")
+        return new_req
+
+
 def github_get(path, binary=False):
     token = os.getenv("GITHUB_TOKEN")
     if not token:
@@ -29,7 +42,7 @@ def github_get(path, binary=False):
                  "Accept": "application/vnd.github+json",
                  "X-GitHub-Api-Version": "2022-11-28",
                  "User-Agent": "UMBRAL-daily-publisher"})
-    with urllib.request.urlopen(req, timeout=65) as res:
+    with urllib.request.build_opener(SafeRedirect()).open(req, timeout=65) as res:
         data = res.read()
     return data if binary else json.loads(data)
 
