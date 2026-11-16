@@ -1,4 +1,5 @@
 name: UMBRAL - Comprobar token Meta sin publicar
+# Validación manual tras renovar el token (sin publicación)
 
 on:
   push:
