@@ -124,6 +124,18 @@ jobs:
           if [ -f staged/already_published ]; then exit 0; fi
           python scripts/wait_public_video.py
 
+      - name: Confirmar La pecera por API sin modificarla
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          python - <<'PYCODE'
+          from scripts.publish_daily import api
+          m=api('GET','18120436877062076',{'fields':'id,permalink,media_product_type'})
+          assert m.get('media_product_type') == 'REELS'
+          print('LA_PECERA_VERIFICADA:',m['id'],m['permalink'])
+          PYCODE
+
       - name: Preparar el contenedor de Instagram con tiempo
         if: steps.guard.outputs.skip == 'false'
         shell: bash
