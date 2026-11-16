@@ -83,25 +83,39 @@ configurados los permisos correspondientes.
   para publicar en @umbral.terror. No se usa un navegador ni un servicio
   de pago para publicar.
 
-### Activación segura (pendiente de completar)
+### Estado operativo desde el 16/11/2026
 
-1. En el repositorio GitHub, abre **Settings → Secrets and variables → Actions**.
-   Guarda **IG_ACCESS_TOKEN** como *Repository secret*, nunca en un archivo
-   del repositorio ni pegándolo en una conversación. Debe ser un token de acceso
-   válido de Meta con permisos para publicar Reels en la cuenta vinculada
-   (Instagram/Facebook Login con los permisos correspondientes).
-2. En **Variables** crea **UMBRAL_META_PUBLISH_ENABLED** con valor `true`.
-   Hasta entonces el flujo está preparado, pero se **omite**: no hay tokens
-   ni autorización implícitos.
-3. Antes de la primera publicación real verifica la conexión a Meta y la
-   generación nocturna con un día fechado. Cuando la prueba oficial funcione,
-   **desactiva la tarea antigua «UMBRAL · Publicar Reel diario» de ChatGPT**;
-   de otro modo ambos sistemas podrían intentar publicar el mismo día.
-4. Verifica el primer Reel a las 21:00 y el recibo de ese día. El programa
-   tolera horarios de verano/invierno y hace dos intentos de arranque.
-   No se puede garantizar precisión absoluta al segundo: GitHub puede retrasar
-   o descartar un cron y Meta puede tardar en mostrar el Reel. La publicación
-   preparada con antelación reduce mucho esos riesgos.
+- **IG_ACCESS_TOKEN** está guardado en GitHub Actions Secrets. La prueba oficial
+  de solo lectura confirmó @umbral.terror, acceso a la cuota de publicación,
+  permiso `instagram_content_publish` y fecha de caducidad del token
+  **15/01/2027** (UTC). No se guarda el valor del token en este repositorio.
+- **La tarea anterior «UMBRAL · Publicar Reel diario» de ChatGPT está desactivada.**
+- **Publicación oficial activada:** el workflow `publish_daily.yml` solo actúa
+  en eventos programados; genera una única publicación diaria a las
+  **21:00 Europe/Madrid**, si pasa todas las validaciones.
+- **Parada de emergencia:** configura la variable de Actions
+  `UMBRAL_META_PUBLISH_ENABLED` al valor `false`. Si no está definida,
+  el sistema permanece activo. También puedes deshabilitar el workflow desde
+  la pestaña Actions de GitHub.
+- **No publicar vídeos de prueba:** la ruta `workflow_dispatch` no autoriza
+  publicaciones y la generación `reel.yml` mantiene sus pasos directos
+  de Instagram bloqueados.
+- La primera publicación 100 % desatendida aún debe **verificarse**: el token
+  pasó validación de lectura, pero no se ha probado un POST autónomo completo.
+
+### Mantenimiento y precauciones
+
+- El nuevo token de Meta caduca el **15 de enero de 2027**. Renovarlo con
+  antelación, actualizar el Secret de GitHub y ejecutar la validación de solo
+  lectura. Sin renovación, los Reels dejarían de publicarse.
+- Después de las 21:20 Europe/Madrid, la tarea ChatGPT de **verificación**,
+  que no publica nada, comprueba el resultado y puede avisar de fallos.
+- Antes de publicar, el workflow comprueba fecha del relato, formato de vídeo,
+  música, identidad del archivo servido por Pages, procesamiento de Meta,
+  y posibles duplicados mediante el registro y los medios de Instagram.
+- No se puede garantizar precisión absoluta al segundo: GitHub puede
+  retrasar o descartar ejecuciones cron y Meta puede tardar en mostrar el Reel.
+  La preparación anticipada reduce el riesgo. Si no está listo a tiempo,
+  la publicación se detiene en lugar de salir tarde.
 
 La publicación directa heredada del generador `reel.yml` continúa bloqueada.
-Solo `publish_daily.yml` publica cuando su variable de activación se habilita.
