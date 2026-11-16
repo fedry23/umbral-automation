@@ -70,7 +70,6 @@
   {
     "title": "La pecera",
     "episode_number": 4,
-    "publish_date": "2026-11-16",
     "hook": "Los golpes llegaron desde el otro lado de la ventana. Vivo en un sexto piso.",
     "narration": "El lunes encontré la pecera vacía. Mi pez había desaparecido, aunque la tapa seguía cerrada y no había una gota de agua en el suelo. Esa noche alguien dio tres golpes en la ventana de mi dormitorio. Vivo en un sexto piso. Sobre el cristal quedó una marca redonda, como la de una boca intentando respirar. A la mañana siguiente, el agua estaba turbia y había una llave diminuta entre las piedras. Probé la llave en el armario donde guardaba la comida del pez. Encajó. Dentro había agua salada hasta el techo, pero no se derramó cuando abrí. Al fondo flotaba una silla idéntica a la mía. Encima descansaba una nota escrita con mi letra: «Si vuelven a llamar, no abras». Cerré el armario y oí un chapoteo detrás de mí. La pecera estaba llena otra vez. Dentro nadaba un pez con mi cara. Desde la ventana llegaron tres golpes. Esta vez, sonaron desde dentro.",
     "caption": "Una pecera vacía. Tres golpes en la ventana. Y alguien que quiere salir. 🐟",
@@ -81,6 +80,7 @@
       "An ordinary wooden food-cabinet door in a small Spanish apartment opening impossibly into a flooded underwater space that does not spill, small office chair floating deep inside, eerie volumetric light through water, photorealistic psychological horror, vertical frame 9:16 no words.",
       "POV facing an old paper note on a floating chair in a flooded cupboard, illegible abstract marks on paper, dread and disorientation, aquarium glass reflections, cinematic dark lighting, vertical 9:16 no readable text or letters.",
       "Close-up of a small aquarium fish with subtly uncanny humanlike facial features swimming toward the glass, living room window behind it marked by three wet finger impressions on its inner side, eerie red and blue cinematic horror lighting, ultra-realistic vertical 9:16, no text."
-    ]
+    ],
+    "test_date": "2026-11-16"
   }
 ]
