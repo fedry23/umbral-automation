@@ -33,32 +33,44 @@ class RenderTests(unittest.TestCase):
             self.assertNotIn('{\\b1}', text)
             self.assertEqual(text.count('Dialogue:'), 2)
 
-    def test_voice_timing_and_speed(self):
+    def test_narration_uses_complete_sentences_not_caption_chunks(self):
         import numpy as np
         import soundfile as sf
         import torch
+        from audio_engine import generate_ambient_score, speech_units
         calls = []
 
         class Pipeline:
             def __init__(self, **kwargs):
-                self.settings = kwargs
+                pass
 
             def __call__(self, text, **kwargs):
                 calls.append((text, kwargs))
-                yield text, None, torch.zeros(24000)
+                yield text, None, torch.ones(24000) * 0.04
 
+        text = ('Una puerta apareció en el pasillo y nadie supo explicar por qué estaba allí. '
+                'Alguien empezó a llamar desde el otro lado.')
+        self.assertEqual(len(speech_units(text)), 2)
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp)
             with patch.dict(sys.modules, {'kokoro': types.SimpleNamespace(KPipeline=Pipeline)}):
-                with patch.dict('os.environ', {'UMBRAL_SPEED': '0.82'}):
-                    cues, duration = render.generate_voice('La puerta crujió. Nadie contestó.', out)
+                with patch.dict('os.environ', {'UMBRAL_SPEED': '1.08'}):
+                    cues, duration = render.generate_voice(text, out)
             audio, rate = sf.read(out / 'voice.wav')
             self.assertEqual(rate, 24000)
-            self.assertEqual(cues[0], (0.0, 1.0, 'La puerta crujió.'))
-            self.assertEqual(cues[1], (1.65, 2.65, 'Nadie contestó.'))
-            self.assertAlmostEqual(duration, len(audio) / rate)
-            self.assertAlmostEqual(duration, 3.3)
-            self.assertTrue(all(c[1] == {'voice': 'em_alex', 'speed': 0.82} for c in calls))
+            self.assertEqual(len(calls), 2)  # 2 sentences, not every 7 caption words
+            self.assertTrue(all(s == {'voice': 'em_alex', 'speed': 1.08} for _, s in calls))
+            self.assertEqual(' '.join(c[2] for c in cues), text)
+            self.assertAlmostEqual(duration, 2.6, places=2)
+            self.assertTrue(all(0 <= a < b <= duration for a, b, _ in cues))
+            self.assertTrue(all(cues[i][1] <= cues[i+1][0] for i in range(len(cues)-1)))
+            generate_ambient_score(duration, cues, out)
+            music, music_rate = sf.read(out / 'music.wav')
+            self.assertEqual(music_rate, 24000)
+            self.assertEqual(len(audio), len(music))
+            self.assertGreater(float(np.max(abs(music))), 0.002)
+            self.assertLess(float(np.max(abs(music))), 0.09)
+
 
     def test_new_reels_have_six_scenes(self):
         stories = render.load_stories()
@@ -97,6 +109,8 @@ class RenderTests(unittest.TestCase):
                 samples = (np.sin(np.arange(72000) * 2 * np.pi * 180 / 24000) * 4000).astype('<i2')
                 f.writeframes(samples.tobytes())
             render.write_subtitles([(0, 1, 'La puerta se abrió.'), (1.3, 2.8, 'Nadie respondió.')], out / 'subtitles.ass')
+            from audio_engine import generate_ambient_score
+            generate_ambient_score(3, [(0.1, 2.4, 'Prueba de voz')], out)
             render.encode(out, paths, 3, out / 'test.mp4')
             self.assertGreater((out / 'test.mp4').stat().st_size, 10000)
 
