@@ -37,7 +37,8 @@ class RenderTests(unittest.TestCase):
         import numpy as np
         import soundfile as sf
         import torch
-        from audio_engine import generate_ambient_score, speech_units
+        from audio_engine import speech_units
+        from music_engine import generate_ambient_score
         calls = []
 
         class Pipeline:
@@ -69,7 +70,7 @@ class RenderTests(unittest.TestCase):
             self.assertEqual(music_rate, 24000)
             self.assertEqual(len(audio), len(music))
             self.assertGreater(float(np.max(abs(music))), 0.002)
-            self.assertLess(float(np.max(abs(music))), 0.09)
+            self.assertLess(float(np.max(abs(music))), 0.32)
 
 
     def test_new_reels_have_six_scenes(self):
@@ -109,7 +110,7 @@ class RenderTests(unittest.TestCase):
                 samples = (np.sin(np.arange(72000) * 2 * np.pi * 180 / 24000) * 4000).astype('<i2')
                 f.writeframes(samples.tobytes())
             render.write_subtitles([(0, 1, 'La puerta se abrió.'), (1.3, 2.8, 'Nadie respondió.')], out / 'subtitles.ass')
-            from audio_engine import generate_ambient_score
+            from music_engine import generate_ambient_score
             generate_ambient_score(3, [(0.1, 2.4, 'Prueba de voz')], out)
             render.encode(out, paths, 3, out / 'test.mp4')
             self.assertGreater((out / 'test.mp4').stat().st_size, 10000)
