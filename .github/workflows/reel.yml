@@ -54,6 +54,10 @@ jobs:
             output/scene_*.png
             output/voice.wav
             output/music.wav
+            output/branding_timing.json
+            output/intro_card.png
+            output/outro_card.png
+            output/cover.jpg
             output/caption.txt
             output/story_used.json
           retention-days: 7
