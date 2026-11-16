@@ -71,7 +71,7 @@ configurados los permisos correspondientes.
   H.264/AAC, los subtítulos y la música de fondo original. No utiliza
   vídeos de ayer ni historias sin fecha.
 - Publica un MP4 **con nombre único por día** en GitHub Pages para que Meta
-  lo descargue. Comprueba que la URL sirve exactamente el archivo generado
+  lo descargue. Solicita explícitamente un build de GitHub Pages (los pushes con GITHUB_TOKEN no lanzan builds automáticos) y comprueba que la URL sirve exactamente el archivo generado
   (SHA-256), crea el contenedor con tiempo, espera el estado FINISHED y
   lanza la orden de publicación al llegar a las **21:00 Europe/Madrid**.
 - Consulta los Reels recientes mediante Instagram Graph API, adjunta una
