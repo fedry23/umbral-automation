@@ -25,7 +25,6 @@ jobs:
     timeout-minutes: 240
     env:
       GITHUB_TOKEN: ${{ github.token }}
-      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
     steps:
       - name: Código y autorización
         uses: actions/checkout@v4
@@ -43,6 +42,8 @@ jobs:
           sudo apt-get install -y ffmpeg
 
       - name: Comprobar credenciales sin mostrarlas
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: |
           if [ -z "$IG_ACCESS_TOKEN" ]; then
             echo "::error::Falta GitHub Actions Secret IG_ACCESS_TOKEN; publicación no habilitada"
@@ -97,6 +98,8 @@ jobs:
       - name: Preparar el contenedor de Instagram con tiempo
         if: steps.guard.outputs.skip == 'false'
         shell: bash
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: |
           if [ -f staged/already_published ]; then exit 0; fi
           python scripts/publish_daily.py prepare \
@@ -105,6 +108,8 @@ jobs:
 
       - name: Publicar exactamente a las 21:00 hora peninsular
         if: steps.guard.outputs.skip == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: |
           if [ -f staged/already_published ]; then exit 0; fi
           python scripts/publish_daily.py publish --date "${{ steps.guard.outputs.date }}"
