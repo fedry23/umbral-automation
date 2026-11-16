@@ -220,8 +220,8 @@ def render():
     print(json.dumps(timings), flush=True)
     (OUT / 'story_used.json').write_text(json.dumps({'date': str(date), **story}, ensure_ascii=False, indent=2))
     (OUT / 'caption.txt').write_text(
-        f"Historia {story['episode_number']}: {story['title']}\\n"
-        + story['caption'] + '\\n#UmbralTerror #RelatosDeTerror\\n',
+        f"Historia {story['episode_number']}: {story['title']}\n"
+        + story['caption'] + '\n#UmbralTerror #RelatosDeTerror\n',
         encoding='utf-8')
     print(f'Vídeo verificado: {outfile} ({duration:.2f}s)')
 
