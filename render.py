@@ -122,16 +122,34 @@ def generate_images(story, out):
     return paths
 
 
-def encode(out, images, duration, outfile):
+def encode(out, images, duration, outfile, branding=None):
     if not images:
         raise ValueError('Se necesitan imágenes para renderizar')
     # Rutas relativas controladas; subprocess nunca utiliza shell.
+    if branding is None:
+        # The small technical fixture can still render an unbranded sample.
+        timeline = [(image, duration / len(images)) for image in images]
+    else:
+        intro_end = float(branding['intro_end'])
+        outro_start = float(branding['outro_start'])
+        total = float(branding['duration'])
+        if abs(total - duration) > 0.04:
+            raise ValueError('La voz y las tarjetas no tienen la misma duración')
+        if not (1 <= intro_end < outro_start - 10 < duration - 1):
+            raise ValueError('Duraciones de intro, historia y outro imposibles')
+        intro = out / 'intro_card.png'
+        outro = out / 'outro_card.png'
+        story_each = (outro_start - intro_end) / len(images)
+        timeline = ([(intro, intro_end)]
+                    + [(img, story_each) for img in images]
+                    + [(outro, duration - outro_start)])
     lines = []
-    for image in images:
-        if image.parent.resolve() != out.resolve() or "'" in image.name:
-            raise ValueError('Las escenas deben estar en output')
-        lines.extend([f"file '{image.name}'", f'duration {duration / len(images):.6f}'])
-    lines.append(f"file '{images[-1].name}'")
+    for image, seconds in timeline:
+        if (image.parent.resolve() != out.resolve() or "'" in image.name
+                or seconds <= 0):
+            raise ValueError('Tarjeta o escena fuera del directorio de render')
+        lines.extend([f"file '{image.name}'", f'duration {seconds:.6f}'])
+    lines.append(f"file '{timeline[-1][0].name}'")
     (out / 'scenes.txt').write_text('\n'.join(lines) + '\n')
     # Movimiento lento de cámara Ken Burns y ambiente original sintetizado con FFmpeg.
     # Sin bibliotecas de música, material de terceros ni servicios de pago.
@@ -228,9 +246,16 @@ def render():
     voiced = time.monotonic()
     write_subtitles(cues, OUT / 'subtitles.ass')
     images = generate_images(story, OUT)
+    # Cover is a distinct downloadable JPEG. Brand cards are original
+    # graphics; they NEVER reuse any generated story scene.
+    from scripts.thumbnail import make_thumbnail
+    from scripts.brand_cards import make_brand_cards
+    make_thumbnail(story, images, OUT / 'cover.jpg')
+    make_brand_cards(story, OUT)
+    timing = json.loads((OUT / 'branding_timing.json').read_text(encoding='utf-8'))
     illustrated = time.monotonic()
     outfile = OUT / f'umbral_{date:%Y%m%d}.mp4'
-    encode(OUT, images, duration, outfile)
+    encode(OUT, images, duration, outfile, branding=timing)
     timings = {'voice_seconds': voiced - started, 'images_seconds': illustrated - voiced,
                'encoding_seconds': time.monotonic() - illustrated,
                'total_seconds': time.monotonic() - started}
