@@ -89,6 +89,22 @@ def validate_mp4(path):
     return duration
 
 
+def validate_cover(path):
+    if not (10_000 <= path.stat().st_size <= 8_000_000):
+        raise ValueError('La portada JPEG no cumple el tamaño requerido')
+    data = path.read_bytes()
+    if not (data.startswith(b'\\xff\\xd8') and data.endswith(b'\\xff\\xd9')):
+        raise ValueError('Portada no es un JPEG válido')
+    info = json.loads(subprocess.check_output(
+        ['ffprobe', '-v', 'error', '-show_streams', '-of', 'json', str(path)],
+        text=True))
+    pic = next((v for v in info['streams'] if v.get('codec_type') == 'video'), None)
+    if pic is None or pic.get('codec_name') != 'mjpeg' or (
+            pic.get('width'), pic.get('height')) != (1080, 1920):
+        raise ValueError('Portada debe ser JPEG 1080x1920')
+    return True
+
+
 def extract_run_zip(raw, date):
     OUT.mkdir(exist_ok=True)
     with zipfile.ZipFile(io.BytesIO(raw)) as z:
@@ -99,7 +115,9 @@ def extract_run_zip(raw, date):
         expected = "umbral_" + date.replace("-", "") + ".mp4"
         if mp4s[0] != expected:
             raise ValueError("Nombre de MP4 diferente a la fecha de hoy")
-        for key in [expected, "story_used.json", "caption.txt", "music.wav"]:
+        for key in [expected, "story_used.json", "caption.txt", "music.wav",
+                    "cover.jpg", "intro_card.png", "outro_card.png",
+                    "branding_timing.json"]:
             if key not in names:
                 raise ValueError("Archivo ausente del artefacto: " + key)
         story = json.loads(z.read("story_used.json"))
@@ -107,8 +125,14 @@ def extract_run_zip(raw, date):
         verify_story(story, caption, date)
         if z.getinfo("music.wav").file_size < 20000:
             raise ValueError("La música original está vacía")
-        for filename in [expected, "story_used.json", "caption.txt"]:
+        for filename in [expected, "story_used.json", "caption.txt",
+                         "cover.jpg", "branding_timing.json"]:
             (OUT / filename).write_bytes(z.read(filename))
+    validate_cover(OUT / "cover.jpg")
+    marks = json.loads((OUT / "branding_timing.json").read_text(encoding="utf-8"))
+    if not (0 < marks.get("intro_end", 0) < marks.get("outro_start", 0)
+            < marks.get("duration", 0)):
+        raise ValueError('Marcas temporales intro/outro incompatibles')
     duration = validate_mp4(OUT / expected)
     return {"title": story["title"], "duration": round(duration, 2),
             "file": str(OUT / expected), "date": date}
