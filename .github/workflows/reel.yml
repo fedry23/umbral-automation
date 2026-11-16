@@ -2,7 +2,12 @@ name: UMBRAL - Generación para revisión
 
 on:
   workflow_dispatch:
-  # Programación diaria preparada, desactivada hasta autorización expresa:
+  # Respaldo externo si GitHub omite el cron nocturno. Solo este archivo activa el respaldo.
+  push:
+    branches: [main]
+    paths:
+      - 'ops/generate-kick.txt'
+  # El workflow de generación NO publica en Instagram.
   schedule:
     - cron: '17 2 * * *' # Generar de madrugada, listo antes de las 21:00 Europe/Madrid
   pull_request:
@@ -36,7 +41,7 @@ jobs:
       - name: Crear Reel
         env:
           UMBRAL_SPEED: '1.08'
-          UMBRAL_REQUIRE_DATED_STORY: ${{ github.event_name == 'schedule' && '1' || '0' }}
+          UMBRAL_REQUIRE_DATED_STORY: ${{ (github.event_name == 'schedule' || github.event_name == 'push') && '1' || '0' }}
         run: /usr/bin/time -v python -u render.py
       - name: Guardar artefacto
         uses: actions/upload-artifact@v4
