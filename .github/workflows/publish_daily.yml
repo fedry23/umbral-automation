@@ -1,4 +1,4 @@
-name: UMBRAL - Publicación a las 21:00 (preparada)
+name: UMBRAL - Publicación oficial a las 21:00
 
 on:
   # Dos lanzamientos con margen, antes de las 21:00 Europe/Madrid.
@@ -19,9 +19,9 @@ concurrency:
 
 jobs:
   publicar:
-    # IMPORTANTE: no se activa hasta que Meta esté configurada con credenciales
-    # válidas en Actions y se haya desactivado la tarea antigua de ChatGPT.
-    if: ${{ vars.UMBRAL_META_PUBLISH_ENABLED == 'true' }}
+    # Publicación programada autorizada. La tarea antigua de ChatGPT está desactivada.
+    # Bloqueo manual de emergencia: UMBRAL_META_PUBLISH_ENABLED=false en Variables.
+    if: ${{ github.event_name == 'schedule' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 240
     env:
