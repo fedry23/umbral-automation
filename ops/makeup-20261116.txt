@@ -1,1 +1,3 @@
 Solicitud expresa del propietario, 16-11-2026: publicar ahora el Reel pendiente «La costura» aunque sea después de las 21:00. Activación excepcional de un solo día; verificar y evitar duplicados.
+
+Segundo intento autorizado 2026-11-16: adaptar audio AAC a 48 kHz, comprobar originalidad y duplicados, publicar solo si Meta procesa correctamente. El contenedor anterior quedó en ERROR sin publicar.
