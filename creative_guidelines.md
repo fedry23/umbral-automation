@@ -34,7 +34,7 @@ Los Reels anteriores han acumulado elementos extraños sin justificar y giros qu
 - Revisar de verdad el borrador: detectar un salto lógico, corregirlo y volver a comprobar todo el texto antes de actualizar stories.json.
 
 ### Introducción y cierre de marca
-El motor audiovisual agrega automáticamente **«Historia número N: Título»** con voz grave y un cierre grave propio. Son piezas de marca, NO forman parte de narration y no deben repetirse ni aparecer como un giro adicional. La voz del relato no se altera. Asignar episode_number único, creciente e inmutable, incluso en episodios de prueba públicos. El siguiente relato nuevo después del episodio 5 es el 6.
+El motor audiovisual agrega automáticamente **«Historia número N: Título»** con voz grave y un cierre grave propio. Son piezas de marca, NO forman parte de narration y no deben repetirse ni aparecer como un giro adicional. La voz del relato no se altera. Asignar episode_number único, creciente e inmutable, incluso en episodios de prueba públicos. El episodio 6 «La luz del rellano» está reservado para la prueba cinematográfica. Calcular siempre el siguiente número como máximo existente + 1; no renumerar el episodio 5 ya programado.
 
 ## Ciclo semanal de mejora
 - Analizar métricas **reales** de Reels publicados (vistas, alcance, me gusta, compartidos, guardados).

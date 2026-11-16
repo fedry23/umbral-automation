@@ -1,4 +1,5 @@
 """Original UMBRAL horror score: audible, melodic, copyright-safe, CPU-only."""
+import json
 from pathlib import Path
 import numpy as np
 import soundfile as sf
@@ -97,6 +98,16 @@ def generate_ambient_score(duration, cues, out, seed=7300):
     peak = float(np.max(np.abs(score)))
     if peak > 0.32:
         score *= 0.32 / peak
-    dest = Path(out) / 'music.wav'
+    marks = Path(out) / 'branding_timing.json'
+    if marks.exists():
+        sections = json.loads(marks.read_text())
+        # Original soft air/hinge effects only in brand sections, below speech.
+        for start, stop in [(0, sections['intro_end']), (sections['outro_start'],duration)]:
+            a,b=round(start*RATE),min(n,round(stop*RATE))
+            tt=np.arange(b-a)/RATE
+            env=np.sin(np.pi*np.arange(b-a)/max(1,b-a))**2
+            score[a:b] += env*(.005*np.sin(2*np.pi*(83*tt+1.5*np.sin(tt)))
+                                  + .014*filtered[a:b])
+    dest = Path(out) / 'music.wav' 
     sf.write(dest, score.astype(np.float32), RATE)
     return dest

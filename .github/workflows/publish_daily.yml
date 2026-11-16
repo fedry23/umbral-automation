@@ -31,6 +31,7 @@ jobs:
     timeout-minutes: 240
     env:
       GITHUB_TOKEN: ${{ github.token }}
+      UMBRAL_DURABLE_GUARD: '1'
     steps:
       - name: Código y autorización
         uses: actions/checkout@v4
@@ -46,6 +47,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg
+          python -m pip install Pillow==11.3.0 numpy==1.26.4
 
       - name: Comprobar credenciales sin mostrarlas
         env:
@@ -147,7 +149,7 @@ jobs:
           python scripts/publish_daily.py publish --date "${{ steps.guard.outputs.date }}"
 
       - name: Registrar ID y fecha, evitando futuras publicaciones duplicadas
-        if: steps.guard.outputs.skip == 'false'
+        if: always() && steps.guard.outputs.skip == 'false'
         shell: bash
         run: |
           DAY="${{ steps.guard.outputs.date }}"
@@ -160,3 +162,17 @@ jobs:
           git commit -m "UMBRAL: publicación Instagram confirmada $DAY" || true
           git pull --rebase origin main
           git push origin HEAD:main
+
+      - name: Conservar diagnostico y recibo incluso si falla la verificacion
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: umbral-publication-receipt
+          path: |
+            staged/published.json
+            staged/prepared.json
+            staged/instagram_cover.jpg
+          if-no-files-found: ignore
+      - name: Aviso visible de fallo
+        if: failure()
+        run: echo '::error::UMBRAL fallo. Revisar pasos y recibo; no repetir publicaciones inciertas.'

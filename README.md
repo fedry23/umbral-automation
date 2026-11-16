@@ -25,11 +25,11 @@ La composición incorpora un zoom de cámara muy suave y una banda sonora origin
 
 Cada nuevo Reel de UMBRAL tiene tres tramos visuales **independientes**:
 
-- **Intro:** pantalla de marca granate/rojo con un umbral luminoso, número del episodio (fijo) y título; narrador con voz ~3 semitonos más grave.
+- **Intro:** escenario animado de arquitectura en perspectiva, puerta roja, niebla y partículas, con un umbral luminoso, número del episodio (fijo) y título; narrador con voz ~3 semitonos más grave.
 - **Historia:** seis escenas AI originales del guion, con la **voz masculina habitual sin alterar**, subtítulos y música tétrica propia.
-- **Outro:** pantalla azul-negro con puerta entreabierta, el cierre **«Has cruzado el umbral. Y ahora... no mires atrás»** y voz grave, distinta de la historia y de la intro.
+- **Outro:** pasillo animado azul-negro con puerta que gira hasta cerrarse, el cierre **«Has cruzado el umbral. Y ahora... no mires atrás»** y voz grave, distinta de la historia y de la intro.
 
-El motor calcula los límites de audio exactos en `output/branding_timing.json` y ensambla `intro_card.png` + escenas + `outro_card.png` para que nunca aparezcan las ilustraciones del relato detrás de la intro o la outro.
+El motor calcula los límites de audio exactos en `output/branding_timing.json` y superpone dos clips animados originales a los tramos de marca; las tarjetas PNG quedan como vistas previas de compatibilidad para que nunca aparezcan las ilustraciones del relato detrás de la intro o la outro.
 
 Cada Reel recibe `output/cover.jpg` **JPEG RGB de 1080×1920**, basada en una escena del propio episodio y sobreimpresa con UMBRAL, número y título en la zona central legible también en la cuadrícula del perfil. El publicador diario recupera la portada desde los artefactos, valida JPEG y tamaño, copia MP4 y JPEG a GitHub Pages, comprueba SHA-256 de ambos archivos y envía `cover_url` a Meta en el contenedor REELS antes de publicar. Si falta una portada válida o se rechaza el contenedor, el flujo falla explícitamente en lugar de publicar a ciegas.
 
@@ -144,3 +144,44 @@ Los horarios `schedule` pueden retrasarse u omitirse. Para no depender de ellos 
 La automatización ChatGPT existente **UMBRAL · Respaldos y verificación** comprueba a las **06:20** si falta la generación del día, a las **18:20** si falta el arranque del publicador y a las **21:20** si consta un recibo de publicación (siempre hora Europe/Madrid). Solo modifica el archivo disparador correspondiente cuando faltan sus requisitos. No se deben activar publicaciones alternativas ni repetir Reels a ciegas. El recibo `docs/published/AAAA-MM-DD.json` y la consulta a Instagram son la protección contra duplicados.
 
 El 16/11/2026 se verificó con un push de prueba que `publish_daily.yml` arranca y respeta la guarda que impide publicar después de las 20:40 si no estaba preparado. También se comprobó el arranque del generador por push; la ejecución completa y la primera publicación autónoma deben seguir validándose a partir de sus runs y recibos reales.
+
+
+## Actualización cinematográfica (16/11/2026)
+
+`scripts/brand_animation.py` renderiza fotogramas originales a 24 FPS: geometría
+proyectada desde una cámara móvil, hojas de puerta con giro independiente,
+niebla multicapa, partículas, reflejos y tipografía con aparición gradual.
+Intro roja y outro azul se generan sin utilizar imágenes del relato. Es CGI
+procedural en CPU, no vídeo generativo fotorrealista. La duración proviene del
+WAV real: no hay cortes de voz. `audio_engine.py` permanece sin modificaciones.
+Los dos clips se guardan en `output/branding/`; el MP4 final mantiene 720×1280,
+H.264 yuv420p, AAC 48 kHz. La música agrega aire/bisagra sintetizados discretos.
+
+La publicación utiliza una portada JPEG distinta por episodio. Se comprueba
+su descarga exacta desde Pages antes de enviar `cover_url`. Tras publicar se
+consulta el medio por ID, `permalink`, tipo REELS y `thumbnail_url`; la imagen
+que devuelve Meta se compara con la portada local tras normalizar tamaño y
+recorte. Una discrepancia queda registrada como fallo de verificación y NO
+provoca una segunda publicación. El recibo se conserva aunque falle esa lectura.
+
+Antes del POST irreversible, el publicador guarda y sube un intento en
+`docs/pending/`. Un intento sin resolver bloquea otro POST incluso tras reiniciar
+el runner. Los recibos están en `docs/published/`; no borrar un intento para
+reintentar sin consultar antes los medios y el contenedor en Meta. El token,
+la identidad y el permiso de publicación se revisan antes de crear el contenedor;
+se avisa al quedar menos de diez días y se bloquea si queda menos de un día.
+Los fallos quedan en Actions y los recibos/diagnóstico se conservan como artefactos.
+La tarea externa de las 21:20 comunica la ausencia de confirmación.
+
+Prueba extraordinaria única: episodio 6 «La luz del rellano», separado de la
+cola diaria. `cinematic_test.yml` solo renderiza. `cinematic_publish.yml` requiere
+un push a `ops/cinematic-publish.json` que identifique el run exitoso revisado y
+la fecha autorizada. Usa el mismo bloqueo de concurrencia que el publicador diario,
+recibo `test-cinematic-episode-6.json` e intento persistente exclusivo. No tiene cron
+ni autorización para otros episodios. No reutilizar el disparador de la prueba 4.
+El episodio 5 conserva su fecha 17/11; la numeración identifica episodios y no
+implica que una prueba extraordinaria se publique en orden cronológico.
+
+La preparación diaria, verano/invierno y respaldos se mantienen. GitHub/Meta
+pueden retrasarse: pasada la ventana se aborta, se informa y no se publica tarde.
+La nueva prueba y sus comprobaciones se documentarán con IDs reales al terminar.

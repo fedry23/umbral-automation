@@ -31,14 +31,14 @@ def target_time(day):
 
 def test_release_allowed(day):
     """A distinct, owner-approved public test; not the regular daily Reel."""
-    return (day == "2026-11-16"
-            and now_local().date().isoformat() == day
-            and os.getenv("UMBRAL_TEST_MODE") == "2026-11-16-episode-4")
+    return (os.getenv("UMBRAL_TEST_MODE") == "cinematic-episode-6"
+            and now_local().date().isoformat() == day)
+
 
 
 def daily_marker(day):
     if test_release_allowed(day):
-        return "🩸 UMBRAL · PRUEBA 4 · " + day
+        return "🩸 UMBRAL · PRUEBA 6 · " + day
     return "🩸 UMBRAL · " + day
 
 
@@ -55,7 +55,7 @@ def full_caption(text, day):
     marker = daily_marker(day)
     if marker in text:
         return text
-    return (text + "\n\n" + marker)[:2200]
+    return text[:2200-len(marker)-2] + "\n\n" + marker
 
 
 def api(method, path, params=None):
@@ -105,6 +105,23 @@ def read_story(day):
     return story, caption
 
 
+def token_preflight():
+    who=api("GET",ACCOUNT,{"fields":"id,username"})
+    if who.get("username") != "umbral.terror":
+        raise RuntimeError("Cuenta Meta incorrecta")
+    details=api("GET","debug_token",{"input_token":os.environ["IG_ACCESS_TOKEN"]}).get("data",{})
+    if not details.get("is_valid") or "instagram_content_publish" not in details.get("scopes",[]):
+        raise RuntimeError("Token invalido o sin permiso de publicacion")
+    expiry=details.get("expires_at",0)
+    if expiry:
+        days=(expiry-now_local().timestamp())/86400
+        if days < 1:
+            raise RuntimeError("Token caducado o caduca en menos de 24 horas")
+        if days < 10:
+            print("::warning::Token Meta caduca en menos de diez dias; renovar")
+        print("Token validado; caduca UTC",dt.datetime.fromtimestamp(expiry,dt.timezone.utc).isoformat())
+
+
 def prepare(day, video_url, cover_url=None):
     if now_local().date().isoformat() != day:
         raise ValueError("La fecha programada no es la fecha local de hoy")
@@ -119,6 +136,7 @@ def prepare(day, video_url, cover_url=None):
                 or not parsed.path.startswith("/umbral-automation/reels/")
                 or not parsed.path.endswith(".jpg")):
             raise ValueError("La portada debe ser un JPEG público de GitHub Pages")
+    token_preflight()
     story, caption = read_story(day)
     previous = already_published(day)
     if previous:
@@ -126,6 +144,8 @@ def prepare(day, video_url, cover_url=None):
         (OUT / "prepared.json").write_text(json.dumps(status))
         print("Un Reel del mismo día ya existe; omitiendo preparación")
         return
+    if intent_path(day).exists():
+        raise RuntimeError("Hay un intento persistente sin resolver; verificar Instagram, NO publicar de nuevo")
     payload = {"media_type": "REELS", "video_url": video_url,
                "caption": full_caption(caption, day), "share_to_feed": "true"}
     if cover_url:
@@ -143,7 +163,8 @@ def prepare(day, video_url, cover_url=None):
         code = status.get("status_code")
         if code == "FINISHED":
             result = {"status": "prepared", "container": container,
-                      "date": day, "title": story["title"]}
+                      "date": day, "title": story["title"], "cover_url": cover_url,
+                      "episode_number": story.get("episode_number")}
             (OUT / "prepared.json").write_text(json.dumps(result))
             print("Contenedor terminado; listo para las 21:00")
             return
@@ -171,7 +192,7 @@ def publish(day):
     if data["date"] != day:
         raise ValueError("La fecha del contenedor no coincide")
     if data["status"] == "already_published":
-        print("Ya publicado; no duplicar")
+        record_verified(day, data["media_id"], data)
         return
     if data["status"] != "prepared":
         raise ValueError("No existe contenedor terminado")
@@ -182,6 +203,9 @@ def publish(day):
         print("Encontrado Reel del día en Instagram; no se duplica")
         media_id = previous["id"]
     else:
+        if intent_path(day).exists():
+            raise RuntimeError("Publicación previa incierta: bloqueo persistente, NO reintentar")
+        persist_intent(day, data)
         # Perform ONE publish request. If the network drops, inspect media before retrying.
         try:
             result = api("POST", f"{ACCOUNT}/media_publish",
@@ -192,11 +216,69 @@ def publish(day):
             if not found:
                 raise RuntimeError("Publicación ambigua: revisar Instagram; NO reintentar automáticamente") from None
             media_id = found["id"]
-    output = {"date": day, "title": data.get("title", ""),
-              "instagram_media_id": media_id,
-              "published_at": now_local().isoformat()}
-    (OUT / "published.json").write_text(json.dumps(output, indent=2, ensure_ascii=False))
-    print("Publicación Instagram confirmada. ID:", media_id)
+    record_verified(day, media_id, data)
+
+
+def intent_path(day):
+    key = "test-cinematic-episode-6" if test_release_allowed(day) else day
+    return Path("docs/pending") / (key + ".json")
+
+
+def persist_intent(day, data):
+    """Durable before POST: a crashed run cannot silently publish twice."""
+    import subprocess
+    if os.getenv("UMBRAL_DURABLE_GUARD") != "1":
+        raise RuntimeError("Publicación bloqueada: falta activar registro persistente")
+    path = intent_path(day)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"date": day, "container": data["container"],
+                               "status": "publish_intent"}, indent=2))
+    for args in (["git","add",str(path)],
+                 ["git","commit","-m","UMBRAL: registrar intento antes de publicar " + day],
+                 ["git","pull","--rebase","origin","main"],
+                 ["git","push","origin","HEAD:main"]):
+        subprocess.run(args,check=True)
+
+
+def record_verified(day, media_id, data):
+    # Save the returned ID immediately, even if subsequent reads fail.
+    output = {"date":day,"title":data.get("title",""),
+              "episode_number":data.get("episode_number"),
+              "instagram_media_id":media_id,"published_at":now_local().isoformat(),
+              "verification":"pending","cover_url_sent":data.get("cover_url")}
+    path = OUT / "published.json"
+    path.write_text(json.dumps(output,indent=2,ensure_ascii=False))
+    for attempt in range(12):
+        media = api("GET",media_id,{"fields":"id,permalink,media_type,media_product_type,thumbnail_url,timestamp"})
+        if media.get("permalink") and media.get("media_product_type") == "REELS":
+            output.update(permalink=media["permalink"],verification="published_media_read_back")
+            if media.get("thumbnail_url") and (OUT/"cover.jpg").exists():
+                output["cover_verification"] = compare_cover(media["thumbnail_url"],OUT/"cover.jpg")
+            path.write_text(json.dumps(output,indent=2,ensure_ascii=False))
+            print("Publicación verificada:",media_id,media["permalink"])
+            if data.get("cover_url") and not output.get("cover_verification",{}).get("matched"):
+                raise RuntimeError("Reel publicado; portada NO confirmada. No volver a publicar")
+            return
+        time.sleep(10)
+    raise RuntimeError("ID guardado pero lectura de publicación pendiente; NO repetir POST")
+
+
+def compare_cover(url, local):
+    """Compare normalized pixels; Meta recompresses JPEG, so hashes differ."""
+    import io
+    import numpy as np
+    from PIL import Image, ImageOps
+    with urllib.request.urlopen(url,timeout=45) as response:
+        raw=response.read(8_000_001)
+    (OUT/"instagram_cover.jpg").write_bytes(raw)
+    with Image.open(io.BytesIO(raw)) as actual, Image.open(local) as expected:
+        actual=actual.convert("RGB")
+        expected=ImageOps.fit(expected.convert("RGB"),actual.size)
+        a=np.asarray(actual.resize((90,160)),dtype=float)
+        b=np.asarray(expected.resize((90,160)),dtype=float)
+        error=float(np.mean(np.abs(a-b)))
+    return {"matched":error < 18,"mean_pixel_error":round(error,3),
+            "method":"center-crop resize mean absolute RGB error <18/255"}
 
 
 def main():

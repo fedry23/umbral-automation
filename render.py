@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import subprocess
 import time
+from zoneinfo import ZoneInfo
 
 BASE = Path(__file__).resolve().parent
 OUT = BASE / 'output'
@@ -143,6 +144,15 @@ def encode(out, images, duration, outfile, branding=None):
         timeline = ([(intro, intro_end)]
                     + [(img, story_each) for img in images]
                     + [(outro, duration - outro_start)])
+    animated_inputs = []
+    if branding is not None:
+        from scripts.brand_animation import render_brand
+        story = json.loads((out / 'brand_story.json').read_text())
+        brand_dir = out / 'branding'
+        brand_dir.mkdir(exist_ok=True)
+        for kind, seconds in [('intro', intro_end), ('outro', duration-outro_start)]:
+            clip = render_brand(story, kind, seconds, brand_dir)
+            animated_inputs.extend(['-i', str(clip.resolve())])
     lines = []
     for image, seconds in timeline:
         if (image.parent.resolve() != out.resolve() or "'" in image.name
@@ -158,12 +168,19 @@ def encode(out, images, duration, outfile, branding=None):
           "zoompan=z='min(zoom+0.000055,1.08)':"
           "x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
           "d=1:s=720x1280:fps=24,ass=subtitles.ass[v]")
+    if branding is not None:
+        vf = vf.replace('ass=subtitles.ass[v]', 'null[base]')
+        vf += (f";[3:v]setpts=PTS-STARTPTS[intro];"
+               f"[4:v]setpts=PTS-STARTPTS+{outro_start}/TB[outro];"
+               f"[base][intro]overlay=eof_action=pass:enable='lt(t,{intro_end})'[opened];"
+               f"[opened][outro]overlay=eof_action=pass:enable='gte(t,{outro_start})',"
+               "ass=subtitles.ass[v]")
     af = ("[1:a]volume=1[voice];[2:a]volume=1[music];"
           "[voice][music]amix=inputs=2:duration=first:normalize=0,"
           "alimiter=limit=0.92[mixed]")
     run('ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-f', 'concat',
         '-safe', '1', '-i', 'scenes.txt', '-i', 'voice.wav',
-        '-i', 'music.wav',
+        '-i', 'music.wav', *animated_inputs,
         '-filter_complex', vf + ';' + af,
         '-map', '[v]', '-map', '[mixed]', '-t', f'{duration:.6f}',
         '-c:v', 'libx264', '-threads', '2', '-preset', 'veryfast', '-crf', '23',
@@ -217,18 +234,17 @@ def load_stories():
 
 
 def render():
-    date = dt.date.fromisoformat(os.getenv('UMBRAL_DATE', dt.datetime.now(dt.timezone.utc).date().isoformat()))
+    date = dt.date.fromisoformat(os.getenv('UMBRAL_DATE', dt.datetime.now(ZoneInfo('Europe/Madrid')).date().isoformat()))
     stories = load_stories()
     daily = next((s for s in stories if s.get('publish_date') == date.isoformat()), None)
     test_title = os.getenv('UMBRAL_STORY_TITLE', '')
     if test_title:
         # Test autorizado de una sola vez; no puede reemplazar el Reel diario.
-        if (os.getenv('UMBRAL_TEST_MODE') != '2026-11-16-episode-4'
-                or date.isoformat() != '2026-11-16'
-                or test_title != 'La pecera'):
+        if (os.getenv('UMBRAL_TEST_MODE') != 'cinematic-episode-6'
+                or test_title != 'La luz del rellano'):
             raise ValueError('Selección de relato de prueba no autorizada')
         test_story = next((s for s in stories if s['title'] == test_title), None)
-        if test_story is None or test_story.get('test_date') != date.isoformat():
+        if test_story is None or test_story.get('episode_number') != 6:
             raise ValueError('Relato de prueba no disponible o fecha incorrecta')
         # A test gets a dated output ONLY in the artifact, not in the production queue.
         story = {**test_story, 'publish_date': date.isoformat()}
@@ -252,6 +268,7 @@ def render():
     from scripts.brand_cards import make_brand_cards
     make_thumbnail(story, images, OUT / 'cover.jpg')
     make_brand_cards(story, OUT)
+    (OUT / 'brand_story.json').write_text(json.dumps(story, ensure_ascii=False))
     timing = json.loads((OUT / 'branding_timing.json').read_text(encoding='utf-8'))
     illustrated = time.monotonic()
     outfile = OUT / f'umbral_{date:%Y%m%d}.mp4'

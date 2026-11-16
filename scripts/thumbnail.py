@@ -73,7 +73,7 @@ def make_thumbnail(story, images, destination):
     values = []
     for y in range(HEIGHT):
         focus = math.exp(-((y - 975) / 600) ** 2)
-        values.append(min(225, round(145 + 58 * focus + 24 * (y / HEIGHT))))
+        values.append(min(225, round(65 + 95 * focus + 15 * (y / HEIGHT))))
     opacity.putdata(values)
     opacity = opacity.resize((WIDTH, HEIGHT))
     darkness = Image.new("RGB", (WIDTH, HEIGHT), (8, 6, 13))
