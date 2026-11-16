@@ -29,15 +29,25 @@ def target_time(day):
     return dt.datetime.combine(dt.date.fromisoformat(day), dt.time(21, 0), tzinfo=TZ)
 
 
+def test_release_allowed(day):
+    """A distinct, owner-approved public test; not the regular daily Reel."""
+    return (day == "2026-11-16"
+            and now_local().date().isoformat() == day
+            and os.getenv("UMBRAL_TEST_MODE") == "2026-11-16-episode-4")
+
+
 def daily_marker(day):
+    if test_release_allowed(day):
+        return "🩸 UMBRAL · PRUEBA 4 · " + day
     return "🩸 UMBRAL · " + day
 
 
 def one_time_late_allowed(day):
     """Explicit owner-approved 16 Nov exception; no effect on future dates."""
-    return (os.getenv("UMBRAL_ONE_TIME_LATE_DATE") == "2026-11-16"
-            and day == "2026-11-16"
-            and now_local().date().isoformat() == "2026-11-16")
+    return (test_release_allowed(day)
+            or (os.getenv("UMBRAL_ONE_TIME_LATE_DATE") == "2026-11-16"
+                and day == "2026-11-16"
+                and now_local().date().isoformat() == "2026-11-16"))
 
 
 def full_caption(text, day):
