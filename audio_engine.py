@@ -1,6 +1,7 @@
 """UMBRAL: natural narration and original, copyright-safe dark-ambient scoring."""
 import os
 import re
+import json
 from pathlib import Path
 
 import numpy as np
@@ -148,8 +149,10 @@ def generate_branded_narration(intro, story, outro, out, split_phrases, pipeline
     # atempo counters the speed change so the opening and close remain brisk.
     deep_filter = "asetrate=20000,aresample=24000,atempo=1.2"
     blocks, cues, cursor = [], [], 0
+    timing = {}
     with tempfile.TemporaryDirectory(prefix="umbral-voice-") as tmp:
         for key, text in (("intro", intro), ("story", story), ("outro", outro)):
+            segment_start = cursor / RATE
             segment = Path(tmp) / key
             segment.mkdir()
             part_cues, original_duration = generate_narration(
@@ -173,10 +176,24 @@ def generate_branded_narration(intro, story, outro, out, split_phrases, pipeline
                         for a, b, phrase in part_cues)
             blocks.append(audio)
             cursor += audio.size
+            voice_end = cursor / RATE
             if key != "outro":
                 pause = np.zeros(round(RATE * (0.50 if key == "intro" else 0.75)),
                                  dtype=np.float32)
                 blocks.append(pause)
                 cursor += pause.size
+            timing[key] = {'start': segment_start,
+                           'voice_end': voice_end,
+                           'end': cursor / RATE}
+    Path(out).mkdir(parents=True, exist_ok=True)
     sf.write(Path(out) / 'voice.wav', np.concatenate(blocks), RATE)
+    boundaries = {'intro_end': timing['intro']['end'],
+                  'outro_start': timing['outro']['start'],
+                  'duration': cursor / RATE,
+                  'sections': timing}
+    if not (0 < boundaries['intro_end'] < boundaries['outro_start']
+            < boundaries['duration']):
+        raise ValueError('Marcadores intro, relato y outro incompatibles')
+    (Path(out) / 'branding_timing.json').write_text(
+        json.dumps(boundaries, indent=2), encoding='utf-8')
     return cues, cursor / RATE
