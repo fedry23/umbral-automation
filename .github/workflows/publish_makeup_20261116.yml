@@ -72,6 +72,20 @@ jobs:
         if: steps.guard.outputs.skip == 'false'
         run: python scripts/stage_daily_reel.py
 
+      - name: Adaptar el audio del Reel al formato de Meta (AAC 48 kHz)
+        if: steps.guard.outputs.skip == 'false'
+        shell: bash
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          DAY="${{ steps.guard.outputs.date }}"
+          INPUT="staged/umbral_${DAY//-/}.mp4"
+          ffmpeg -hide_banner -loglevel error -y -i "$INPUT" \
+            -map 0:v:0 -map 0:a:0 -c:v copy -c:a aac -b:a 128k \
+            -ar 48000 -movflags +faststart staged/meta_ready.mp4
+          test "$(ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of csv=p=0 staged/meta_ready.mp4)" = "48000"
+          mv staged/meta_ready.mp4 "$INPUT"
+          echo "UMBRAL: preparado AAC 48 kHz para Instagram"
+
       - name: Guardar la copia pública HTTPS de hoy
         if: steps.guard.outputs.skip == 'false'
         shell: bash
