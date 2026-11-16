@@ -94,9 +94,11 @@ jobs:
           if [ -f staged/already_published ]; then exit 0; fi
           mkdir -p docs/reels
           cp "staged/umbral_${DAY//-/}.mp4" "docs/reels/$DAY.mp4"
+          test -f staged/cover.jpg
+          cp staged/cover.jpg "docs/reels/$DAY.jpg"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "docs/reels/$DAY.mp4"
+          git add "docs/reels/$DAY.mp4" "docs/reels/$DAY.jpg"
           if ! git diff --cached --quiet; then
             git commit -m "UMBRAL: preparar Reel original $DAY"
             git pull --rebase origin main
@@ -115,8 +117,10 @@ jobs:
           gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
           echo "Actualización de Pages solicitada para el vídeo del día"
 
-      - name: Verificar que GitHub Pages sirve exactamente el MP4 esperado
+      - name: Verificar que GitHub Pages sirve MP4 y portada JPEG exactos
         if: steps.guard.outputs.skip == 'false'
+        env:
+          UMBRAL_COVER_REQUIRED: '1'
         run: |
           if [ -f staged/already_published ]; then exit 0; fi
           python scripts/wait_public_video.py
@@ -128,9 +132,11 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: |
           if [ -f staged/already_published ]; then exit 0; fi
+          test -s staged/public_cover_url.txt
           python scripts/publish_daily.py prepare \
             --date "${{ steps.guard.outputs.date }}" \
-            --video-url "$(cat staged/public_video_url.txt)"
+            --video-url "$(cat staged/public_video_url.txt)" \
+            --cover-url "$(cat staged/public_cover_url.txt)"
 
       - name: Publicar exactamente a las 21:00 hora peninsular
         if: steps.guard.outputs.skip == 'false'
