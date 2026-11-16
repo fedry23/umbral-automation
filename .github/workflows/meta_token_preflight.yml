@@ -48,6 +48,28 @@ jobs:
                   quota, quota_code = get(host, account + "/content_publishing_limit", "quota_usage")
                   if quota_code == 200 and quota is not None:
                       print("PERMISO_PUBLICACION_VERIFICADO: lectura de cuota permitida")
+                      # Inspección de caducidad y scopes. Nunca imprimir token, URL ni respuesta completa.
+                      from datetime import datetime, timezone
+                      u = "https://graph.facebook.com/v25.0/debug_token?" + urlencode({"input_token": token})
+                      req = urllib.request.Request(u, headers={"Authorization": "Bearer " + token})
+                      try:
+                          with urllib.request.urlopen(req, timeout=20) as response:
+                              info = json.load(response).get("data", {})
+                          expires = info.get("expires_at", 0)
+                          kind = info.get("type", "desconocido")
+                          perms = info.get("scopes", [])
+                          if expires:
+                              print("TOKEN_EXPIRA_UTC: " + datetime.fromtimestamp(expires, timezone.utc).isoformat())
+                              if datetime.fromtimestamp(expires, timezone.utc).timestamp() < datetime.now(timezone.utc).timestamp() + 2 * 86400:
+                                  print("ADVERTENCIA: token de corta duración; no sirve para la publicación diaria a largo plazo")
+                          else:
+                              print("TOKEN_EXPIRACION: sin vencimiento declarado")
+                          print("TOKEN_TIPO: " + str(kind))
+                          print("PUBLISH_SCOPE_PRESENTE: " + str("instagram_content_publish" in perms))
+                      except urllib.error.HTTPError as e:
+                          print("TOKEN_EXPIRACION_NO_CONSULTABLE: HTTP " + str(e.code))
+                      except Exception:
+                          print("TOKEN_EXPIRACION_NO_CONSULTABLE: error de lectura")
                       raise SystemExit(0)
                   print("PERMISO_PUBLICACION_NO_CONFIRMADO: código HTTP " + str(quota_code))
                   raise SystemExit(2)
@@ -58,6 +80,28 @@ jobs:
                   quota, quota_code = get(host, str(me.get("id","")) + "/content_publishing_limit", "quota_usage")
                   if quota_code == 200 and quota is not None:
                       print("PERMISO_PUBLICACION_VERIFICADO: lectura de cuota permitida")
+                      # Inspección de caducidad y scopes. Nunca imprimir token, URL ni respuesta completa.
+                      from datetime import datetime, timezone
+                      u = "https://graph.facebook.com/v25.0/debug_token?" + urlencode({"input_token": token})
+                      req = urllib.request.Request(u, headers={"Authorization": "Bearer " + token})
+                      try:
+                          with urllib.request.urlopen(req, timeout=20) as response:
+                              info = json.load(response).get("data", {})
+                          expires = info.get("expires_at", 0)
+                          kind = info.get("type", "desconocido")
+                          perms = info.get("scopes", [])
+                          if expires:
+                              print("TOKEN_EXPIRA_UTC: " + datetime.fromtimestamp(expires, timezone.utc).isoformat())
+                              if datetime.fromtimestamp(expires, timezone.utc).timestamp() < datetime.now(timezone.utc).timestamp() + 2 * 86400:
+                                  print("ADVERTENCIA: token de corta duración; no sirve para la publicación diaria a largo plazo")
+                          else:
+                              print("TOKEN_EXPIRACION: sin vencimiento declarado")
+                          print("TOKEN_TIPO: " + str(kind))
+                          print("PUBLISH_SCOPE_PRESENTE: " + str("instagram_content_publish" in perms))
+                      except urllib.error.HTTPError as e:
+                          print("TOKEN_EXPIRACION_NO_CONSULTABLE: HTTP " + str(e.code))
+                      except Exception:
+                          print("TOKEN_EXPIRACION_NO_CONSULTABLE: error de lectura")
                       raise SystemExit(0)
                   print("PERMISO_PUBLICACION_NO_CONFIRMADO: código HTTP " + str(quota_code))
                   raise SystemExit(2)
