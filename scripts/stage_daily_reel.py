@@ -66,7 +66,7 @@ def verify_story(story, caption, date):
         raise ValueError("El Reel generado NO pertenece al día de hoy")
     if not (140 <= len(story.get("narration", "").split()) <= 170):
         raise ValueError("Relato fuera de la longitud esperada")
-    if not story.get("title") or len(story.get("scenes", [])) < 4:
+    if not story.get("title") or len(story.get("scenes", [])) != 6:
         raise ValueError("Relato o escenas incompletas")
     if not caption.strip() or story.get("caption", "").strip() not in caption:
         raise ValueError("Descripción no coincide con el relato")

@@ -6,12 +6,29 @@ and illumination evolve independently. CPU-only deterministic rendering.
 import math
 from pathlib import Path
 import subprocess
+from functools import lru_cache
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 from scripts.brand_cards import font, fit_title
 
 W, H, FPS = 720, 1280, 24
+
+
+@lru_cache(maxsize=2)
+def stone(material="stone"):
+    """Original mineral texture, fixed in world space rather than screen noise."""
+    rng = np.random.default_rng(651)
+    y,x = np.mgrid[:256,:256]
+    noise = rng.normal(0,14,(256,256))
+    cloud = np.asarray(Image.fromarray(rng.integers(30,230,(16,16),dtype=np.uint8)).resize((256,256),Image.Resampling.BICUBIC),dtype=float)
+    grain = 95 + noise + cloud*.45 + 8*np.sin(x*.27+np.sin(y*.12))
+    mortar = (y%64 < 3) | ((x + (y//64%2)*64)%128 < 3)
+    if material == "stone":
+        grain[mortar] *= .38
+    else:
+        grain = 115 + noise*.6 + 22*np.sin(x*.35 + np.sin(y*.008)*3) + 9*np.sin(x*1.7+y*.015)
+    return Image.fromarray(np.uint8(np.clip(grain,0,255)))
 
 
 def frame(story, kind, t, duration):
@@ -26,11 +43,32 @@ def frame(story, kind, t, duration):
     tint = (85, 150, 205) if closing else (240, 34, 31)
     opening = max(0, 1 - p * 1.4) if closing else .16 + .15 * p
     flicker = .92 + .04 * math.sin(t * 2.1) + .025 * math.sin(t * 7.3)
-    def poly(points, fill, outline=None, width=1):
-        d.polygon([project(*q) for q in points], fill=fill, outline=outline, width=width)
+    def poly(points, fill, outline=None, width=1, textured=True):
+        coords=[project(*q) for q in points]
+        d.polygon(coords, fill=fill, outline=outline, width=width)
+        if not textured or len(points)!=4:
+            return
+        left=max(0,int(min(q[0] for q in coords))); right=min(W,int(max(q[0] for q in coords))+1)
+        top=max(0,int(min(q[1] for q in coords))); bottom=min(H,int(max(q[1] for q in coords))+1)
+        if right<=left or bottom<=top:
+            return
+        local=[(x-left,y-top) for x,y in coords]
+        rows=[]; values=[]
+        for (x,y),(u,v) in zip(local,[(0,256),(0,0),(256,0),(256,256)]):
+            rows.extend([[x,y,1,0,0,0,-u*x,-u*y],[0,0,0,x,y,1,-v*x,-v*y]])
+            values.extend([u,v])
+        try:
+            coeff=np.linalg.solve(rows,values)
+        except np.linalg.LinAlgError:
+            return
+        tex=stone("wood" if textured == "wood" else "stone").transform((right-left,bottom-top),Image.Transform.PERSPECTIVE,coeff,Image.Resampling.BILINEAR)
+        rgb=np.asarray(tex,dtype=float)[:,:,None]/150*np.array(fill)[None,None,:]
+        mask=Image.new('L',tex.size)
+        ImageDraw.Draw(mask).polygon(local,fill=255)
+        image.paste(Image.fromarray(np.uint8(np.clip(rgb,0,255))),(left,top),mask)
     # Floor and ceiling, receding stone ribs and mortar lines provide parallax.
     poly([(-5,-1.8,0),(5,-1.8,0),(5,-1.8,35),(-5,-1.8,35)], (16,17,20))
-    for z in reversed(range(0, 36, 3)):
+    for z in (reversed(range(0, 36, 3)) if closing else (8,4,0)):
         tone = int(22 * (1 - z / 45))
         for side in (-1,1):
             poly([(side*2,-1.8,z),(side*2,2.5,z),(side*2,2.5,z+2.6),(side*2,-1.8,z+2.6)],
@@ -48,12 +86,12 @@ def frame(story, kind, t, duration):
         poly([(-a,-1.8,z-n*.05),(-a,b,z-n*.05),(a,b,z-n*.05),(a,-1.8,z-n*.05)],
              (26+n*3,25+n*2,30+n*2), (50,46,49), 2)
     light = tuple(int(c * min(1, opening*2.8) * flicker) for c in tint)
-    poly([(-1,-1.8,z),(-1,1.8,z),(1,1.8,z),(1,-1.8,z)], light)
+    poly([(-1,-1.8,z),(-1,1.8,z),(1,1.8,z),(1,-1.8,z)], light, textured=False)
     angle = opening * 1.2
     edge_x = -1 + 2 * math.cos(angle)
     edge_z = z + 2 * math.sin(angle)
     poly([(-1,-1.8,z),(-1,1.8,z),(edge_x,1.8,edge_z),(edge_x,-1.8,edge_z)],
-         (12,15,21) if closing else (19,10,13), (63,57,61), 3)
+         (12,15,21) if closing else (19,10,13), (63,57,61), 3, textured="wood")
     for yy in (-1.45,-.1,.25,1.45):
         d.line([project(-.85,yy,z-.02),project(edge_x-.12,yy,edge_z-.02)], fill=(44,37,40), width=2)
     knob = project(edge_x-.2, -.05, edge_z-.05)
@@ -63,6 +101,8 @@ def frame(story, kind, t, duration):
     gd = ImageDraw.Draw(glow)
     origin = project(.95,-1.75,z)
     gd.polygon([origin,(W*.9,H),(W*.28,H)], fill=tuple(int(c*opening*.34) for c in tint))
+    top_light = project(.98,1.78,z)
+    gd.line([top_light,origin],fill=tuple(int(c*opening*.6) for c in tint),width=38)
     glow = glow.filter(ImageFilter.GaussianBlur(30))
     arr = np.asarray(image).astype(np.float32) + np.asarray(glow)
     # Layered moving fog: different velocities and scales imply depth.
