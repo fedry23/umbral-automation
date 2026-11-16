@@ -174,11 +174,27 @@ def load_stories():
     stories = json.loads((BASE / 'stories.json').read_text(encoding='utf-8'))
     if not stories:
         raise ValueError('No hay relatos')
+    seen_numbers = set()
+    seen_dates = set()
     for story in stories:
         if not 140 <= len(story['narration'].split()) <= 170:
             raise ValueError(f"Longitud incorrecta: {story['title']}")
         if not 3 <= len(story['scenes']) <= 8:
             raise ValueError('Se requieren de tres a ocho escenas')
+        episode = story.get('episode_number')
+        if episode is not None:
+            if not isinstance(episode, int) or isinstance(episode, bool) or episode < 1 or episode in seen_numbers:
+                raise ValueError('Número de episodio ausente o repetido: ' + str(episode))
+            seen_numbers.add(episode)
+        if story.get('publish_date'):
+            day = story['publish_date']
+            if day in seen_dates:
+                raise ValueError('Dos historias diarias con la misma fecha ' + day)
+            seen_dates.add(day)
+            if episode is None or len(story['scenes']) != 6:
+                raise ValueError('Un episodio diario necesita número fijo y seis escenas')
+        if story.get('test_date') and story.get('publish_date'):
+            raise ValueError('Un episodio de prueba no debe ocupar una fecha diaria')
     return stories
 
 
@@ -193,9 +209,11 @@ def render():
                 or date.isoformat() != '2026-11-16'
                 or test_title != 'La pecera'):
             raise ValueError('Selección de relato de prueba no autorizada')
-        story = next((s for s in stories if s['title'] == test_title), None)
-        if story is None:
-            raise ValueError('Relato de prueba no disponible')
+        test_story = next((s for s in stories if s['title'] == test_title), None)
+        if test_story is None or test_story.get('test_date') != date.isoformat():
+            raise ValueError('Relato de prueba no disponible o fecha incorrecta')
+        # A test gets a dated output ONLY in the artifact, not in the production queue.
+        story = {**test_story, 'publish_date': date.isoformat()}
     else:
         if os.getenv('UMBRAL_REQUIRE_DATED_STORY') == '1' and daily is None:
             raise ValueError('Falta un relato original fechado para ' + date.isoformat())
