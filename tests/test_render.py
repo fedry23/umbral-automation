@@ -63,7 +63,7 @@ class RenderTests(unittest.TestCase):
     def test_publication_stays_disabled(self):
         import yaml
         workflow = yaml.load((render.BASE / '.github/workflows/reel.yml').read_text(), Loader=yaml.BaseLoader)
-        self.assertEqual(workflow['on']['schedule'][0]['cron'], '17 17 * * *')
+        self.assertEqual(workflow['on']['schedule'][0]['cron'], '17 2 * * *')
         self.assertEqual(workflow['permissions']['contents'], 'read')
         steps = workflow['jobs']['generar']['steps']
         blocked = [step for step in steps if step.get('name') in {
