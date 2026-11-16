@@ -46,6 +46,14 @@ class PublicationTests(unittest.TestCase):
         self.assertIsNone(stager.select_run([dict(base, conclusion="failure")], "2026-11-17"))
         self.assertIsNone(stager.select_run([dict(base, created_at="2026-11-16T02:17:00Z")], "2026-11-17"))
 
+    def test_oneoff_special_today_only(self):
+        run = {"id": 16, "name": stager.WORKFLOW, "event": "push",
+               "head_branch": "main", "status": "completed",
+               "conclusion": "success", "created_at": "2026-11-16T13:34:26Z"}
+        self.assertEqual(stager.select_run([run], "2026-11-16")["id"], 16)
+        self.assertIsNone(stager.select_run([run], "2026-11-17"))
+        self.assertIsNone(stager.select_run([dict(run, head_branch="other")], "2026-11-16"))
+
     def test_stale_story_is_rejected(self):
         story = {"date": "2026-11-16", "publish_date": "2026-11-16",
                  "title": "Otra noche", "narration": "x " * 150,
