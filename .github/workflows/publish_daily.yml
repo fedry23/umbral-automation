@@ -78,6 +78,14 @@ jobs:
         if: steps.guard.outputs.skip == 'false'
         run: python scripts/stage_daily_reel.py
 
+      - name: Validar formato Meta y autocorregir audio si hace falta
+        if: steps.guard.outputs.skip == 'false'
+        shell: bash
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          DAY="${{ steps.guard.outputs.date }}"
+          python scripts/ensure_meta_compatible.py "staged/umbral_${DAY//-/}.mp4"
+
       - name: Guardar la copia pública HTTPS de hoy
         if: steps.guard.outputs.skip == 'false'
         shell: bash
