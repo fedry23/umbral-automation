@@ -19,7 +19,7 @@ falla explícitamente en vez de sustituir las escenas por tarjetas de texto.
 Revisar las condiciones de licencia de los modelos antes de distribuir contenido.
 Las imágenes son generativas: los detalles y las caras pueden variar entre escenas.
 
-La composición incorpora un zoom de cámara muy suave y una banda sonora original de terror compuesta por código: drones graves, armonías disonantes, ruido ambiental y pulsos lejanos. La música baja automáticamente durante la voz y sube ligeramente en los silencios, sin música ajena, bancos de audio ni servicios de pago.
+La composición incorpora un zoom de cámara muy suave y una banda sonora original de terror compuesta por código: drones graves, cuerdas oscuras, melodía inquietante de piano/caja de música, ruido ambiental y pulsos lejanos. La pista está normalizada para oírse en móviles, sin tapar la voz. La música baja automáticamente durante la voz y sube ligeramente en los silencios, sin música ajena, bancos de audio ni servicios de pago.
 
 ## Generar
 
