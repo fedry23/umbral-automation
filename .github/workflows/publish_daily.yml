@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   actions: read
+  pages: write
 
 concurrency:
   group: umbral-instagram-21
@@ -88,6 +89,18 @@ jobs:
             git pull --rebase origin main
             git push origin HEAD:main
           fi
+
+      - name: Solicitar explícitamente el despliegue de GitHub Pages
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if [ -f staged/already_published ]; then exit 0; fi
+          # Los pushes hechos por GITHUB_TOKEN no desencadenan Pages automáticamente.
+          # API oficial: POST /repos/{owner}/{repo}/pages/builds (pages:write)
+          gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
+          echo "Actualización de Pages solicitada para el vídeo del día"
 
       - name: Verificar que GitHub Pages sirve exactamente el MP4 esperado
         if: steps.guard.outputs.skip == 'false'
