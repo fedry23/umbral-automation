@@ -59,6 +59,22 @@ def generate_voice(text, out):
     return generate_narration(text, out, phrases)
 
 
+OUTRO_PHRASE = 'Has cruzado el umbral. Y ahora... no mires atrás.'
+
+
+def episode_intro(story):
+    number = story.get('episode_number')
+    if not isinstance(number, int) or isinstance(number, bool) or number < 1:
+        raise ValueError('La historia necesita un episode_number fijo y positivo')
+    return f"Historia número {number}: {story['title']}."
+
+
+def generate_branded_voice(story, out):
+    from audio_engine import generate_branded_narration
+    return generate_branded_narration(
+        episode_intro(story), story['narration'], OUTRO_PHRASE, out, phrases)
+
+
 def ass_time(seconds):
     ticks = round(seconds * 100)
     return f'{ticks // 360000}:{ticks // 6000 % 60:02}:{ticks // 100 % 60:02}.{ticks % 100:02}'
@@ -145,6 +161,11 @@ def validate_video(path, expected):
     audio = next(s for s in info['streams'] if s['codec_type'] == 'audio')
     assert (video['width'], video['height']) == (WIDTH, HEIGHT)
     assert video['codec_name'] == 'h264' and audio['codec_name'] == 'aac'
+    assert audio.get('sample_rate') == '48000', 'Audio AAC debe salir a 48 kHz para Meta'
+    assert audio.get('channels') in (1, 2), 'Meta solo admite 1-2 canales'
+    assert video.get('pix_fmt') == 'yuv420p', 'Video debe ser 4:2:0'
+    fps_num, fps_den = map(int, video['avg_frame_rate'].split('/'))
+    assert fps_den and 23 <= fps_num / fps_den <= 60, 'FPS fuera de rango para Meta'
     assert abs(float(info['format']['duration']) - expected) < 0.3
     run('ffmpeg', '-v', 'error', '-i', path, '-f', 'null', '-')
 
@@ -165,12 +186,25 @@ def render():
     date = dt.date.fromisoformat(os.getenv('UMBRAL_DATE', dt.datetime.now(dt.timezone.utc).date().isoformat()))
     stories = load_stories()
     daily = next((s for s in stories if s.get('publish_date') == date.isoformat()), None)
-    if os.getenv('UMBRAL_REQUIRE_DATED_STORY') == '1' and daily is None:
-        raise ValueError('Falta un relato original fechado para ' + date.isoformat())
-    story = daily if daily is not None else stories[(date - dt.date(2026, 11, 15)).days % len(stories)]
+    test_title = os.getenv('UMBRAL_STORY_TITLE', '')
+    if test_title:
+        # Test autorizado de una sola vez; no puede reemplazar el Reel diario.
+        if (os.getenv('UMBRAL_TEST_MODE') != '2026-11-16-episode-4'
+                or date.isoformat() != '2026-11-16'
+                or test_title != 'La pecera'):
+            raise ValueError('Selección de relato de prueba no autorizada')
+        story = next((s for s in stories if s['title'] == test_title), None)
+        if story is None:
+            raise ValueError('Relato de prueba no disponible')
+    else:
+        if os.getenv('UMBRAL_REQUIRE_DATED_STORY') == '1' and daily is None:
+            raise ValueError('Falta un relato original fechado para ' + date.isoformat())
+        story = daily if daily is not None else stories[(date - dt.date(2026, 11, 15)).days % len(stories)]
+    if 'episode_number' not in story:
+        raise ValueError('La historia seleccionada no tiene número de episodio fijo')
     OUT.mkdir(exist_ok=True)
     started = time.monotonic()
-    cues, duration = generate_voice(story['narration'], OUT)
+    cues, duration = generate_branded_voice(story, OUT)
     from music_engine import generate_ambient_score
     generate_ambient_score(duration, cues, OUT, seed=7300 + date.toordinal() % 10000)
     voiced = time.monotonic()
@@ -185,7 +219,10 @@ def render():
     (OUT / 'timings.json').write_text(json.dumps(timings, indent=2))
     print(json.dumps(timings), flush=True)
     (OUT / 'story_used.json').write_text(json.dumps({'date': str(date), **story}, ensure_ascii=False, indent=2))
-    (OUT / 'caption.txt').write_text(story['caption'] + '\n#UmbralTerror #RelatosDeTerror\n', encoding='utf-8')
+    (OUT / 'caption.txt').write_text(
+        f"Historia {story['episode_number']}: {story['title']}\\n"
+        + story['caption'] + '\\n#UmbralTerror #RelatosDeTerror\\n',
+        encoding='utf-8')
     print(f'Vídeo verificado: {outfile} ({duration:.2f}s)')
 
 
