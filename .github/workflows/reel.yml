@@ -1,9 +1,6 @@
 name: UMBRAL - Generación para revisión
 
 on:
-  # Excepción de un único día: al añadir el relato de hoy, generar un Reel anticipado.
-  push:
-    paths: ['stories.json']
   workflow_dispatch:
   # Programación diaria preparada, desactivada hasta autorización expresa:
   schedule:
