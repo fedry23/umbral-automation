@@ -1,0 +1,152 @@
+name: UMBRAL - Reel de prueba con intro y outro graves
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ops/test-kick-20261116.txt'
+
+permissions:
+  contents: write
+  actions: read
+  pages: write
+
+concurrency:
+  group: umbral-instagram-21
+  cancel-in-progress: false
+
+jobs:
+  test_reel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      UMBRAL_TEST_MODE: '2026-11-16-episode-4'
+      UMBRAL_STORY_TITLE: 'La pecera'
+      UMBRAL_DATE: '2026-11-16'
+      UMBRAL_SPEED: '1.08'
+      UMBRAL_REQUIRE_DATED_STORY: '1'
+    steps:
+      - name: Código
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fecha, existencia y bloqueo de duplicados
+        id: guard
+        shell: bash
+        run: |
+          LOCAL_DAY="$(TZ=Europe/Madrid date +%F)"
+          if [ "$LOCAL_DAY" != "2026-11-16" ]; then
+            echo "::error::El test del 16/11 ha caducado; no ejecutar ni publicar"
+            exit 1
+          fi
+          if [ -f docs/published/test-2026-11-16-episode-4.json ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Ya se publicó el episodio de prueba; no duplicarlo"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Instalar herramientas y dependencias gratuitas
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core libsndfile1
+          python -m pip install -r requirements.txt
+
+      - name: Ejecutar regresiones de voz, formato y programación
+        if: steps.guard.outputs.skip == 'false'
+        run: python -m unittest discover -s tests -v
+
+      - name: Renderizar episodio 4 La pecera con intro y outro graves
+        if: steps.guard.outputs.skip == 'false'
+        run: /usr/bin/time -v python -u render.py
+
+      - name: Comprobar episodio 4 y perfil técnico Meta
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("output/story_used.json").read_text())
+          assert s["title"]=="La pecera", "Relato equivocado"
+          assert s["episode_number"]==4, "Número de episodio equivocado"
+          assert s["date"]=="2026-11-16" and s["publish_date"]=="2026-11-16"
+          assert Path("output/voice.wav").is_file()
+          print("TEST_UMBRAL_CORRECTO: capítulo original n.º 4")
+          PY
+          python scripts/ensure_meta_compatible.py output/umbral_20261116.mp4
+          mkdir -p staged
+          cp output/umbral_20261116.mp4 staged/umbral_20261116.mp4
+          cp output/story_used.json staged/story_used.json
+          cp output/caption.txt staged/caption.txt
+
+      - name: Servir vídeo público único sin sustituir el Reel diario
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          mkdir -p docs/reels
+          cp staged/umbral_20261116.mp4 docs/reels/test-2026-11-16-episode-4.mp4
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/reels/test-2026-11-16-episode-4.mp4
+          git commit -m "UMBRAL: vídeo de prueba, episodio 4" || true
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Construir Pages con vídeo de prueba
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
+
+      - name: Verificar enlace público y SHA del MP4
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          UMBRAL_VIDEO_FILE: docs/reels/test-2026-11-16-episode-4.mp4
+          UMBRAL_VIDEO_URL: https://fedry23.github.io/umbral-automation/reels/test-2026-11-16-episode-4.mp4
+        run: python scripts/wait_public_video.py
+
+      - name: Crear contenedor de Meta y verificar que termina procesado
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          python scripts/publish_daily.py prepare --date 2026-11-16 \
+            --video-url "$(cat staged/public_video_url.txt)"
+
+      - name: Publicar Reel original de prueba autorizado
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python scripts/publish_daily.py publish --date 2026-11-16
+
+      - name: Guardar recibo del test separado del episodio diario
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          test -f staged/published.json
+          mkdir -p docs/published
+          cp staged/published.json docs/published/test-2026-11-16-episode-4.json
+          git add docs/published/test-2026-11-16-episode-4.json
+          git commit -m "UMBRAL: publicación del Reel de prueba 4 confirmada" || true
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Conservar MP4 de prueba y voces como artefactos
+        if: steps.guard.outputs.skip == 'false' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: umbral-episodio-4-prueba
+          path: |
+            output/umbral_20261116.mp4
+            output/voice.wav
+            output/subtitles.ass
+            output/story_used.json
+            output/caption.txt
+          retention-days: 7
+          if-no-files-found: warn
