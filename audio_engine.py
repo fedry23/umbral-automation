@@ -126,3 +126,57 @@ def generate_ambient_score(duration, cues, out, seed=7300):
     dest = Path(out) / 'music.wav'
     sf.write(dest, music, RATE)
     return dest
+
+
+def generate_branded_narration(intro, story, outro, out, split_phrases, pipeline=None):
+    """Intro/outro lowered by ~3 semitones; story waveform is NOT pitch-shifted.
+
+    A single Kokoro pipeline is reused for all three segments to keep CPU cost down.
+    Each segment is synthesised as normal Spanish speech; FFmpeg only processes
+    the opening and closing sections. Cue offsets are adjusted to actual samples.
+    """
+    import subprocess
+    import tempfile
+
+    if pipeline is None:
+        import torch
+        torch.set_num_threads(min(4, os.cpu_count() or 1))
+        from kokoro import KPipeline
+        pipeline = KPipeline(lang_code='e', repo_id='hexgrad/Kokoro-82M', device='cpu')
+
+    # 20000/24000 = 0.8333, equivalent to approximately -3.2 semitones.
+    # atempo counters the speed change so the opening and close remain brisk.
+    deep_filter = "asetrate=20000,aresample=24000,atempo=1.2"
+    blocks, cues, cursor = [], [], 0
+    with tempfile.TemporaryDirectory(prefix="umbral-voice-") as tmp:
+        for key, text in (("intro", intro), ("story", story), ("outro", outro)):
+            segment = Path(tmp) / key
+            segment.mkdir()
+            part_cues, original_duration = generate_narration(
+                text, segment, split_phrases, pipeline=pipeline)
+            src = segment / 'voice.wav'
+            final_path = src
+            if key != "story":
+                final_path = segment / 'lowered.wav'
+                subprocess.run([
+                    'ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
+                    '-i', str(src), '-af', deep_filter,
+                    '-ar', str(RATE), '-ac', '1', str(final_path)
+                ], check=True)
+            audio, sample_rate = sf.read(final_path, dtype='float32')
+            if sample_rate != RATE or audio.ndim != 1 or audio.size == 0:
+                raise ValueError('Audio de marca incompatible')
+            new_duration = audio.size / RATE
+            ratio = new_duration / original_duration
+            cues.extend((cursor / RATE + a * ratio,
+                         cursor / RATE + b * ratio, phrase)
+                        for a, b, phrase in part_cues)
+            blocks.append(audio)
+            cursor += audio.size
+            if key != "outro":
+                pause = np.zeros(round(RATE * (0.50 if key == "intro" else 0.75)),
+                                 dtype=np.float32)
+                blocks.append(pause)
+                cursor += pause.size
+    sf.write(Path(out) / 'voice.wav', np.concatenate(blocks), RATE)
+    return cues, cursor / RATE
