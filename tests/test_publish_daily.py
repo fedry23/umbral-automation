@@ -73,6 +73,8 @@ class PublicationTests(unittest.TestCase):
         steps = yml["jobs"]["publicar"]["steps"]
         self.assertTrue(any("publicar" in s.get("name","").lower() for s in steps))
         self.assertEqual(yml["permissions"]["actions"], "read")
+        self.assertEqual(yml["permissions"]["pages"], "write")
+        self.assertTrue(any("Solicitar explícitamente el despliegue de GitHub Pages" == s.get("name") for s in steps))
 
     def test_publisher_wait_rejects_late_retry(self):
         late = dt.datetime(2026, 11, 17, 21, 0, 25, tzinfo=ZoneInfo("Europe/Madrid"))
