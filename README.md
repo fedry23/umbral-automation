@@ -8,13 +8,15 @@ Se muestran como máximo dos líneas breves, con contorno y margen inferior de
 235 px para dejar espacio a los controles. Los subtítulos ocupan una zona reducida;
 conviene revisar visualmente cada vídeo antes de usarlo.
 
-Las cuatro escenas de cada relato se generan localmente con `stabilityai/sd-turbo`
+Las escenas de cada relato (cuatro en los antiguos y seis en los nuevos) se generan localmente con `stabilityai/sd-turbo`
 (Diffusers, float32, CPU, cuatro pasos). No usa APIs de pago, claves ni GPU.
 La primera ejecución descarga los modelos públicos de Hugging Face y necesita
 Internet. La disponibilidad del proveedor puede hacer fallar una descarga; se
 falla explícitamente en vez de sustituir las escenas por tarjetas de texto.
 Revisar las condiciones de licencia de los modelos antes de distribuir contenido.
 Las imágenes son generativas: los detalles y las caras pueden variar entre escenas.
+
+La composición incorpora un zoom de cámara muy suave y una nota ambiental original y tenue sintetizada por FFmpeg, sin música ajena ni servicios de pago.
 
 ## Generar
 
@@ -32,7 +34,7 @@ python render.py
 `UMBRAL_SPEED` permite cambiar el ritmo (predeterminado 0,86).
 Los tres relatos nuevos tienen 140–170 palabras; los veinte anteriores se
 conservan íntegros en `stories.archive.json` para revisión y futuras ampliaciones.
-Cada relato incluye cuatro descripciones de escenas en orden narrativo.
+Los relatos nuevos admiten seis descripciones de escenas para mayor dinamismo; los anteriores conservan cuatro.
 
 El workflow valida un MP4 real en cada PR y admite ejecución manual. Su artefacto
 incluye MP4 H.264/AAC, voz, imágenes, subtítulos ASS, relato y descripción.
