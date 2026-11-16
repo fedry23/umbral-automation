@@ -3,8 +3,8 @@ name: UMBRAL - Generación para revisión
 on:
   workflow_dispatch:
   # Programación diaria preparada, desactivada hasta autorización expresa:
-  # schedule:
-  #   - cron: '0 18 * * *'
+  schedule:
+    - cron: '17 17 * * *' # Generar antes de las 21:00 Europe/Madrid
   pull_request:
     branches: [main]
 
@@ -34,6 +34,9 @@ jobs:
       - name: Pruebas de sincronización y codificación
         run: python -m unittest discover -s tests -v
       - name: Crear Reel
+        env:
+          UMBRAL_SPEED: '0.86'
+          UMBRAL_REQUIRE_DATED_STORY: ${{ github.event_name == 'schedule' && '1' || '0' }}
         run: /usr/bin/time -v python -u render.py
       - name: Guardar artefacto
         uses: actions/upload-artifact@v4
