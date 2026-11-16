@@ -29,18 +29,19 @@ jobs:
       - name: Instalar herramientas
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
+          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core libsndfile1
           python -m pip install -r requirements.txt
       - name: Pruebas de sincronización y codificación
         run: python -m unittest discover -s tests -v
       - name: Crear Reel
-        run: python render.py
+        run: /usr/bin/time -v python -u render.py
       - name: Guardar artefacto
         uses: actions/upload-artifact@v4
         with:
           name: umbral-reel
           path: |
             output/*.mp4
+            output/timings.json
             output/subtitles.ass
             output/scene_*.png
             output/voice.wav

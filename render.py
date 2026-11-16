@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import time
 
 BASE = Path(__file__).resolve().parent
 OUT = BASE / 'output'
@@ -17,13 +18,39 @@ def run(*args, **kwargs):
     subprocess.run([str(a) for a in args], check=True, **kwargs)
 
 
+def subtitle_lines(text):
+    from PIL import ImageFont
+    font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 38)
+    words = text.split()
+    if font.getlength(text) <= 550:
+        return [text]
+    options = [(' '.join(words[:i]), ' '.join(words[i:])) for i in range(1, len(words))]
+    if not options:
+        raise ValueError('Palabra demasiado larga para el subtítulo')
+    lines = min(options, key=lambda pair: max(font.getlength(line) for line in pair))
+    if max(font.getlength(line) for line in lines) > 550:
+        raise ValueError('Subtítulo demasiado largo')
+    return list(lines)
+
+
 def phrases(text):
-    """Unidades cortas: cada subtítulo corresponde a su propio audio."""
+    """Unidades cortas que caben en dos líneas, medidas con la fuente real."""
     result = []
     for sentence in re.split(r'(?<=[.!?…;,:])\s+', text.strip()):
-        words = sentence.split()
-        for i in range(0, len(words), 7):
-            result.append(' '.join(words[i:i + 7]))
+        current = []
+        for word in sentence.split():
+            candidate = ' '.join(current + [word])
+            try:
+                subtitle_lines(candidate)
+                fits = len(current) < 7
+            except ValueError:
+                fits = False
+            if current and not fits:
+                result.append(' '.join(current))
+                current = []
+            current.append(word)
+        if current:
+            result.append(' '.join(current))
     return result
 
 
@@ -38,7 +65,8 @@ def generate_voice(text, out):
         raise ValueError('UMBRAL_SPEED debe estar entre 0.5 y 1.2')
     pipeline = KPipeline(lang_code='e', repo_id='hexgrad/Kokoro-82M', device='cpu')
     parts, cues, cursor = [], [], 0
-    for phrase in phrases(text):
+    units = phrases(text)
+    for index, phrase in enumerate(units, 1):
         chunks = [audio.cpu().numpy() for _, _, audio in pipeline(
             phrase, voice='em_alex', speed=speed) if audio is not None]
         if not chunks:
@@ -51,6 +79,7 @@ def generate_voice(text, out):
                             0.3 if phrase[-1] in ',;:' else 0.06))
         parts.append(np.zeros(pause, dtype=np.float32))
         cursor += pause
+        print(f'Voz: {index}/{len(units)} fragmentos', flush=True)
     sf.write(out / 'voice.wav', np.concatenate(parts), RATE)
     return cues, cursor / RATE
 
@@ -76,10 +105,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     for start, end, text in cues:
         # No se permiten comandos ASS procedentes del relato.
         text = text.replace('\\', '').replace('{', '').replace('}', '')
-        words = text.split()
-        if len(text) > 30 and len(words) > 3:
-            middle = len(words) // 2
-            text = ' '.join(words[:middle]) + r'\N' + ' '.join(words[middle:])
+        text = r'\N'.join(subtitle_lines(text))
         events.append(f'Dialogue: 0,{ass_time(start)},{ass_time(end)},Default,,0,0,0,,{text}')
     dest.write_text(header + '\n'.join(events) + '\n', encoding='utf-8')
 
@@ -100,6 +126,7 @@ def generate_images(story, out):
                      generator=torch.Generator('cpu').manual_seed(7300 + i)).images[0]
         path = out / f'scene_{i:02}.png'
         image.save(path)
+        print(f'Imagen: {i + 1}/{len(story["scenes"])}', flush=True)
         paths.append(path)
     return paths
 
@@ -153,11 +180,19 @@ def render():
     stories = load_stories()
     story = stories[(date - dt.date(2026, 11, 15)).days % len(stories)]
     OUT.mkdir(exist_ok=True)
+    started = time.monotonic()
     cues, duration = generate_voice(story['narration'], OUT)
+    voiced = time.monotonic()
     write_subtitles(cues, OUT / 'subtitles.ass')
     images = generate_images(story, OUT)
+    illustrated = time.monotonic()
     outfile = OUT / f'umbral_{date:%Y%m%d}.mp4'
     encode(OUT, images, duration, outfile)
+    timings = {'voice_seconds': voiced - started, 'images_seconds': illustrated - voiced,
+               'encoding_seconds': time.monotonic() - illustrated,
+               'total_seconds': time.monotonic() - started}
+    (OUT / 'timings.json').write_text(json.dumps(timings, indent=2))
+    print(json.dumps(timings), flush=True)
     (OUT / 'story_used.json').write_text(json.dumps({'date': str(date), **story}, ensure_ascii=False, indent=2))
     (OUT / 'caption.txt').write_text(story['caption'] + '\n#UmbralTerror #RelatosDeTerror\n', encoding='utf-8')
     print(f'Vídeo verificado: {outfile} ({duration:.2f}s)')

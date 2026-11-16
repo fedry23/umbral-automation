@@ -16,6 +16,12 @@ class RenderTests(unittest.TestCase):
         self.assertGreaterEqual(len(stories), 3)
         for story in stories:
             self.assertEqual(' '.join(render.phrases(story['narration'])), story['narration'])
+            from PIL import ImageFont
+            font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 38)
+            for phrase in render.phrases(story['narration']):
+                lines = render.subtitle_lines(phrase)
+                self.assertLessEqual(len(lines), 2)
+                self.assertTrue(all(font.getlength(line) <= 550 for line in lines))
 
     def test_subtitles(self):
         with tempfile.TemporaryDirectory() as tmp:
