@@ -1,0 +1,53 @@
+name: UMBRAL - Verificar montaje, caratulas y Meta
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'render.py'
+      - 'audio_engine.py'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/quality_gate.yml'
+      - '.github/workflows/reel.yml'
+      - '.github/workflows/publish_daily.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: umbral-quality-gate
+  cancel-in-progress: true
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar FFmpeg, fuentes y dependencias gratuitas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core libsndfile1
+          python -m pip install -r requirements.txt
+          python -m pip install PyYAML
+      - name: Comprobar sintaxis Python
+        run: python -m compileall -q render.py audio_engine.py scripts tests
+      - name: Ejecutar pruebas de vídeo, portadas, voces y duplicados
+        run: python -m unittest discover -s tests -v
+      - name: Verificar que este workflow jamás publica contenido
+        run: |
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          flow = yaml.load(Path('.github/workflows/quality_gate.yml').read_text(), Loader=yaml.BaseLoader)
+          assert flow['permissions']['contents']=='read'
+          assert set(flow['jobs']) == {'validar'}
+          print('UMBRAL: quality gate de solo lectura, sin tokens Meta ni publicaciones')
+          PY
