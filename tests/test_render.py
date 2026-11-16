@@ -4,6 +4,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import wave
+import sys
+import types
 
 import render
 
@@ -24,6 +26,33 @@ class RenderTests(unittest.TestCase):
             self.assertIn('0:00:03.00', text)
             self.assertNotIn('{\\b1}', text)
             self.assertEqual(text.count('Dialogue:'), 2)
+
+    def test_voice_timing_and_speed(self):
+        import numpy as np
+        import soundfile as sf
+        import torch
+        calls = []
+
+        class Pipeline:
+            def __init__(self, **kwargs):
+                self.settings = kwargs
+
+            def __call__(self, text, **kwargs):
+                calls.append((text, kwargs))
+                yield text, None, torch.zeros(24000)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            with patch.dict(sys.modules, {'kokoro': types.SimpleNamespace(KPipeline=Pipeline)}):
+                with patch.dict('os.environ', {'UMBRAL_SPEED': '0.82'}):
+                    cues, duration = render.generate_voice('La puerta crujió. Nadie contestó.', out)
+            audio, rate = sf.read(out / 'voice.wav')
+            self.assertEqual(rate, 24000)
+            self.assertEqual(cues[0], (0.0, 1.0, 'La puerta crujió.'))
+            self.assertEqual(cues[1], (1.65, 2.65, 'Nadie contestó.'))
+            self.assertAlmostEqual(duration, len(audio) / rate)
+            self.assertAlmostEqual(duration, 3.3)
+            self.assertTrue(all(c[1] == {'voice': 'em_alex', 'speed': 0.82} for c in calls))
 
     def test_real_encoding(self):
         # Fixture técnica sin red; el workflow ejecuta después el render neuronal real.
