@@ -60,7 +60,7 @@ def generate_voice(text, out):
     import numpy as np
     import soundfile as sf
     from kokoro import KPipeline
-    speed = float(os.getenv('UMBRAL_SPEED', '0.82'))
+    speed = float(os.getenv('UMBRAL_SPEED', '0.86'))
     if not 0.5 <= speed <= 1.2:
         raise ValueError('UMBRAL_SPEED debe estar entre 0.5 y 1.2')
     pipeline = KPipeline(lang_code='e', repo_id='hexgrad/Kokoro-82M', device='cpu')
@@ -178,7 +178,10 @@ def load_stories():
 def render():
     date = dt.date.fromisoformat(os.getenv('UMBRAL_DATE', dt.datetime.now(dt.timezone.utc).date().isoformat()))
     stories = load_stories()
-    story = stories[(date - dt.date(2026, 11, 15)).days % len(stories)]
+    daily = next((s for s in stories if s.get('publish_date') == date.isoformat()), None)
+    if os.getenv('UMBRAL_REQUIRE_DATED_STORY') == '1' and daily is None:
+        raise ValueError('Falta un relato original fechado para ' + date.isoformat())
+    story = daily if daily is not None else stories[(date - dt.date(2026, 11, 15)).days % len(stories)]
     OUT.mkdir(exist_ok=True)
     started = time.monotonic()
     cues, duration = generate_voice(story['narration'], OUT)
