@@ -51,8 +51,7 @@ def select_run(runs, date):
     candidates = []
     for run in runs:
         if (run.get("name") == WORKFLOW
-                and (run.get("event") == "schedule"
-                     or (date == "2026-11-16" and run.get("event") == "push"))
+                and run.get("event") in ("schedule", "push")
                 and run.get("head_branch") == "main"
                 and run.get("status") == "completed"
                 and run.get("conclusion") == "success"):
