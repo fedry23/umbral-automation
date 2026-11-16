@@ -129,7 +129,7 @@ def prepare(day, video_url):
             print("Contenedor terminado; listo para las 21:00")
             return
         if code in ("ERROR", "EXPIRED"):
-            raise RuntimeError("Instagram rechazó el contenedor: " + str(code))
+            raise RuntimeError("Instagram rechazó el contenedor: " + str(code) + "; detalle=" + str(status.get("status", "sin detalle"))[:400])
         time.sleep(15)
     raise RuntimeError("Meta no terminó de procesar el Reel antes de las 21:00")
 
