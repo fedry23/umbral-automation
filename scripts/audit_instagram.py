@@ -21,7 +21,7 @@ def inventory():
     by_marker = defaultdict(list)
     import re
     for item in items:
-        for day in set(re.findall(r"UMBRAL · (20\\d{2}-\\d{2}-\\d{2})", item.get("caption") or "")):
+        for day in set(re.findall(r"UMBRAL · (20\d{2}-\d{2}-\d{2})", item.get("caption") or "")):
             by_marker[day].append(item["id"])
     return {"account": account["username"], "count": len(items),
             "oldest": {k: oldest.get(k) for k in
