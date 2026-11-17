@@ -4,8 +4,8 @@ Run in the same GitHub Actions job as render.py. No Instagram mutations.
 """
 import json
 from pathlib import Path
-from scripts.stage_daily_reel import validate_mp4, validate_cover
-from scripts.ensure_meta_compatible import verify
+from stage_daily_reel import validate_mp4, validate_cover
+from ensure_meta_compatible import verify
 
 def main():
     out = Path("output")
