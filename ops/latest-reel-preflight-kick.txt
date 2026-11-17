@@ -1,0 +1,1 @@
+Lanzar inventario de ultimo Reel (solo lectura).
