@@ -32,7 +32,7 @@ jobs:
           python -u render.py
           test -s output/umbral_20261117.mp4
           test -s output/cover.jpg
-          python scripts/ensure_meta_compatible.py output/umbral_20261117.mp4
+          python scripts/validate_replacement_artifact.py
       - name: Guardar vídeo de sustitución para verificación
         uses: actions/upload-artifact@v4
         with:
