@@ -114,7 +114,7 @@ def generate_images(story, out):
         prompt = scene + ' Cinematic horror film still, realistic, dim lighting, no text.'
         image = pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0.0,
                      height=896, width=512,
-                     generator=torch.Generator('cpu').manual_seed(7300 + i)).images[0]
+                     generator=torch.Generator('cpu').manual_seed(int(story.get('image_seed_base', 7300)) + i)).images[0]
         path = out / f'scene_{i:02}.png'
         image.save(path)
         print(f'Imagen: {i + 1}/{len(story["scenes"])}', flush=True)
