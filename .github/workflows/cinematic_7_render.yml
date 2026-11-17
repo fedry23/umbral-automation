@@ -1,0 +1,36 @@
+name: UMBRAL - Render cinematografico episodio 7 sin publicar
+on:
+  push:
+    branches: [main]
+    paths: ['ops/cinematic-7-render.txt']
+permissions:
+  contents: read
+concurrency:
+  group: umbral-cinematic-render
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      UMBRAL_TEST_MODE: cinematic-episode-7
+      UMBRAL_STORY_TITLE: El maniquí del escaparate
+      UMBRAL_SPEED: '1.08'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: "true"
+      - name: Regresiones completas
+        run: python -m unittest discover -s tests -v
+      - name: Render original sin publicar
+        run: python -u render.py
+      - name: Guardar prueba para inspeccion previa
+        uses: actions/upload-artifact@v4
+        with:
+          name: umbral-cinematic-7
+          path: output/
+          retention-days: 7
+          if-no-files-found: error
