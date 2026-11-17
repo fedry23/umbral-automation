@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths: ['ops/replacement-preflight-kick.txt']
 permissions:
-  contents: read
+  contents: write
 jobs:
   preflight:
     runs-on: ubuntu-latest
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          persist-credentials: true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -21,6 +21,20 @@ jobs:
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: python scripts/replacement_preflight.py
+      - name: Guardar resultado verificable en el repositorio
+        if: success()
+        shell: bash
+        run: |
+          mkdir -p docs/audit
+          cp staged/replacement_preflight.json docs/audit/replacement-preflight.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/audit/replacement-preflight.json
+          if ! git diff --cached --quiet; then
+            git commit -m "UMBRAL: registrar preflight seguro de sustitución"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
       - name: Conservar diagnóstico
         if: always()
         uses: actions/upload-artifact@v4
