@@ -17,11 +17,11 @@ class RenderTests(unittest.TestCase):
         for story in stories:
             self.assertEqual(' '.join(render.phrases(story['narration'])), story['narration'])
             from PIL import ImageFont
-            font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 38)
+            font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 34)
             for phrase in render.phrases(story['narration']):
                 lines = render.subtitle_lines(phrase)
                 self.assertLessEqual(len(lines), 2)
-                self.assertTrue(all(font.getlength(line) <= 550 for line in lines))
+                self.assertTrue(all(font.getlength(line) <= 480 for line in lines))
 
     def test_scene_image_prompt_keeps_scene_and_limits_visual_chaos(self):
         prompt = render.scene_image_prompt("  An empty corridor  at night. ")
