@@ -1,1 +1,1 @@
-2026-11-17 | Render independiente episodio 8 La llamada de mantenimiento; no publicar ni eliminar en este workflow.
+2026-11-17 | PRUEBA COMPLETA: render episodio 8 con validador integral, sin borrar ni publicar antes de verificación.
