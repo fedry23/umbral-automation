@@ -18,7 +18,7 @@ def assess_image(image, previous=None):
     mean = float(gray.mean())
     reasons = []
     # Low-key lighting is intentional in horror; reject only near-flat frames.
-    if contrast < 4:
+    if contrast < 2 and detail < 1:
         reasons.append('low_contrast')
     if detail < 0.8 and contrast < 8:
         reasons.append('blur_or_flat')
