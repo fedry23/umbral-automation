@@ -154,7 +154,34 @@ def generate_images(story, out):
     return paths
 
 
-def encode(out, images, duration, outfile, branding=None):
+
+def scene_boundaries_from_cues(cues, branding, count):
+    """Align scene transitions to narrated story cues, not arbitrary video time."""
+    if count < 1:
+        raise ValueError('No hay escenas')
+    start, end = float(branding['intro_end']), float(branding['outro_start'])
+    story_cues = [(float(a), float(b), text) for a, b, text in cues
+                  if a >= start - 0.02 and b <= end + 0.02 and text.strip()]
+    if not story_cues:
+        return [start + (end - start) * i / count for i in range(count + 1)]
+    weights = [max(1, len(text.split())) for _, _, text in story_cues]
+    total = sum(weights)
+    boundaries = [start]
+    for index in range(1, count):
+        target = total * index / count
+        running = 0
+        chosen = None
+        for (a, b, _), weight in zip(story_cues, weights):
+            if running + weight >= target:
+                fraction = (target - running) / weight
+                chosen = a + (b - a) * fraction
+                break
+            running += weight
+        boundaries.append(max(boundaries[-1] + 0.001, min(end - 0.001, chosen if chosen is not None else end)))
+    return boundaries + [end]
+
+
+def encode(out, images, duration, outfile, branding=None, cues=None):
     if not images:
         raise ValueError('Se necesitan imágenes para renderizar')
     # Rutas relativas controladas; subprocess nunca utiliza shell.
@@ -171,9 +198,11 @@ def encode(out, images, duration, outfile, branding=None):
             raise ValueError('Duraciones de intro, historia y outro imposibles')
         intro = out / 'intro_card.png'
         outro = out / 'outro_card.png'
-        story_each = (outro_start - intro_end) / len(images)
+        bounds = (scene_boundaries_from_cues(cues, branding, len(images))
+                  if cues else [intro_end + (outro_start - intro_end) * i / len(images)
+                                for i in range(len(images) + 1)])
         timeline = ([(intro, intro_end)]
-                    + [(img, story_each) for img in images]
+                    + [(img, bounds[i + 1] - bounds[i]) for i, img in enumerate(images)]
                     + [(outro, duration - outro_start)])
     animated_inputs = []
     if branding is not None:
@@ -333,7 +362,7 @@ def render():
     timing = json.loads((OUT / 'branding_timing.json').read_text(encoding='utf-8'))
     illustrated = time.monotonic()
     outfile = OUT / f'umbral_{date:%Y%m%d}.mp4'
-    encode(OUT, images, duration, outfile, branding=timing)
+    encode(OUT, images, duration, outfile, branding=timing, cues=cues)
     timings = {'voice_seconds': voiced - started, 'images_seconds': illustrated - voiced,
                'encoding_seconds': time.monotonic() - illustrated,
                'total_seconds': time.monotonic() - started}
