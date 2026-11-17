@@ -34,6 +34,15 @@ class RenderTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             render.scene_image_prompt("x" * 851)
 
+    def test_image_profile_configuration_is_reversible(self):
+        # The CPU profile must keep the old quality mode available.
+        import inspect
+        source = inspect.getsource(render.generate_images)
+        self.assertIn("UMBRAL_IMAGE_PROFILE", source)
+        self.assertIn("(3, 768, 448)", source)
+        self.assertIn("(4, 896, 512)", source)
+        self.assertIn("profile not in ('fast', 'quality')", source)
+
     def test_subtitles(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'subtitles.ass'
