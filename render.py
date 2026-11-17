@@ -248,7 +248,7 @@ def render():
         if replacement_file != 'stories/replacement_latest_2026-11-17.json' or test_title:
             raise ValueError('Ruta de sustitución no autorizada')
         story = json.loads((BASE / replacement_file).read_text(encoding='utf-8'))
-        story = {**story, 'episode_number': 10}
+        story = {**story, 'episode_number': 8}
         if story.get('publish_date') or len(story.get('scenes', [])) != 6 or not 140 <= len(story.get('narration','').split()) <= 170:
             raise ValueError('Relato de sustitución inválido')
     elif test_title:
