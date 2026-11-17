@@ -1,0 +1,18 @@
+[
+  {
+    "title": "La voz del ascensor",
+    "hook": "El ascensor anunciaba pisos que no existían.",
+    "narration": "El ascensor de mi edificio empezó a hablar una noche de noviembre. No era la voz grabada de siempre. Susurraba mi nombre antes de abrir las puertas. Pensé que algún vecino había manipulado el altavoz, hasta que anunció el piso trece. Nuestro bloque solo tiene ocho plantas. Pulsé el botón de alarma, pero la cabina siguió subiendo. En el espejo apareció una mujer detrás de mí. Me giré y no había nadie. Cuando volví a mirar, ella estaba más cerca. La voz dijo que llevaba años esperando que alguien llegara hasta arriba. Las puertas se abrieron frente a un pasillo idéntico al de mi casa, salvo por una cosa: todas las puertas tenían mi nombre. Escuché golpes desde dentro de cada vivienda. Entonces sonó mi teléfono. Era mi madre, llorando. Me preguntó por qué llevaba tres días desaparecido. Miré el reloj del ascensor. Marcaba las nueve de la mañana del próximo jueves. Y detrás de mí, la mujer sonrió.",
+    "caption": "Un ascensor que llega a un piso imposible. ¿Entrarías en ese pasillo?",
+    "scenes": [
+      "Interior de ascensor antiguo de edificio residencial español por la noche, panel de botones del uno al ocho, iluminación fría y realista",
+      "Primer plano del altavoz del ascensor y pantalla digital que marca 13, reflejos metálicos inquietantes",
+      "Espejo de ascensor con silueta femenina borrosa detrás de un hombre visto de espaldas, fotografía cinematográfica realista",
+      "Pasillo residencial oscuro con múltiples puertas de madera idénticas y placas con un mismo nombre ilegible",
+      "Primer plano de teléfono móvil iluminado en una mano temblorosa dentro del ascensor, llamada entrante de madre",
+      "Reloj digital del ascensor mostrando 09:00, figura femenina sonriente reflejada en espejo al fondo"
+    ],
+    "episode_number": 11,
+    "publish_date": "2026-11-18"
+  }
+]
