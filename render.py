@@ -211,6 +211,12 @@ def load_stories():
     seen_numbers = set()
     seen_dates = set()
     for story in stories:
+        if not isinstance(story.get('narration'), str) or not story['narration'].strip():
+            raise ValueError('Narración vacía o inválida: ' + str(story.get('title')))
+        if ' '.join(story['narration'].split()) != story['narration']:
+            raise ValueError('La narración contiene saltos o espacios no normalizados: ' + str(story.get('title')))
+        if not isinstance(story.get('scenes'), list) or not all(isinstance(s, str) and s.strip() for s in story['scenes']):
+            raise ValueError('Escenas vacías o inválidas: ' + str(story.get('title')))
         if not 140 <= len(story['narration'].split()) <= 170:
             raise ValueError(f"Longitud incorrecta: {story['title']}")
         if not 3 <= len(story['scenes']) <= 8:
