@@ -10,8 +10,8 @@ on:
   # El workflow de generación NO publica en Instagram.
   schedule:
     - cron: '17 2 * * *' # Generar de madrugada, listo antes de las 21:00 Europe/Madrid
-  pull_request:
-    branches: [main]
+  # PR test renders disabled to avoid redundant CPU-heavy runs.
+  # Daily schedule and manual dispatch remain available.
 
 permissions:
   contents: read
