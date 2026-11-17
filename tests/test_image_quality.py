@@ -16,6 +16,13 @@ class ImageQualityTests(unittest.TestCase):
         _, reasons = assess_image(image)
         self.assertEqual(reasons, [])
 
+    def test_dark_cinematic_scene_is_not_rejected(self):
+        rng = np.random.default_rng(17)
+        pixels = rng.integers(4, 34, (640, 384, 3), dtype=np.uint8)
+        image = Image.fromarray(pixels)
+        _, reasons = assess_image(image)
+        self.assertEqual(reasons, [])
+
     def test_rejects_duplicate(self):
         rng = np.random.default_rng(3)
         image = Image.fromarray(rng.integers(20, 230, (640, 384, 3), dtype=np.uint8))
