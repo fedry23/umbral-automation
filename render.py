@@ -125,16 +125,21 @@ def generate_images(story, out):
     pipe = AutoPipelineForText2Image.from_pretrained(
         'stabilityai/sd-turbo', torch_dtype=torch.float32)
     pipe.enable_attention_slicing()
+    import time
     paths = []
+    total_start = time.monotonic()
     for i, scene in enumerate(story['scenes']):
+        scene_start = time.monotonic()
         prompt = scene_image_prompt(scene)
         image = pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0.0,
                      height=896, width=512,
                      generator=torch.Generator('cpu').manual_seed(int(story.get('image_seed_base', 7300)) + i)).images[0]
         path = out / f'scene_{i:02}.png'
         image.save(path)
-        print(f'Imagen: {i + 1}/{len(story["scenes"])}', flush=True)
+        print(f'Imagen: {i + 1}/{len(story["scenes"])} '
+              f'({time.monotonic() - scene_start:.1f}s)', flush=True)
         paths.append(path)
+    print(f'UMBRAL_IMAGE_TOTAL_SECONDS={time.monotonic() - total_start:.1f}', flush=True)
     return paths
 
 
