@@ -128,6 +128,14 @@ def extract_run_zip(raw, date):
         story = json.loads(z.read("story_used.json"))
         caption = z.read("caption.txt").decode("utf-8")
         verify_story(story, caption, date)
+        # Reject stale renders from earlier runs on the same date.
+        scheduled = json.loads(Path("stories.json").read_text(encoding="utf-8"))
+        expected = [s for s in scheduled if s.get("publish_date") == date]
+        if len(expected) != 1 or any(
+            story.get(key) != expected[0].get(key)
+            for key in ("title", "episode_number", "narration")
+        ):
+            raise ValueError("Artefacto obsoleto: no coincide con episodio oficial vigente")
         if z.getinfo("music.wav").file_size < 20000:
             raise ValueError("La música original está vacía")
         for filename in [expected, "story_used.json", "caption.txt",
