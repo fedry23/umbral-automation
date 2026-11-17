@@ -2,6 +2,7 @@
 import datetime as dt
 import importlib.util
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -23,6 +24,23 @@ stager = load_module("stage_daily_reel", "scripts/stage_daily_reel.py")
 
 
 class PublicationTests(unittest.TestCase):
+    def setUp(self):
+        # Production assertions must not inherit the one-shot render job's mode.
+        env = patch.dict(os.environ, {"UMBRAL_TEST_MODE": "", "UMBRAL_ONE_TIME_LATE_DATE": ""})
+        env.start()
+        self.addCleanup(env.stop)
+
+    def test_test_marker_is_distinct_on_fixed_date(self):
+        now = dt.datetime(2026, 11, 17, 6, 0, tzinfo=ZoneInfo("Europe/Madrid"))
+        with patch.object(publisher, "now_local", return_value=now):
+            daily = publisher.daily_marker("2026-11-17")
+            with patch.dict(os.environ, {"UMBRAL_TEST_MODE": "cinematic-episode-6"}):
+                special = publisher.daily_marker("2026-11-17")
+                self.assertEqual(special, "🩸 UMBRAL · PRUEBA 6 · 2026-11-17")
+                self.assertNotEqual(daily, special)
+                self.assertFalse(publisher.test_release_allowed("2026-11-18"))
+                self.assertEqual(publisher.daily_marker("2026-11-18"), "🩸 UMBRAL · 2026-11-18")
+
     def test_winter_and_summer_21_local(self):
         winter = publisher.target_time("2026-11-17")
         summer = publisher.target_time("2027-07-17")
