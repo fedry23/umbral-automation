@@ -169,19 +169,48 @@ def generate_images(story, out):
         raise ValueError('Perfil de imágenes desconocido')
     steps, height, width = (1, 640, 384) if profile == 'fast' else (4, 896, 512)
     print(f'UMBRAL_IMAGE_PROFILE={profile} steps={steps} size={width}x{height}', flush=True)
-    paths = []
+    from image_quality import assess_image
+    paths, report = [], []
     total_start = time.monotonic()
+    max_attempts = int(os.getenv('UMBRAL_IMAGE_ATTEMPTS', '3'))
+    if not 1 <= max_attempts <= 5:
+        raise ValueError('Número de intentos de imagen fuera de rango')
     for i, scene in enumerate(visual_shots(story)):
         scene_start = time.monotonic()
         prompt = scene_image_prompt(scene)
-        image = pipe(prompt=prompt, num_inference_steps=steps, guidance_scale=0.0,
-                     height=height, width=width,
-                     generator=torch.Generator('cpu').manual_seed(int(story.get('image_seed_base', 7300)) + i)).images[0]
+        best_image, best_score, best_reasons = None, float('-inf'), []
+        attempts = []
+        for attempt in range(max_attempts):
+            seed = int(story.get('image_seed_base', 7300)) + i + attempt * 1009
+            image = pipe(prompt=prompt, num_inference_steps=steps, guidance_scale=0.0,
+                         height=height, width=width,
+                         generator=torch.Generator('cpu').manual_seed(seed)).images[0]
+            if paths:
+                with Image.open(paths[-1]) as prev:
+                    score, reasons = assess_image(image, prev)
+            else:
+                score, reasons = assess_image(image)
+            attempts.append({'seed': seed, 'score': score, 'reasons': reasons})
+            if score > best_score:
+                best_image, best_score, best_reasons = image, score, reasons
+            if not reasons:
+                break
+            print(f'Imagen {i + 1}: intento {attempt + 1} rechazado '
+                  f'({", ".join(reasons)}); regenerando', flush=True)
+        if best_reasons:
+            # Do not silently publish an objectively defective frame.
+            raise RuntimeError(f'Imagen {i + 1} sin candidato válido tras '
+                               f'{max_attempts} intentos: {best_reasons}')
         path = out / f'scene_{i:02}.png'
-        image.save(path)
+        best_image.save(path)
+        report.append({'scene': i + 1, 'attempts': attempts,
+                       'accepted_score': best_score})
         print(f'Imagen: {i + 1}/{len(story["scenes"])} '
-              f'({time.monotonic() - scene_start:.1f}s)', flush=True)
+              f'({time.monotonic() - scene_start:.1f}s; '
+              f'{len(attempts)} intento(s))', flush=True)
         paths.append(path)
+    (out / 'image_quality_report.json').write_text(
+        json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
     print(f'UMBRAL_IMAGE_TOTAL_SECONDS={time.monotonic() - total_start:.1f}', flush=True)
     return paths
 
