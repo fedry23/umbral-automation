@@ -214,7 +214,7 @@ def encode(out, images, duration, outfile, branding=None):
         '-i', 'music.wav', *animated_inputs,
         '-filter_complex', vf + ';' + af,
         '-map', '[v]', '-map', '[mixed]', '-t', f'{duration:.6f}',
-        '-c:v', 'libx264', '-threads', '2', '-preset', 'veryfast', '-crf', '23',
+        '-c:v', 'libx264', '-threads', '4', '-preset', 'superfast', '-crf', '23',
         '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-ar', '48000',
         '-movflags', '+faststart', outfile.name, cwd=out)
     validate_video(outfile, duration)
