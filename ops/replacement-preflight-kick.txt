@@ -1,1 +1,2 @@
 2026-11-17: Comprobación automática sin borrar ni publicar. Objetivo 18121779709999190.
+Segundo lanzamiento: persistir diagnóstico sin publicar ni borrar.
