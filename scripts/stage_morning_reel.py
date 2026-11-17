@@ -170,7 +170,7 @@ def main():
     if not run:
         raise RuntimeError("No hay una generación programada correcta para hoy; no se reutilizan vídeos")
     art = github_get(f"repos/{REPO}/actions/runs/{run['id']}/artifacts")
-    matches = [a for a in art.get("artifacts", []) if a.get("name") == "umbral-reel" and not a.get("expired")]
+    matches = [a for a in art.get("artifacts", []) if a.get("name") == "umbral-reel-09" and not a.get("expired")]
     if len(matches) != 1:
         raise RuntimeError("No existe el artefacto único esperado del Reel diario")
     blob = github_get(f"repos/{REPO}/actions/artifacts/{matches[0]['id']}/zip", binary=True)
