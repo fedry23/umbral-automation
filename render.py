@@ -122,6 +122,14 @@ def scene_image_prompt(scene):
 # Curated object-led shots avoid the recurring SD-Turbo failures with people,
 # hands, complex multi-character actions and electrical equipment manipulation.
 CURATED_VISUAL_SHOTS = {
+    'El turno que faltaba': [
+        'Empty Spanish factory at night, one attendance terminal glowing on a desk in a small industrial control room, cold fluorescent lighting, cinematic photographic still, no people, no hands, no text.',
+        'A single old industrial metal lathe inside an empty Spanish factory workshop at night, long shadows, straight realistic machinery, cinematic photographic still, no people, no hands, no text.',
+        'An empty factory locker room, one metal locker door slightly open, a small vintage time clock beside the exit, grounded photographic suspense, no people, no hands, no text.',
+        'Close-up of one security surveillance monitor on a factory office desk showing an empty locker-room corridor, realistic screen reflections, dim surroundings, no people, no hands, no text.',
+        'An empty security booth at a Spanish factory gate at night, an old telephone resting beside a rain-streaked window, deserted parking area, cinematic photographic still, no people, no hands, no text.',
+        'Close-up of one factory attendance terminal glowing deep red beside an abandoned navy work jacket hanging on a chair, empty dark corridor behind, photographic horror still, no people, no hands, no text.',
+    ],
     'El contador inverso': [
         'A small basement electricity meter room in an old Spanish apartment building, a single vintage mechanical electricity meter on a concrete wall, straight-on architectural photograph, no people, no hands, no lettering.',
         'An empty third-floor apartment doorway opening onto a modest Spanish living room, a single pendant lamp above an empty armchair, realistic interior photograph, no people, no hands, no lettering.',
