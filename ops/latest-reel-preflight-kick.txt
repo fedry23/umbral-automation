@@ -1,1 +1,1 @@
-Lanzar inventario de ultimo Reel (solo lectura).
+Revalidar último Reel y número de episodio desde Instagram, solo lectura. 2026-11-17 segunda comprobación.
