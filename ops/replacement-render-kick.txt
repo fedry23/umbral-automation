@@ -1,1 +1,1 @@
-Ejecutar render aislado de La llamada de mantenimiento, sin publicar ni eliminar.
+2026-11-17 | Render independiente episodio 8 La llamada de mantenimiento; no publicar ni eliminar en este workflow.
