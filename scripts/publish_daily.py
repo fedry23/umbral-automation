@@ -44,11 +44,12 @@ def daily_marker(day):
 
 
 def one_time_late_allowed(day):
-    """Explicit owner-approved 16 Nov exception; no effect on future dates."""
+    """Allow an explicitly configured, date-scoped recovery, never globally."""
+    configured = os.getenv("UMBRAL_ONE_TIME_LATE_DATE", "")
     return (test_release_allowed(day)
-            or (os.getenv("UMBRAL_ONE_TIME_LATE_DATE") == "2026-11-16"
-                and day == "2026-11-16"
-                and now_local().date().isoformat() == "2026-11-16"))
+            or (configured in ("2026-11-16", "2026-11-17")
+                and configured == day
+                and now_local().date().isoformat() == day))
 
 
 def full_caption(text, day):
