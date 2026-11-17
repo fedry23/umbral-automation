@@ -1,0 +1,28 @@
+name: UMBRAL - Auditoría Instagram sin cambios
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Leer cuenta y detectar publicación más antigua y duplicados
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python scripts/audit_instagram.py
+      - name: Guardar informe privado como artefacto
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instagram-readonly-audit
+          path: staged/instagram_inventory.json
+          retention-days: 3
+          if-no-files-found: ignore
