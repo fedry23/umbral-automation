@@ -67,6 +67,7 @@ jobs:
             output/branding_timing.json
             output/intro_card.png
             output/outro_card.png
+            output/scene_contact_sheet.jpg
             output/cover.jpg
             output/caption.txt
             output/story_used.json
