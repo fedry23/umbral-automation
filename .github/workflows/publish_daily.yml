@@ -12,6 +12,7 @@ on:
     paths:
       - 'ops/publish-kick.txt'
   workflow_dispatch:
+  workflow_call:
   # Recover from a missed scheduler by reacting to a verified daily render.
   workflow_run:
     workflows: ['UMBRAL - Generación para revisión']
@@ -37,7 +38,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ github.token }}
       UMBRAL_DURABLE_GUARD: '1'
-      # One-day recovery only; remove after 2026-11-17.
+      # Date-scoped exception only; expires automatically on other dates.
       UMBRAL_ONE_TIME_LATE_DATE: '2026-11-17'
     steps:
       - name: Código y autorización
