@@ -44,5 +44,8 @@ jobs:
             output/caption.txt
             output/branding_timing.json
             output/music.wav
+            output/intro_card.png
+            output/outro_card.png
+            output/subtitles.ass
           retention-days: 7
           if-no-files-found: error
