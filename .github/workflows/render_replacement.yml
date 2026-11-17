@@ -1,0 +1,48 @@
+name: UMBRAL - Render sustituto independiente (NO PUBLICA)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'ops/replacement-render-kick.txt'
+permissions:
+  contents: read
+concurrency:
+  group: umbral-replacement-render
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: "true"
+      - name: Validar relato independiente
+        run: python scripts/auto_repair.py --file stories.json
+      - name: Generar sustituto sin tocar Instagram
+        env:
+          UMBRAL_REPLACEMENT_STORY_FILE: stories/replacement_latest_2026-11-17.json
+          UMBRAL_DATE: '2026-11-17'
+          UMBRAL_SPEED: '1.08'
+        run: |
+          python -u render.py
+          test -s output/umbral_20261117.mp4
+          test -s output/cover.jpg
+          python scripts/ensure_meta_compatible.py output/umbral_20261117.mp4
+      - name: Guardar vídeo de sustitución para verificación
+        uses: actions/upload-artifact@v4
+        with:
+          name: umbral-replacement-preview
+          path: |
+            output/*.mp4
+            output/cover.jpg
+            output/story_used.json
+            output/caption.txt
+            output/branding_timing.json
+            output/music.wav
+          retention-days: 7
+          if-no-files-found: error
