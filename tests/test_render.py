@@ -51,6 +51,14 @@ class RenderTests(unittest.TestCase):
         self.assertIn('armchair', shots[3])
         self.assertIn('intercom', shots[4])
 
+    def test_tomorrows_factory_story_has_safe_storyboard(self):
+        story = next(s for s in render.load_stories() if s['title'] == 'El turno que faltaba')
+        shots = render.visual_shots(story)
+        self.assertEqual(len(shots), 6)
+        self.assertTrue(all('no people' in shot and 'no hands' in shot for shot in shots))
+        self.assertIn('security booth', shots[4])
+        self.assertIn('attendance terminal', shots[5])
+
     def test_scene_boundaries_follow_spoken_cues(self):
         cues = [(2, 3, 'primera frase'), (3, 5, 'segunda frase con mas palabras'),
                 (5, 9, 'tercera frase bastante mas larga para cerrar')]
