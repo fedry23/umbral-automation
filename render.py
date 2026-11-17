@@ -118,6 +118,30 @@ def scene_image_prompt(scene):
     )
 
 
+
+# Curated object-led shots avoid the recurring SD-Turbo failures with people,
+# hands, complex multi-character actions and electrical equipment manipulation.
+CURATED_VISUAL_SHOTS = {
+    'El contador inverso': [
+        'A small basement electricity meter room in an old Spanish apartment building, a single vintage mechanical electricity meter on a concrete wall, straight-on architectural photograph, no people, no hands, no lettering.',
+        'An empty third-floor apartment doorway opening onto a modest Spanish living room, a single pendant lamp above an empty armchair, realistic interior photograph, no people, no hands, no lettering.',
+        'Close-up of one old mechanical electricity meter mounted on a concrete wall under a fluorescent light, simple realistic utility-room still life, no people, no hands, no lettering.',
+        'An empty armchair in a modest Spanish living room, shattered glass from a fallen ceiling lamp on the floor beside the chair, realistic interior photograph, no people, no hands, no lettering.',
+        'An empty second-floor apartment corridor with a wall intercom beside a doorway, a thin stream of water visible through the open doorway, realistic architectural photograph, no people, no hands, no lettering.',
+        'An empty basement electricity meter room, several vintage meters on a wall, fine dust drifting from a cracked concrete ceiling, cinematic realistic architectural photograph, no people, no hands, no lettering.',
+    ],
+}
+
+
+def visual_shots(story):
+    curated = CURATED_VISUAL_SHOTS.get(story.get('title'))
+    if curated is not None:
+        if len(curated) != len(story['scenes']):
+            raise ValueError('Las escenas visuales revisadas no coinciden con el relato')
+        return curated
+    return story['scenes']
+
+
 def generate_images(story, out):
     import torch
     from diffusers import AutoPipelineForText2Image
@@ -139,7 +163,7 @@ def generate_images(story, out):
     print(f'UMBRAL_IMAGE_PROFILE={profile} steps={steps} size={width}x{height}', flush=True)
     paths = []
     total_start = time.monotonic()
-    for i, scene in enumerate(story['scenes']):
+    for i, scene in enumerate(visual_shots(story)):
         scene_start = time.monotonic()
         prompt = scene_image_prompt(scene)
         image = pipe(prompt=prompt, num_inference_steps=steps, guidance_scale=0.0,
