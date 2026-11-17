@@ -36,6 +36,22 @@ class CoverAndCardsTests(unittest.TestCase):
             self.assertLess(cover.stat().st_size, 8_000_000)
             self.assertTrue(validate_cover(cover))
 
+    def test_cover_prefers_opening_scene_over_uninformative_middle(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            scenes = []
+            for i in range(6):
+                p = out / f"scene_{i:02}.png"
+                Image.new("RGB", (512, 896), (245, 35, 35) if i == 0 else (35, 35, 245)).save(p)
+                scenes.append(p)
+            story = {"episode_number": 6, "title": "La luz del rellano"}
+            path = make_thumbnail(story, scenes, out / "cover.jpg")
+            with Image.open(path) as cover:
+                red, green, blue = cover.getpixel((80, 80))
+                self.assertGreater(red, blue)
+            with self.assertRaises(ValueError):
+                make_thumbnail({**story, "cover_scene_index": 6}, scenes, out / "bad.jpg")
+
     def test_number_is_required_and_empty_scene_list_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(ValueError):
