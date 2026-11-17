@@ -98,12 +98,39 @@ def api(method, path, params=None):
             raise RuntimeError(f"Instagram Graph API {method}: fallo de red; no se repite la escritura") from None
 
 
+def owned_media(max_pages=20):
+    """Read-only paginated account inventory. Fail closed if incomplete."""
+    from urllib.parse import urlsplit, parse_qs
+    cursor = None
+    seen_cursors = set()
+    for _ in range(max_pages):
+        params = {"fields": "id,caption,permalink,timestamp,media_type,media_product_type",
+                  "limit": 100}
+        if cursor:
+            params["after"] = cursor
+        data = api("GET", f"{ACCOUNT}/media", params)
+        if not isinstance(data.get("data"), list):
+            raise RuntimeError("Meta devolvió un listado incompleto; no se permite publicar")
+        yield from data["data"]
+        next_url = data.get("paging", {}).get("next")
+        if not next_url:
+            return
+        parts = urlsplit(next_url)
+        if parts.scheme != "https" or parts.hostname != "graph.facebook.com":
+            raise RuntimeError("Paginación Meta inesperada")
+        values = parse_qs(parts.query).get("after", [])
+        if len(values) != 1 or not values[0] or values[0] in seen_cursors:
+            raise RuntimeError("Paginación Meta repetida o inválida")
+        cursor = values[0]
+        seen_cursors.add(cursor)
+    raise RuntimeError("Inventario Meta supera límite de páginas; detener por seguridad")
+
+
 def already_published(day):
-    """Search owned recent media; prevent duplicate retries after timeouts."""
-    data = api("GET", f"{ACCOUNT}/media",
-               {"fields": "id,caption,permalink,timestamp", "limit": 100})
-    for item in data.get("data", []):
-        if daily_marker(day) in item.get("caption", ""):
+    """Find an existing dated Reel across paginated account media."""
+    marker = daily_marker(day)
+    for item in owned_media():
+        if marker in (item.get("caption") or ""):
             return item
     return None
 
