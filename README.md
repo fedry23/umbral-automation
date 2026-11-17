@@ -185,3 +185,19 @@ implica que una prueba extraordinaria se publique en orden cronológico.
 La preparación diaria, verano/invierno y respaldos se mantienen. GitHub/Meta
 pueden retrasarse: pasada la ventana se aborta, se informa y no se publica tarde.
 La nueva prueba y sus comprobaciones se documentarán con IDs reales al terminar.
+
+
+### Revisión del 17/11/2026
+
+El render de prueba 43963282111 terminó correctamente (68,67 s de vídeo),
+pero la inspección visual detectó que los prompts largos repetían el ambiente
+al principio y perdían acciones específicas por el límite de texto del modelo.
+El generador ahora prioriza la acción y las seis escenas del episodio 6 usan
+prompts breves. La tarea editorial incorpora el mismo límite para relatos nuevos.
+Se solicita un render nuevo antes de publicar; el render anterior no se publicó.
+
+Dos ejecuciones retrasadas del publicador, 43990600566 y 43998945222, llegaron
+de madrugada del 17/11 y abortaron antes de Meta por falta del vídeo de ese día.
+La guarda admite ahora preparación solo de 17:00 a 20:40 Europe/Madrid y evita
+que un cron del día anterior intente preparar una publicación de madrugada.
+La hora objetivo permanece en 21:00 y los cron y respaldos no se alteran.
