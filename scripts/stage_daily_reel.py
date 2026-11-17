@@ -114,6 +114,13 @@ def extract_run_zip(raw, date):
     OUT.mkdir(exist_ok=True)
     with zipfile.ZipFile(io.BytesIO(raw)) as z:
         names = z.namelist()
+        # Reject ambiguous or oversized artifacts before decompressing anything.
+        if len(names) != len(set(names)) or len(names) > 100:
+            raise ValueError("Artefacto ZIP con entradas duplicadas o excesivas")
+        if any(info.file_size > 250_000_000 for info in z.infolist()):
+            raise ValueError("Archivo del artefacto demasiado grande")
+        if sum(info.file_size for info in z.infolist()) > 350_000_000:
+            raise ValueError("Artefacto descomprimido supera el límite")
         mp4s = [n for n in names if n.endswith(".mp4") and "/" not in n]
         if len(mp4s) != 1:
             raise ValueError("Se esperaba exactamente un MP4 en el artefacto")
