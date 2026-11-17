@@ -63,12 +63,8 @@ jobs:
           path: |
             output/*.mp4
             output/timings.json
-            output/subtitles.ass
-            output/scene_*.png
-            output/voice.wav
             output/music.wav
             output/branding_timing.json
-            output/brand_story.json
             output/intro_card.png
             output/outro_card.png
             output/cover.jpg
