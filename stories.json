@@ -36,7 +36,6 @@
     ]
   },
   {
-    "publish_date": "2026-11-17",
     "title": "El piso menos dos",
     "hook": "El ascensor que debía estar apagado volvió a funcionar. Alguien lo había preparado para mí.",
     "narration": "Trabajo revisando ascensores. Ayer el portero me llamó porque el ascensor de servicio, clausurado desde hacía veinte años, volvía a funcionar. Entré para desconectarlo y apareció un botón que no figuraba en los planos: menos dos. La cabina bajó antes de que pudiera pulsarlo. Al abrirse, encontré un pasillo idéntico al de la cuarta planta, donde vivo. Delante de cada puerta había un par de zapatos. Reconocí mis botas, con la suela derecha rota. Entonces mi puerta se abrió. Salió un hombre con mi cara, mi uniforme y unas botas nuevas. «Gracias por venir», me dijo. Pasó a mi lado y subió al ascensor. Corrí detrás, pero las puertas se cerraron. Llamé al portero para que lo detuviera. «¿Detenerte? —preguntó—. Acabas de subir. Me has dado las buenas noches». Intenté llamar de nuevo. No había cobertura. Miré el panel del ascensor: todos los botones habían desaparecido, salvo el de menos dos.",
@@ -118,7 +117,7 @@
     "image_seed_base": 14371
   },
   {
-    "publish_date": "2026-11-18",
+    "publish_date": "2026-11-17",
     "title": "El contador inverso",
     "hook": "El contador empezó a girar hacia atrás. Después cayó la lámpara.",
     "narration": "Soy electricista y ayer me llamaron a un bloque porque los contadores marcaban consumos negativos. En el cuarto de instalaciones encontré uno girando hacia atrás. Pertenecía al tercero B. Subí a comprobar si había una instalación defectuosa. La vecina me abrió y aseguró que llevaba dos días sin encender nada. Sin embargo, su contador retrocedía cada vez más deprisa. Le pedí que bajara conmigo para cortar el suministro con seguridad. Cuando llegamos, el contador se detuvo en cero. Se oyó un golpe arriba. Volvimos al tercero: una lámpara había caído exactamente donde ella estaba sentada antes de abrirme. Pensé que había sido una coincidencia. Pero el contador del segundo A empezó a retroceder. Avisé a su propietario por el telefonillo. Salió al pasillo justo antes de que reventara una tubería sobre su cama. Regresé al cuarto de instalaciones para llamar a emergencias. Todos los contadores estaban quietos, salvo el de las zonas comunes. Giraba hacia atrás. Sobre mi cabeza empezó a crujir el techo.",
@@ -131,6 +130,22 @@
       "Vertical over-the-shoulder shot of the electrician and elderly woman returning to her third-floor living room, staring at a shattered ceiling pendant lying beside the empty armchair where she had been sitting. Dust and glass fragments, consistent apartment interior, natural realistic thriller lighting, no text.",
       "Vertical medium shot of the electrician urgently speaking into a wall intercom outside the second-floor apartment while its male resident steps into the corridor. Through the open doorway, a burst water pipe sprays over the resident's unoccupied bed. Realistic Spanish residential building, cinematic urgency, no text.",
       "Low-angle vertical shot of the same electrician alone beneath a cracking concrete ceiling in the basement meter room, looking up in fear while a single common-area mechanical meter spins backwards beside still meters. Fine dust falls, black tool bag nearby, photorealistic suspense, no text."
+    ]
+  },
+  {
+    "publish_date": "2026-11-18",
+    "title": "El turno que faltaba",
+    "episode_number": 9,
+    "hook": "El registro marcaba un operario más. Nadie sabía quién era.",
+    "narration": "La fábrica cerraba a las diez, pero el registro de presencia seguía contando a un trabajador dentro. Éramos cuatro y los cuatro estábamos junto al torno. Revisé la pantalla: el quinto empleado figuraba como encargado del turno de noche. Su fotografía estaba borrosa y su fecha de alta era mañana. Pensé en un error del programa. Entonces sonó el timbre del vestuario. Alguien había fichado la salida. El contador bajó a cuatro, aunque ninguno se movió. Fuimos a comprobar las cámaras. En la grabación se veía a los cuatro entrando al vestuario y a un quinto hombre saliendo con mi chaqueta. Yo seguía allí, delante del monitor. Llamé al vigilante de la puerta principal. Me dijo que acababa de verme marchar y que le había pedido un favor: no dejara salir a los otros tres. En ese momento, el registro cambió de nuevo. Quedaba un solo trabajador dentro. Mi nombre apareció en rojo.",
+    "caption": "En el turno de noche sobraba un trabajador. Después faltaron tres. 🕒 ¿Quién fichó realmente?",
+    "scenes": [
+      "Photorealistic cinematic horror 9:16, empty Spanish industrial factory control room at night, attendance terminal glowing on a desk, four workers in dark uniforms seen from behind, no readable text.",
+      "Vertical cinematic photo, four industrial technicians standing beside an old metal lathe under cold factory fluorescent lights, deserted background, suspenseful realism, no lettering.",
+      "Close vertical view of a deserted industrial locker room, one metal locker ajar and an old time clock lit beside the door, eerie atmospheric shadows, no text.",
+      "Photorealistic vertical thriller scene, security surveillance monitor in factory office showing an indistinct fifth figure in a work jacket exiting a locker room, four technicians watching from behind, no legible text.",
+      "Vertical 9:16 cinematic night photograph, lone factory security guard on the phone inside a small glass entrance booth, rain streaked windows and empty parking lot, grounded horror realism, no writing.",
+      "Vertical cinematic horror close shot of a deserted factory attendance terminal glowing ominous red, single abandoned work jacket hanging on a chair, empty corridor beyond, realistic lighting, no readable text."
     ]
   }
 ]
