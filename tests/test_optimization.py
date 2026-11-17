@@ -23,6 +23,17 @@ class OptimizationsTests(unittest.TestCase):
         raw=b'known-MP4-bytes'*200000
         self.assertEqual(stream_digest(Bounded(raw)),hashlib.sha256(raw).digest())
 
+    def test_pages_length_mismatch_avoids_full_download(self):
+        class Remote(io.BytesIO):
+            headers = {"Content-Length": "999"}
+            def read(self, *args):
+                raise AssertionError("Should not download mismatched remote asset")
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "video.mp4"
+            path.write_bytes(b"abc")
+            with patch("scripts.wait_public_video.urllib.request.urlopen", return_value=Remote()):
+                self.assertFalse(check_remote(path, "https://example.com/video.mp4"))
+
     def test_intent_is_durable_before_wait_and_single_post(self):
         with tempfile.TemporaryDirectory() as tmp:
             out=Path(tmp)
