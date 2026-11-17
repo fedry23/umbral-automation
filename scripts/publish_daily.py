@@ -40,7 +40,7 @@ def daily_marker(day):
     if test_release_allowed(day):
         episode = "7" if os.getenv("UMBRAL_TEST_MODE") == "cinematic-episode-7" else "6"
         return "🩸 UMBRAL · PRUEBA " + episode + " · " + day
-    return "🩸 UMBRAL · " + day
+    return "🩸 UMBRAL · OFICIAL · " + day
 
 
 def one_time_late_allowed(day):
@@ -54,6 +54,9 @@ def one_time_late_allowed(day):
 def full_caption(text, day):
     text = text.strip()
     marker = daily_marker(day)
+    if not test_release_allowed(day):
+        story = json.loads((OUT / "story_used.json").read_text(encoding="utf-8"))
+        marker += " · EPISODIO " + str(story["episode_number"])
     if marker in text:
         return text
     return text[:2200-len(marker)-2] + "\n\n" + marker
@@ -127,10 +130,16 @@ def owned_media(max_pages=20):
 
 
 def already_published(day):
-    """Find an existing dated Reel across paginated account media."""
-    marker = daily_marker(day)
+    """Only the matching official episode blocks a scheduled publication.
+
+    Tests and legacy day-only markers do not identify the official episode.
+    Durable publish intent and receipt remain enforced separately.
+    """
+    story, _ = read_story(day)
+    marker = daily_marker(day) + " · EPISODIO " + str(story["episode_number"])
     for item in owned_media():
-        if marker in (item.get("caption") or ""):
+        if (item.get("media_product_type") == "REELS"
+                and marker in (item.get("caption") or "")):
             return item
     return None
 
