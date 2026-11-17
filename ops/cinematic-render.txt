@@ -1,1 +1,1 @@
-2026-11-17: regenerate episode 6 with concise action-first scene prompts; render only, no publication.
+2026-11-17: render episode 6 after isolating daily/test marker regression fixtures. No publication.
