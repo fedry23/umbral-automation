@@ -102,6 +102,25 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     dest.write_text(header + '\n'.join(events) + '\n', encoding='utf-8')
 
 
+def scene_image_prompt(scene):
+    """Favor a coherent photographic scene rather than surreal artifacts."""
+    if not isinstance(scene, str) or not scene.strip():
+        raise ValueError("La escena visual no puede estar vacía")
+    scene = ' '.join(scene.split())
+    if len(scene) > 850:
+        raise ValueError("La descripción de escena es demasiado larga")
+    return (
+        "Photorealistic live-action horror film still. One coherent real-world "
+        "location, one clear focal subject, believable human anatomy, realistic "
+        "architecture and object scale, physically plausible practical lighting. "
+        "35mm cinema photography, natural textures, controlled shadows, "
+        "subtle film grain, suspense through composition. "
+        "No collage, no split screen, no lettering, no logos, no extra limbs, "
+        "no duplicated people, no floating objects, no impossible geometry. "
+        "Scene: " + scene
+    )
+
+
 def generate_images(story, out):
     import torch
     from diffusers import AutoPipelineForText2Image
@@ -111,7 +130,7 @@ def generate_images(story, out):
     pipe.enable_attention_slicing()
     paths = []
     for i, scene in enumerate(story['scenes']):
-        prompt = scene + ' Cinematic horror film still, realistic, dim lighting, no text.'
+        prompt = scene_image_prompt(scene)
         image = pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0.0,
                      height=896, width=512,
                      generator=torch.Generator('cpu').manual_seed(int(story.get('image_seed_base', 7300)) + i)).images[0]
