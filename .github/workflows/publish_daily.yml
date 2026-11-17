@@ -38,8 +38,6 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ github.token }}
       UMBRAL_DURABLE_GUARD: '1'
-      # Date-scoped exception only; expires automatically on other dates.
-      UMBRAL_ONE_TIME_LATE_DATE: '2026-11-17'
     steps:
       - name: Código y autorización
         uses: actions/checkout@v4
@@ -78,9 +76,9 @@ jobs:
           if [ -f "docs/published/$DAY.json" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "UMBRAL ya tiene recibo para $DAY, no duplicar"
-          elif [[ "$HHMM" < "1700" || "$HHMM" > "2040" ]] && [[ "$DAY" != "2026-11-17" ]]; then
+          elif [[ "$HHMM" < "1700" ]]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "::warning::Fuera de la ventana de preparacion 17:00-20:40 Europe/Madrid; no preparar ni publicar"
+            echo "::warning::Antes de las 17:00 Europe/Madrid; esperar a la ventana de publicación"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
             echo "Generación comprobable y publicación preparada antes de las 21:00"
