@@ -1,2 +1,1 @@
-Render episode 6 with textured architecture and red light bloom. Review only; no publication.
-2026-11-16 revision 2
+2026-11-17: regenerate episode 6 with concise action-first scene prompts; render only, no publication.
