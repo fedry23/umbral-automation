@@ -1,0 +1,26 @@
+name: UMBRAL - Verificar permiso de eliminacion (solo lectura)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'ops/delete-auth-check-kick.txt'
+permissions:
+  contents: read
+concurrency:
+  group: umbral-delete-auth-check
+  cancel-in-progress: false
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Comprobar token de eliminacion sin publicar ni borrar
+        env:
+          IG_DELETE_ACCESS_TOKEN: ${{ secrets.IG_DELETE_ACCESS_TOKEN }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python scripts/check_delete_token.py
