@@ -63,26 +63,38 @@ def api(method, path, params=None):
     if not token:
         raise RuntimeError("Falta el secreto IG_ACCESS_TOKEN para publicar")
     body = dict(params or {})
-    body["access_token"] = token
     endpoint = GRAPH.rstrip("/") + "/" + path.lstrip("/")
     if method == "GET":
         endpoint += "?" + urllib.parse.urlencode(body)
-        req = urllib.request.Request(endpoint, method="GET")
+        req = urllib.request.Request(endpoint, method="GET", headers={"Authorization": "Bearer " + token})
     else:
         req = urllib.request.Request(
             endpoint, data=urllib.parse.urlencode(body).encode("utf-8"),
-            method=method)
-    try:
-        with urllib.request.urlopen(req, timeout=65) as response:
-            return json.load(response)
-    except urllib.error.HTTPError as exc:
+            method=method, headers={"Authorization": "Bearer " + token})
+    attempts = 3 if method == "GET" else 1
+    for attempt in range(attempts):
         try:
-            err = json.loads(exc.read()).get("error", {})
-            code = err.get("code", exc.code)
-            msg = err.get("message", "No details")
-        except Exception:
-            code, msg = exc.code, "HTTP error"
-        raise RuntimeError(f"Instagram Graph API {method} error {code}: {msg}") from None
+            with urllib.request.urlopen(req, timeout=65) as response:
+                return json.load(response)
+        except urllib.error.HTTPError as exc:
+            if method == "GET" and exc.code in (429, 500, 502, 503, 504) and attempt + 1 < attempts:
+                exc.close()
+                time.sleep(2 ** attempt)
+                continue
+            try:
+                err = json.loads(exc.read()).get("error", {})
+                code = err.get("code", exc.code)
+                msg = str(err.get("message", "No details")).replace(token, "[REDACTED]")
+            except Exception:
+                code, msg = exc.code, "HTTP error"
+            finally:
+                exc.close()
+            raise RuntimeError(f"Instagram Graph API {method} error {code}: {msg}") from None
+        except (urllib.error.URLError, TimeoutError):
+            if method == "GET" and attempt + 1 < attempts:
+                time.sleep(2 ** attempt)
+                continue
+            raise RuntimeError(f"Instagram Graph API {method}: fallo de red; no se repite la escritura") from None
 
 
 def already_published(day):
@@ -125,8 +137,8 @@ def token_preflight():
 def prepare(day, video_url, cover_url=None):
     if now_local().date().isoformat() != day:
         raise ValueError("La fecha programada no es la fecha local de hoy")
-    if now_local() >= target_time(day) and not one_time_late_allowed(day):
-        raise RuntimeError("La preparación empezó demasiado tarde; no publicar fuera de hora")
+    if not one_time_late_allowed(day) and not (17 <= now_local().hour and now_local() <= target_time(day) - dt.timedelta(minutes=20)):
+        raise RuntimeError("Fuera de ventana de preparación 17:00–20:40; no publicar fuera de hora")
     if not video_url.startswith("https://"):
         raise ValueError("Instagram requiere una URL HTTPS pública")
     if cover_url:
@@ -140,7 +152,9 @@ def prepare(day, video_url, cover_url=None):
     story, caption = read_story(day)
     previous = already_published(day)
     if previous:
-        status = {"status": "already_published", "media_id": previous["id"], "date": day}
+        status = {"status": "already_published", "media_id": previous["id"], "date": day,
+                  "title": story["title"], "episode_number": story.get("episode_number"),
+                  "cover_url": cover_url}
         (OUT / "prepared.json").write_text(json.dumps(status))
         print("Un Reel del mismo día ya existe; omitiendo preparación")
         return
@@ -196,8 +210,6 @@ def publish(day):
         return
     if data["status"] != "prepared":
         raise ValueError("No existe contenedor terminado")
-    if not one_time_late_allowed(day):
-        wait_until_target(day)
     previous = already_published(day)
     if previous:
         print("Encontrado Reel del día en Instagram; no se duplica")
@@ -205,7 +217,11 @@ def publish(day):
     else:
         if intent_path(day).exists():
             raise RuntimeError("Publicación previa incierta: bloqueo persistente, NO reintentar")
+        # Network/git work is completed BEFORE the scheduled publication time.
         persist_intent(day, data)
+        if not one_time_late_allowed(day):
+            wait_until_target(day)
+        # Shared workflow concurrency plus the durable intent protects this POST.
         # Perform ONE publish request. If the network drops, inspect media before retrying.
         try:
             result = api("POST", f"{ACCOUNT}/media_publish",

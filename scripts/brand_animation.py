@@ -31,6 +31,21 @@ def stone(material="stone"):
     return Image.fromarray(np.uint8(np.clip(grain,0,255)))
 
 
+@lru_cache(maxsize=1)
+def static_layers():
+    """Immutable layers reused without changing a single rendered pixel."""
+    yy, xx = np.mgrid[:H:4,:W:4].astype(np.float32)
+    fog_envelope = np.exp(-((yy-H*.76)/(H*.26))**2)
+    vignette = np.clip(1 - .5*((np.arange(W)[None,:]-W/2)/(W/2))**2, .4,1)
+    grain = np.random.default_rng(902).normal(0,1.5,(H,W))
+    stains = np.sin(np.arange(H)[:,None]*.017 + np.sin(np.arange(W)[None,:]*.023))*1.8
+    surface = (grain+stains)[:,:,None]
+    particles = np.random.default_rng(850).random((65,4))
+    for array in (yy,xx,fog_envelope,vignette,surface,particles):
+        array.setflags(write=False)
+    return yy,xx,fog_envelope,vignette,surface,particles
+
+
 def frame(story, kind, t, duration):
     p = min(1.0, t / duration)
     closing = kind == 'outro'
@@ -106,25 +121,20 @@ def frame(story, kind, t, duration):
     glow = glow.filter(ImageFilter.GaussianBlur(30))
     arr = np.asarray(image).astype(np.float32) + np.asarray(glow)
     # Layered moving fog: different velocities and scales imply depth.
-    yy, xx = np.mgrid[:H:4,:W:4].astype(np.float32)
+    yy, xx, fog_envelope, vignette, surface, particles = static_layers()
     fog = np.zeros_like(xx)
     for k in range(1,5):
         fog += (np.sin(xx/(40*k)+t*(.16+k*.08)+np.sin(yy/(60+k*20)-t*.12))
                 * np.cos(yy/(25*k)-t*.08*k)) / (k+2)
-    fog = np.maximum(0,fog+.35) * np.exp(-((yy-H*.76)/(H*.26))**2)
+    fog = np.maximum(0,fog+.35) * fog_envelope
     fog_img = Image.fromarray(np.uint8(np.clip(fog*55,0,85))).resize((W,H),Image.Resampling.BILINEAR)
     fog_arr = np.asarray(fog_img).astype(np.float32)
     arr += fog_arr[:,:,None] * np.array([.50,.65,.85] if closing else [.85,.43,.39])
-    vignette = np.clip(1 - .5*((np.arange(W)[None,:]-W/2)/(W/2))**2, .4,1)
-    # Fine mineral grain and low-frequency stains keep architecture tactile.
-    grain = np.random.default_rng(902).normal(0, 1.5, (H,W))
-    stains = np.sin(np.arange(H)[:,None]*.017 + np.sin(np.arange(W)[None,:]*.023))*1.8
-    arr += (grain+stains)[:,:,None]
+    arr += surface
     arr *= vignette[:,:,None]
     image = Image.fromarray(np.uint8(np.clip(arr,0,255)))
     d = ImageDraw.Draw(image)
-    rng = np.random.default_rng(850)
-    for x,y,speed,size in rng.random((65,4)):
+    for x,y,speed,size in particles:
         px = (x*W + math.sin(t*.2+x*8)*16) % W
         py = (y*H - t*(7+speed*18)) % H
         c = int(45+70*size)*(.4+opening)

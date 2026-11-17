@@ -36,10 +36,15 @@ class RenderTests(unittest.TestCase):
     def test_narration_uses_complete_sentences_not_caption_chunks(self):
         import numpy as np
         import soundfile as sf
-        import torch
         from audio_engine import speech_units
         from music_engine import generate_ambient_score
         calls = []
+
+        class Sample:
+            def cpu(self):
+                return self
+            def numpy(self):
+                return np.ones(24000, dtype=np.float32) * 0.04
 
         class Pipeline:
             def __init__(self, **kwargs):
@@ -47,14 +52,15 @@ class RenderTests(unittest.TestCase):
 
             def __call__(self, text, **kwargs):
                 calls.append((text, kwargs))
-                yield text, None, torch.ones(24000) * 0.04
+                yield text, None, Sample()
 
         text = ('Una puerta apareció en el pasillo y nadie supo explicar por qué estaba allí. '
                 'Alguien empezó a llamar desde el otro lado.')
         self.assertEqual(len(speech_units(text)), 2)
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp)
-            with patch.dict(sys.modules, {'kokoro': types.SimpleNamespace(KPipeline=Pipeline)}):
+            with patch.dict(sys.modules, {'kokoro': types.SimpleNamespace(KPipeline=Pipeline),
+                                         'torch': types.SimpleNamespace(set_num_threads=lambda _: None)}):
                 with patch.dict('os.environ', {'UMBRAL_SPEED': '1.08'}):
                     cues, duration = render.generate_voice(text, out)
             audio, rate = sf.read(out / 'voice.wav')
@@ -85,11 +91,12 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(workflow['on']['schedule'][0]['cron'], '17 2 * * *')
         self.assertEqual(workflow['permissions']['contents'], 'read')
         steps = workflow['jobs']['generar']['steps']
-        blocked = [step for step in steps if step.get('name') in {
-            'Preparar vídeo público para Meta', 'Esperar vídeo público en GitHub Pages', 'Publicar en Instagram'}]
-        self.assertEqual(len(blocked), 3)
-        self.assertTrue(all(step['if'] == '${{ false }}' for step in blocked))
-        self.assertTrue((render.BASE / 'publish_reel.py').is_file())
+        # No hidden publishing route or Meta credentials in the renderer.
+        serialized = json.dumps(steps)
+        self.assertNotIn('IG_ACCESS_TOKEN', serialized)
+        self.assertNotIn('publish_reel.py', serialized)
+        self.assertNotIn('scripts/publish_daily.py', serialized)
+
 
     def test_real_encoding(self):
         # Fixture técnica sin red; el workflow ejecuta después el render neuronal real.

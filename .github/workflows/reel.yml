@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: umbral-publish
+  group: umbral-render-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -28,14 +28,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: ./.github/actions/setup-render
         with:
-          python-version: '3.11'
-      - name: Instalar herramientas
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core libsndfile1
-          python -m pip install -r requirements.txt
+          models: "true"
       - name: Pruebas de sincronización y codificación
         run: python -m unittest discover -s tests -v
       - name: Crear Reel
@@ -63,40 +58,3 @@ jobs:
             output/story_used.json
           retention-days: 7
           if-no-files-found: error
-      - name: Preparar vídeo público para Meta
-        if: ${{ false }} # Publicación conservada pero bloqueada hasta autorización
-        run: |
-          mkdir -p docs
-          cp output/*.mp4 docs/reel.mp4
-          printf 'UMBRAL\n' > docs/index.html
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/reel.mp4 docs/index.html
-          git commit -m "Update Reel for Instagram" || true
-          git push
-      - name: Esperar vídeo público en GitHub Pages
-        if: ${{ false }} # Publicación conservada pero bloqueada hasta autorización
-        env:
-          REEL_URL: https://fedry23.github.io/umbral-automation/reel.mp4
-        run: |
-          for i in $(seq 1 36); do
-            if curl -fsSL --max-time 20 "$REEL_URL" -o /tmp/reel.mp4 && cmp -s /tmp/reel.mp4 docs/reel.mp4; then
-              echo "Vídeo público actualizado"
-              exit 0
-            fi
-            sleep 15
-          done
-          echo "GitHub Pages no ha actualizado el vídeo" >&2
-          exit 1
-      - name: Publicar en Instagram
-        if: ${{ false }} # Publicación conservada pero bloqueada hasta autorización
-        env:
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-          IG_PUBLISH_DRY_RUN: "false"
-          REEL_VIDEO_URL: https://fedry23.github.io/umbral-automation/reel.mp4
-        run: |
-          test -n "$IG_USER_ID"
-          test -n "$IG_ACCESS_TOKEN"
-          export REEL_CAPTION="$(cat output/caption.txt)"
-          python publish_reel.py

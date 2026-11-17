@@ -11,15 +11,27 @@ import urllib.request
 from zoneinfo import ZoneInfo
 
 
-def check_remote(path, url):
-    local_hash = hashlib.sha256(path.read_bytes()).digest()
+def stream_digest(stream):
+    digest = hashlib.sha256()
+    for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+        digest.update(chunk)
+    return digest.digest()
+
+
+def file_digest(path):
+    with path.open('rb') as stream:
+        return stream_digest(stream)
+
+
+def check_remote(path, url, local_hash=None):
+    local_hash = local_hash if local_hash is not None else file_digest(path)
     request = urllib.request.Request(
         url, headers={"User-Agent": "UMBRAL-Pages-publisher"})
     try:
         with urllib.request.urlopen(request, timeout=55) as f:
             if f.headers.get("Content-Type", "").lower().startswith("text/html"):
                 return False
-            remote_hash = hashlib.sha256(f.read()).digest()
+            remote_hash = stream_digest(f)
         return remote_hash == local_hash
     except (urllib.error.URLError, TimeoutError):
         return False
@@ -45,9 +57,14 @@ def main():
             raise RuntimeError("Falta portada del día; no se publica sin cover")
         if not cover_url.startswith("https://fedry23.github.io/umbral-automation/reels/"):
             raise ValueError("La portada debe estar en GitHub Pages oficial")
+    video_hash = file_digest(path)
+    cover_hash = file_digest(cover_path) if cover_required else None
+    video_ready, cover_ready = False, not cover_required
     for _ in range(60):
-        video_ready = check_remote(path, url)
-        cover_ready = not cover_required or check_remote(cover_path, cover_url)
+        if not video_ready:
+            video_ready = check_remote(path, url, video_hash)
+        if not cover_ready:
+            cover_ready = check_remote(cover_path, cover_url, cover_hash)
         if video_ready and cover_ready:
             print("GitHub Pages listo; SHA256 del vídeo"
                   + (" y portada" if cover_required else "") + " comprobado")

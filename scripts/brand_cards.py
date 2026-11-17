@@ -4,6 +4,7 @@
 Creates dedicated stills for the opening and the ending; never uses any
 story illustration for these segments. Deterministic, offline, free.
 """
+from functools import lru_cache
 from pathlib import Path
 import math
 import random
@@ -16,6 +17,7 @@ BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 NORMAL = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
 
+@lru_cache(maxsize=64)
 def font(size, bold=True):
     return ImageFont.truetype(BOLD if bold else NORMAL, size)
 

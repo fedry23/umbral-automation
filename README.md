@@ -1,5 +1,54 @@
 # UMBRAL
 
+## Estado técnico y operación (revisión 17/11/2026)
+
+| Componente | Responsabilidad |
+| --- | --- |
+| `render.py`, `audio_engine.py`, `music_engine.py` | Voz, seis escenas, música y MP4; sin publicar |
+| `scripts/brand_animation.py`, `brand_cards.py`, `thumbnail.py` | Animación original, previsualizaciones y portada |
+| `scripts/stage_daily_reel.py`, `ensure_meta_compatible.py`, `wait_public_video.py` | Recuperación, validación y descarga pública comprobada |
+| `scripts/publish_daily.py` | Token, contenedor, registro preventivo, publicación y verificación |
+| `.github/actions/setup-render/action.yml` | Instalación común y cachés de pip/modelos públicos |
+| `requirements-test.txt` | Pruebas offline sin descargar PyTorch, Kokoro ni modelos |
+| `requirements.txt` | Runtime completo de generación, con versiones de voz conservadas |
+
+**Operación diaria:** historia anticipada → generación 02:17 UTC → preparación
+17:00–20:40 local → publicación 21:00 Europe/Madrid. Se conserva el respaldo
+externo 06:20/18:20/21:20, DST y la protección frente a duplicados. Los workflows
+de publicación comparten exclusión mutua. No se ejecuta código de publicación
+desde el generador. Las pruebas antiguas fechadas no son rutas operativas.
+
+**Optimización medida:** en la misma máquina, tres pasadas de ocho fotogramas:
+mediana 1,745 s antes y 1,537 s después (~12 % menos en esa muestra). Los hashes
+RGB coinciden exactamente. No es una estimación de aceleración del render completo.
+Se reutilizan matrices, texturas y fuentes inmutables. No cambia `audio_engine.py`,
+la voz, el ritmo, la resolución, FPS ni los pasos de difusión.
+
+**Cachés:** pip por archivos de dependencias y pesos públicos Hugging Face por
+sistema/versión. Se guarda solo `hub/`, no tokens ni credenciales. La primera
+pasada sigue descargando; un cache miss no afecta la corrección. Las pruebas
+rápidas usan solo cuatro dependencias; la generación completa prueba los modelos
+reales. No se reduce la calidad para obtener velocidad.
+
+**Publicación:** el registro preventivo se sube antes de esperar a las 21:00,
+para no añadir operaciones git en el instante de publicación. Ante un fallo de
+ese registro no se envía ningún POST. Las lecturas de Meta pueden reintentarse
+hasta tres veces ante errores transitorios; las escrituras jamás se repiten a
+ciegas. El token viaja como Bearer y se elimina de mensajes de error. El SHA-256
+de Pages se calcula en bloques de 1 MiB, sin cargar todo el MP4; los archivos ya
+confirmados no se descargan otra vez durante la espera de la portada.
+
+**Validar cambios:** `python -m pip install -r requirements-test.txt` y
+`python -m unittest discover -s tests -v`. Para render real, instalar
+`requirements.txt`, FFmpeg, espeak-ng, fuentes DejaVu y libsndfile. La prueba de
+voz offline sustituye únicamente la dependencia del modelo dentro del test;
+el motor real y sus parámetros se conservan.
+
+Los apartados siguientes conservan el historial y detalles de la puesta en marcha.
+La hora exacta depende de servicios externos; un estado pendiente no equivale a
+una publicación confirmada. No borrar `docs/pending` para forzar reintentos.
+
+
 Generación gratuita en CPU de vídeo vertical 720×1280 con voz masculina española
 Kokoro `em_alex`, velocidad 1,08, frases completas y subtítulos quemados. La voz
 se sintetiza por frases enteras y conserva su prosodia: no se corta en cada
@@ -66,7 +115,7 @@ cuotas gratuitas y a la configuración de facturación de la cuenta.
 
 ## Generación diaria y publicación segura
 
-`reel.yml` genera los vídeos y nunca publica Instagram: sus tres antiguos pasos de preparación pública, Pages y publicación permanecen en `if: ${{ false }}`. Su cron sigue a las 02:17 UTC, y también admite un disparo de respaldo por `push` limitado a `ops/generate-kick.txt`. La publicación real se realiza mediante el workflow INDEPENDIENTE `publish_daily.yml` y la API oficial de Meta (véase abajo). No se leen secretos de Meta durante la generación. El token del workflow de generación solo tiene lectura y checkout no conserva credenciales.
+`reel.yml` genera los vídeos y nunca publica Instagram: se han eliminado sus tres pasos heredados de publicación, que ya estaban desactivados. Su cron sigue a las 02:17 UTC, y también admite un disparo de respaldo por `push` limitado a `ops/generate-kick.txt`. La publicación real se realiza mediante el workflow INDEPENDIENTE `publish_daily.yml` y la API oficial de Meta (véase abajo). No se leen secretos de Meta durante la generación. El token del workflow de generación solo tiene lectura y checkout no conserva credenciales.
 
 El relato del día siguiente se prepara por la tarde del día anterior. Los relatos destinados a la generación programada deben llevar `publish_date` con la fecha peninsular del día (`AAAA-MM-DD`) y el generador se detiene si falta el relato fechado. Se evita así publicar inadvertidamente una historia repetida. El workflow `reel.yml` genera el MP4 y sus artefactos: **nunca publica en Instagram**. `publish_daily.yml` lo recupera y publica mediante la API oficial de Meta a las 21:00 Europe/Madrid, comprobando fecha, formato, URL pública y duplicados. Cambiar `IG_PUBLISH_ENABLED` no activa publicación directa en el generador.
 
@@ -132,7 +181,7 @@ configurados los permisos correspondientes.
   La preparación anticipada reduce el riesgo. Si no está listo a tiempo,
   la publicación se detiene en lugar de salir tarde.
 
-La publicación directa heredada del generador `reel.yml` continúa bloqueada.
+La publicación directa heredada se ha eliminado de `reel.yml`.
 
 ## Respaldo contra omisiones del cron de GitHub (desde 16/11/2026)
 

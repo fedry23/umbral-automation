@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - 'render.py'
+      - 'music_engine.py'
+      - 'requirements*.txt'
+      - '.github/actions/**'
+      - 'stories.json'
       - 'audio_engine.py'
       - 'scripts/**'
       - 'tests/**'
@@ -28,15 +32,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: ./.github/actions/setup-render
         with:
-          python-version: '3.11'
-      - name: Instalar FFmpeg, fuentes y dependencias gratuitas
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core libsndfile1
-          python -m pip install -r requirements.txt
-          python -m pip install PyYAML
+          models: "false"
       - name: Comprobar sintaxis Python
         run: python -m compileall -q render.py audio_engine.py scripts tests
       - name: Ejecutar pruebas de vídeo, portadas, voces y duplicados

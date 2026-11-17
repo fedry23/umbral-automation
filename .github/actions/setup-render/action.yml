@@ -1,0 +1,37 @@
+name: UMBRAL Python runtime
+description: Install cached dependencies and optional public CPU models
+inputs:
+  models:
+    description: Install full rendering runtime
+    default: 'true'
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: |
+          requirements.txt
+          requirements-test.txt
+    - name: Restore public model weights
+      if: inputs.models == 'true'
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/huggingface/hub
+        key: umbral-models-${{ runner.os }}-py311-${{ hashFiles('requirements.txt', 'requirements-test.txt') }}
+    - name: System tools
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng fonts-dejavu-core libsndfile1
+    - name: Python dependencies
+      shell: bash
+      env:
+        WITH_MODELS: ${{ inputs.models }}
+      run: |
+        if [ "$WITH_MODELS" = 'true' ]; then
+          python -m pip install -r requirements.txt
+        else
+          python -m pip install -r requirements-test.txt
+        fi
