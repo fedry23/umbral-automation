@@ -1,0 +1,19 @@
+{
+  "status": "READ_ONLY_AUDIT",
+  "reels_checked": 6,
+  "issues": [
+    {
+      "id": "18113016677238522",
+      "issue": "duplicate_daily_marker",
+      "other": "18497985145109554"
+    },
+    {
+      "id": "18096307043444916",
+      "issue": "duplicate_daily_marker",
+      "other": "18120436877062076"
+    }
+  ],
+  "auto_delete": false,
+  "auto_publish": false,
+  "note": "Subjective audio, story and image quality requires source-artifact validation and review."
+}
