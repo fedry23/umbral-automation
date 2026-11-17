@@ -124,7 +124,10 @@ def generate_images(story, out):
     torch.set_num_threads(min(4, os.cpu_count() or 1))
     pipe = AutoPipelineForText2Image.from_pretrained(
         'stabilityai/sd-turbo', torch_dtype=torch.float32)
-    pipe.enable_attention_slicing()
+    # On CPU, attention slicing serializes work and often makes inference slower.
+    # Leave it off unless explicitly requested for a memory-constrained runner.
+    if os.getenv('UMBRAL_LOW_MEMORY', '0') == '1':
+        pipe.enable_attention_slicing()
     import time
     paths = []
     total_start = time.monotonic()
