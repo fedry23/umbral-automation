@@ -175,8 +175,10 @@ def token_preflight():
 def prepare(day, video_url, cover_url=None):
     if now_local().date().isoformat() != day:
         raise ValueError("La fecha programada no es la fecha local de hoy")
-    if not one_time_late_allowed(day) and not (17 <= now_local().hour and now_local() <= target_time(day) - dt.timedelta(minutes=20)):
-        raise RuntimeError("Fuera de ventana de preparación 17:00–20:40; no publicar fuera de hora")
+    # Reliability-first: a valid, dated Reel may be prepared late on the same day.
+    # The caller still verifies story/date, Instagram state and durable intent.
+    if now_local().date().isoformat() != day:
+        raise RuntimeError("La recuperación solo puede publicar el episodio de hoy")
     if not video_url.startswith("https://"):
         raise ValueError("Instagram requiere una URL HTTPS pública")
     if cover_url:
@@ -206,10 +208,7 @@ def prepare(day, video_url, cover_url=None):
     container = res["id"]
     print("Contenedor creado, esperando procesado")
     # Meta can need several minutes; never publish unfinished media.
-    deadline = (now_local() + dt.timedelta(minutes=35)
-                if one_time_late_allowed(day)
-                else min(target_time(day) - dt.timedelta(seconds=25),
-                         now_local() + dt.timedelta(minutes=35)))
+    deadline = now_local() + dt.timedelta(minutes=35)
     while now_local() < deadline:
         status = api("GET", container, {"fields": "status_code,status"})
         code = status.get("status_code")
@@ -223,7 +222,7 @@ def prepare(day, video_url, cover_url=None):
         if code in ("ERROR", "EXPIRED"):
             raise RuntimeError("Instagram rechazó el contenedor: " + str(code) + "; detalle=" + str(status.get("status", "sin detalle"))[:400])
         time.sleep(15)
-    raise RuntimeError("Meta no terminó de procesar el Reel antes de las 21:00")
+    raise RuntimeError("Meta no terminó de procesar el Reel en 35 minutos")
 
 
 def wait_until_target(day):
@@ -257,7 +256,7 @@ def publish(day):
             raise RuntimeError("Publicación previa incierta: bloqueo persistente, NO reintentar")
         # Network/git work is completed BEFORE the scheduled publication time.
         persist_intent(day, data)
-        if not one_time_late_allowed(day):
+        if now_local() < target_time(day):
             wait_until_target(day)
         # Shared workflow concurrency plus the durable intent protects this POST.
         # Perform ONE publish request. If the network drops, inspect media before retrying.
