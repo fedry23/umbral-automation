@@ -31,6 +31,13 @@ def check_remote(path, url, local_hash=None):
         with urllib.request.urlopen(request, timeout=55) as f:
             if f.headers.get("Content-Type", "").lower().startswith("text/html"):
                 return False
+            length = f.headers.get("Content-Length")
+            if length is not None:
+                try:
+                    if int(length) != path.stat().st_size:
+                        return False
+                except (ValueError, OSError):
+                    return False
             remote_hash = stream_digest(f)
         return remote_hash == local_hash
     except (urllib.error.URLError, TimeoutError):
