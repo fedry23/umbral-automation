@@ -40,9 +40,9 @@ class StageDailyReelTests(unittest.TestCase):
             try:
                 os.chdir(tmp)
                 Path("stories.json").write_text(json.dumps([story]), encoding="utf-8")
-                with patch.object(stage, "OUT", Path("staged")), \\
-                     patch.object(stage, "validate_cover", return_value=True), \\
-                     patch.object(stage, "validate_mp4", return_value=30.0):
+                with (patch.object(stage, "OUT", Path("staged")),
+                     patch.object(stage, "validate_cover", return_value=True),
+                     patch.object(stage, "validate_mp4", return_value=30.0)):
                     result = stage.extract_run_zip(stream.getvalue(), day)
                 self.assertEqual(result["file"], "staged/" + name)
                 self.assertEqual(Path(result["file"]).read_bytes(), b"video-placeholder")
