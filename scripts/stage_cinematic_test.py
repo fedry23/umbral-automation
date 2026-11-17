@@ -28,7 +28,7 @@ validate_mp4(mp4)
 # Recreate the approved episode's cover from its establishing shot without
 # rerendering the reviewed video or altering its voice, music or captions.
 scene_images = [root / f'scene_{i:02d}.png' for i in range(6)]
-make_thumbnail(story, scene_images, root/'cover.jpg')
+make_thumbnail({**story, 'cover_scene_index': 0}, scene_images, root/'cover.jpg')
 validate_cover(root/'cover.jpg')
 Path('staged').mkdir(exist_ok=True)
 for p in [mp4,root/'cover.jpg',root/'story_used.json',root/'caption.txt']:
