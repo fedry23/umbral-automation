@@ -31,14 +31,15 @@ def target_time(day):
 
 def test_release_allowed(day):
     """A distinct, owner-approved public test; not the regular daily Reel."""
-    return (os.getenv("UMBRAL_TEST_MODE") == "cinematic-episode-6"
+    return (os.getenv("UMBRAL_TEST_MODE") in ("cinematic-episode-6", "cinematic-episode-7")
             and now_local().date().isoformat() == day)
 
 
 
 def daily_marker(day):
     if test_release_allowed(day):
-        return "🩸 UMBRAL · PRUEBA 6 · " + day
+        episode = "7" if os.getenv("UMBRAL_TEST_MODE") == "cinematic-episode-7" else "6"
+        return "🩸 UMBRAL · PRUEBA " + episode + " · " + day
     return "🩸 UMBRAL · " + day
 
 
@@ -236,7 +237,8 @@ def publish(day):
 
 
 def intent_path(day):
-    key = "test-cinematic-episode-6" if test_release_allowed(day) else day
+    key = ("test-cinematic-episode-7" if os.getenv("UMBRAL_TEST_MODE") == "cinematic-episode-7"
+           else "test-cinematic-episode-6") if test_release_allowed(day) else day
     return Path("docs/pending") / (key + ".json")
 
 
