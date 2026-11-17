@@ -35,11 +35,27 @@ jobs:
         run: python scripts/auto_repair.py --fix
       - name: Pruebas de sincronización y codificación
         run: python -m unittest discover -s tests -v
-      - name: Crear Reel
+      - name: Crear Reel con regeneración limitada si falla el render
         env:
           UMBRAL_SPEED: '1.08'
           UMBRAL_REQUIRE_DATED_STORY: ${{ (github.event_name == 'schedule' || github.event_name == 'push') && '1' || '0' }}
-        run: /usr/bin/time -v python -u render.py
+        shell: bash
+        run: |
+          set -uo pipefail
+          for attempt in 1 2; do
+            echo "UMBRAL: intento de render $attempt/2"
+            if /usr/bin/time -v python -u render.py; then
+              echo "UMBRAL: render y validación correctos"
+              exit 0
+            fi
+            if [ "$attempt" -eq 2 ]; then
+              echo '::error::Dos intentos de render fallidos. No se entrega ni publica vídeo defectuoso.'
+              exit 1
+            fi
+            echo '::warning::Falló el render. Eliminando únicamente los archivos locales incompletos y regenerando.'
+            rm -rf -- output
+            sleep 15
+          done
       - name: Guardar artefacto
         uses: actions/upload-artifact@v4
         with:
