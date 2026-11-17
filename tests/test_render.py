@@ -43,6 +43,17 @@ class RenderTests(unittest.TestCase):
         self.assertIn("(4, 896, 512)", source)
         self.assertIn("profile not in ('fast', 'quality')", source)
 
+    def test_scene_boundaries_follow_spoken_cues(self):
+        cues = [(2, 3, 'primera frase'), (3, 5, 'segunda frase con mas palabras'),
+                (5, 9, 'tercera frase bastante mas larga para cerrar')]
+        branding = {'intro_end': 2, 'outro_start': 9}
+        bounds = render.scene_boundaries_from_cues(cues, branding, 3)
+        self.assertEqual(len(bounds), 4)
+        self.assertEqual(bounds[0], 2)
+        self.assertEqual(bounds[-1], 9)
+        self.assertTrue(all(a < b for a, b in zip(bounds, bounds[1:])))
+        self.assertNotAlmostEqual(bounds[1] - bounds[0], (9 - 2) / 3)
+
     def test_subtitles(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'subtitles.ass'
