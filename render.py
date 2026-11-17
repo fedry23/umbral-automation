@@ -109,15 +109,12 @@ def scene_image_prompt(scene):
     scene = ' '.join(scene.split())
     if len(scene) > 850:
         raise ValueError("La descripción de escena es demasiado larga")
+    # Put the scene first: SD-Turbo's text encoder truncates long prompts.
+    # Keep the camera direction short so the actual scene remains visible.
     return (
-        "Photorealistic live-action horror film still. One coherent real-world "
-        "location, one clear focal subject, believable human anatomy, realistic "
-        "architecture and object scale, physically plausible practical lighting. "
-        "35mm cinema photography, natural textures, controlled shadows, "
-        "subtle film grain, suspense through composition. "
-        "No collage, no split screen, no lettering, no logos, no extra limbs, "
-        "no duplicated people, no floating objects, no impossible geometry. "
-        "Scene: " + scene
+        scene + " Realistic live-action film photograph, one clear focal "
+        "subject, natural anatomy, plausible lighting, coherent architecture, "
+        "35mm cinematic horror, no text, no collage."
     )
 
 
