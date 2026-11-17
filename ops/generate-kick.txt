@@ -1,4 +1,1 @@
-2026-11-16 | Prueba de respaldo de generación (después de las 21:00 Europe/Madrid). No autoriza ni activa publicación.
-
-2026-11-16T22:22 Europe/Madrid | Validación de producción sin publicar: intro roja separada, outro azul separada, portada JPEG 1080x1920 y audio 48k. No tocar Instagram.
-2026-11-17T06:16 Europe/Madrid | Respaldo de generación del relato 2026-11-17 «El piso menos dos»; solo render y artefacto, NO publicar.
+Generar episodio 8 El contador inverso para 2026-11-17; episodio 9 El turno que faltaba programado 2026-11-18. Solicitud excepcional 2026-11-17 16:08 Europe/Madrid.
