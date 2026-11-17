@@ -43,6 +43,14 @@ class RenderTests(unittest.TestCase):
         self.assertIn("(4, 896, 512)", source)
         self.assertIn("profile not in ('fast', 'quality')", source)
 
+    def test_curated_meter_shots_avoid_anatomical_chaos(self):
+        story = next(s for s in render.load_stories() if s['title'] == 'El contador inverso')
+        shots = render.visual_shots(story)
+        self.assertEqual(len(shots), 6)
+        self.assertTrue(all('no people' in s and 'no hands' in s for s in shots))
+        self.assertIn('armchair', shots[3])
+        self.assertIn('intercom', shots[4])
+
     def test_scene_boundaries_follow_spoken_cues(self):
         cues = [(2, 3, 'primera frase'), (3, 5, 'segunda frase con mas palabras'),
                 (5, 9, 'tercera frase bastante mas larga para cerrar')]
