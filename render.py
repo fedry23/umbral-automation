@@ -151,6 +151,7 @@ def visual_shots(story):
 
 
 def generate_images(story, out):
+    from PIL import Image
     import torch
     from diffusers import AutoPipelineForText2Image
     torch.set_num_threads(min(4, os.cpu_count() or 1))
