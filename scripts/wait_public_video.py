@@ -46,19 +46,21 @@ def check_remote(path, url, local_hash=None):
 
 def main():
     date = dt.datetime.now(ZoneInfo("Europe/Madrid")).date().isoformat()
-    path = Path(os.getenv("UMBRAL_VIDEO_FILE", "docs/reels/" + date + ".mp4"))
+    suffix = "_09" if os.getenv("UMBRAL_SLOT") == "09" else ""
+    key = date + suffix
+    path = Path(os.getenv("UMBRAL_VIDEO_FILE", "docs/reels/" + key + ".mp4"))
     if not path.is_file() or path.suffix.lower() != ".mp4":
         raise RuntimeError("Falta el vídeo MP4 previsto en GitHub Pages")
     url = os.getenv("UMBRAL_VIDEO_URL",
-                    "https://fedry23.github.io/umbral-automation/reels/" + date + ".mp4")
+                    "https://fedry23.github.io/umbral-automation/reels/" + key + ".mp4")
     if not url.startswith("https://fedry23.github.io/umbral-automation/reels/"):
         raise ValueError("URL del Reel fuera del sitio oficial de GitHub Pages")
     cover_required = os.getenv("UMBRAL_COVER_REQUIRED") == "1"
     cover_path = Path(os.getenv("UMBRAL_COVER_FILE",
-                             "docs/reels/" + date + ".jpg"))
+                             "docs/reels/" + key + ".jpg"))
     cover_url = os.getenv("UMBRAL_COVER_URL",
                         "https://fedry23.github.io/umbral-automation/reels/"
-                        + date + ".jpg")
+                        + key + ".jpg")
     if cover_required:
         if not cover_path.is_file():
             raise RuntimeError("Falta portada del día; no se publica sin cover")
