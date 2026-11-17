@@ -19,6 +19,13 @@ GRAPH = "https://graph.facebook.com/" + os.getenv("GRAPH_API_VERSION", "v25.0")
 TZ = ZoneInfo("Europe/Madrid")
 ACCOUNT = "17841465578937909"
 OUT = Path("staged")
+SLOT = os.getenv("UMBRAL_SLOT", "21")
+if SLOT not in ("09", "21"):
+    raise ValueError("UMBRAL_SLOT debe ser 09 o 21")
+
+def receipt_key(day):
+    return day + ("_09" if SLOT == "09" else "")
+
 
 
 def now_local():
@@ -26,7 +33,7 @@ def now_local():
 
 
 def target_time(day):
-    return dt.datetime.combine(dt.date.fromisoformat(day), dt.time(21, 0), tzinfo=TZ)
+    return dt.datetime.combine(dt.date.fromisoformat(day), dt.time(9 if SLOT == "09" else 21, 0), tzinfo=TZ)
 
 
 def test_release_allowed(day):
@@ -40,7 +47,7 @@ def daily_marker(day):
     if test_release_allowed(day):
         episode = "7" if os.getenv("UMBRAL_TEST_MODE") == "cinematic-episode-7" else "6"
         return "🩸 UMBRAL · PRUEBA " + episode + " · " + day
-    return "🩸 UMBRAL · OFICIAL · " + day
+    return "🩸 UMBRAL · OFICIAL · " + day + (" · MAÑANA" if SLOT == "09" else "")
 
 
 def one_time_late_allowed(day):
@@ -228,14 +235,14 @@ def prepare(day, video_url, cover_url=None):
 def wait_until_target(day):
     target = target_time(day)
     if now_local() > target + dt.timedelta(seconds=20):
-        raise RuntimeError("El horario de las 21:00 ya pasó; no publicar tarde")
+        raise RuntimeError("La hora objetivo ya pasó; publicación tardía gestionada por el llamador")
     while True:
         remaining = (target - now_local()).total_seconds()
         if remaining <= 0:
             break
         time.sleep(min(remaining, 30.0))
     if now_local() > target + dt.timedelta(seconds=20):
-        raise RuntimeError("Demasiado tarde para publicar; revisar la ejecución")
+        raise RuntimeError("La hora objetivo ya pasó durante la espera; revisar la ejecución")
 
 
 def publish(day):
@@ -275,7 +282,7 @@ def publish(day):
 def intent_path(day):
     key = ("test-cinematic-episode-7" if os.getenv("UMBRAL_TEST_MODE") == "cinematic-episode-7"
            else "test-cinematic-episode-6") if test_release_allowed(day) else day
-    return Path("docs/pending") / (key + ".json")
+    return Path("docs/pending") / (key + ("_09" if SLOT == "09" else "") + ".json")
 
 
 def persist_intent(day, data):
