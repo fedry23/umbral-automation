@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer"><title>UMBRAL · Autorización segura</title>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0a10;color:#eee;font:16px system-ui,sans-serif}main{max-width:550px;padding:30px}h1{color:#f45167}p{line-height:1.6}small{color:#b6b2bd}</style></head>
+<body><main><h1>UMBRAL · Autorización</h1><p id="status">Comprobando la respuesta de Meta…</p><p>Por seguridad, esta página no envía códigos ni tokens a ningún servidor, no los almacena y no autoriza publicaciones ni eliminaciones.</p><small>Si no has iniciado una autorización para UMBRAL, cierra esta pestaña.</small></main>
+<script>
+(function(){
+  const params=new URLSearchParams(location.search);
+  const hash=new URLSearchParams(location.hash.slice(1));
+  const hasSecret=params.has('code')||hash.has('access_token');
+  const error=params.get('error')||params.get('error_reason');
+  history.replaceState(null,'',location.pathname);
+  document.getElementById('status').textContent=error
+    ? 'Meta no ha completado la autorización. No compartas códigos ni datos de esta página.'
+    : hasSecret
+      ? 'Meta ha devuelto una respuesta de autorización. Por seguridad, no se muestra ni se guarda. La integración de intercambio seguro todavía no está habilitada.'
+      : 'Página de retorno lista. Aún no se ha iniciado ninguna autorización.';
+})();
+</script></body></html>
