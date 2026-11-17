@@ -239,11 +239,15 @@ def render():
     test_title = os.getenv('UMBRAL_STORY_TITLE', '')
     if test_title:
         # Test autorizado de una sola vez; no puede reemplazar el Reel diario.
-        if (os.getenv('UMBRAL_TEST_MODE') != 'cinematic-episode-6'
-                or test_title != 'La luz del rellano'):
+        authorized_tests = {
+            'cinematic-episode-6': ('La luz del rellano', 6),
+            'cinematic-episode-7': ('El maniquí del escaparate', 7),
+        }
+        expected = authorized_tests.get(os.getenv('UMBRAL_TEST_MODE'))
+        if expected is None or test_title != expected[0]:
             raise ValueError('Selección de relato de prueba no autorizada')
         test_story = next((s for s in stories if s['title'] == test_title), None)
-        if test_story is None or test_story.get('episode_number') != 6:
+        if test_story is None or test_story.get('episode_number') != expected[1]:
             raise ValueError('Relato de prueba no disponible o fecha incorrecta')
         # A test gets a dated output ONLY in the artifact, not in the production queue.
         story = {**test_story, 'publish_date': date.isoformat()}
