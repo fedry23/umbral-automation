@@ -129,13 +129,21 @@ def generate_images(story, out):
     if os.getenv('UMBRAL_LOW_MEMORY', '0') == '1':
         pipe.enable_attention_slicing()
     import time
+    # CPU-only runner: fewer diffusion pixels and steps yield a substantial
+    # speedup; FFmpeg still produces the same 720x1280 delivery format.
+    # Use UMBRAL_IMAGE_PROFILE=quality to restore the previous settings.
+    profile = os.getenv('UMBRAL_IMAGE_PROFILE', 'fast')
+    if profile not in ('fast', 'quality'):
+        raise ValueError('Perfil de imágenes desconocido')
+    steps, height, width = (3, 768, 448) if profile == 'fast' else (4, 896, 512)
+    print(f'UMBRAL_IMAGE_PROFILE={profile} steps={steps} size={width}x{height}', flush=True)
     paths = []
     total_start = time.monotonic()
     for i, scene in enumerate(story['scenes']):
         scene_start = time.monotonic()
         prompt = scene_image_prompt(scene)
-        image = pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0.0,
-                     height=896, width=512,
+        image = pipe(prompt=prompt, num_inference_steps=steps, guidance_scale=0.0,
+                     height=height, width=width,
                      generator=torch.Generator('cpu').manual_seed(int(story.get('image_seed_base', 7300)) + i)).images[0]
         path = out / f'scene_{i:02}.png'
         image.save(path)
