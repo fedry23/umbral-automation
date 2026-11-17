@@ -1,0 +1,77 @@
+name: UMBRAL - Generación 09:00
+
+on:
+  workflow_dispatch:
+  # Respaldo externo si GitHub omite el cron nocturno. Solo este archivo activa el respaldo.
+  push:
+    branches: [main]
+    paths:
+      - 'ops/generate-morning-kick.txt'
+  # El workflow de generación NO publica en Instagram.
+  schedule:
+    - cron: '17 0 * * *' # Generar de madrugada, listo antes de las 21:00 Europe/Madrid
+  # PR test renders disabled to avoid redundant CPU-heavy runs.
+  # Daily schedule and manual dispatch remain available.
+
+permissions:
+  contents: read
+
+concurrency:
+  group: umbral-render-morning-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: "true"
+      - name: Autorreparación segura y validación previa de relatos
+        run: python scripts/auto_repair.py --fix
+      - name: Pruebas de sincronización y codificación
+        run: python -m unittest discover -s tests -v
+      - name: Crear Reel con regeneración limitada si falla el render
+        env:
+          UMBRAL_SPEED: '1.08'
+          UMBRAL_SLOT: '09'
+          UMBRAL_REQUIRE_DATED_STORY: ${{ (github.event_name == 'schedule' || github.event_name == 'push') && '1' || '0' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          for attempt in 1 2; do
+            echo "UMBRAL: intento de render $attempt/2"
+            if /usr/bin/time -v python -u render.py; then
+              echo "UMBRAL: render y validación correctos"
+              exit 0
+            fi
+            if [ "$attempt" -eq 2 ]; then
+              echo '::error::Dos intentos de render fallidos. No se entrega ni publica vídeo defectuoso.'
+              exit 1
+            fi
+            echo '::warning::Falló el render. Eliminando únicamente los archivos locales incompletos y regenerando.'
+            rm -rf -- output
+            sleep 15
+          done
+      - name: Guardar artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: umbral-reel-09
+          path: |
+            output/*.mp4
+            output/timings.json
+            output/music.wav
+            output/branding_timing.json
+            output/intro_card.png
+            output/outro_card.png
+            output/scene_contact_sheet.jpg
+            output/image_quality_report.json
+            output/cover.jpg
+            output/caption.txt
+            output/story_used.json
+          retention-days: 7
+          if-no-files-found: error
