@@ -21,15 +21,15 @@ def run(*args, **kwargs):
 
 def subtitle_lines(text):
     from PIL import ImageFont
-    font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 38)
+    font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 34)
     words = text.split()
-    if font.getlength(text) <= 550:
+    if font.getlength(text) <= 480:
         return [text]
     options = [(' '.join(words[:i]), ' '.join(words[i:])) for i in range(1, len(words))]
     if not options:
         raise ValueError('Palabra demasiado larga para el subtítulo')
     lines = min(options, key=lambda pair: max(font.getlength(line) for line in pair))
-    if max(font.getlength(line) for line in lines) > 550:
+    if max(font.getlength(line) for line in lines) > 480:
         raise ValueError('Subtítulo demasiado largo')
     return list(lines)
 
@@ -89,7 +89,7 @@ PlayResY: 1280
 WrapStyle: 0
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,DejaVu Sans,38,&H00FFFFFF,&H00FFFFFF,&H00101010,&H90000000,1,0,0,0,100,100,0,0,1,3,1,2,65,95,235,1
+Style: Default,DejaVu Sans,34,&H00FFFFFF,&H00FFFFFF,&H00101010,&H90000000,1,0,0,0,100,100,0,0,1,3,1,2,85,95,280,1
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 '''
@@ -132,7 +132,7 @@ def generate_images(story, out):
     # CPU-only runner: fewer diffusion pixels and steps yield a substantial
     # speedup; FFmpeg still produces the same 720x1280 delivery format.
     # Use UMBRAL_IMAGE_PROFILE=quality to restore the previous settings.
-    profile = os.getenv('UMBRAL_IMAGE_PROFILE', 'fast')
+    profile = os.getenv('UMBRAL_IMAGE_PROFILE', 'quality')
     if profile not in ('fast', 'quality'):
         raise ValueError('Perfil de imágenes desconocido')
     steps, height, width = (1, 640, 384) if profile == 'fast' else (4, 896, 512)
