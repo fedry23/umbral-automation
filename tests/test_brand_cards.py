@@ -44,7 +44,7 @@ class CoverAndCardsTests(unittest.TestCase):
                 p = out / f"scene_{i:02}.png"
                 Image.new("RGB", (512, 896), (245, 35, 35) if i == 0 else (35, 35, 245)).save(p)
                 scenes.append(p)
-            story = {"episode_number": 6, "title": "La luz del rellano"}
+            story = {"episode_number": 6, "title": "La luz del rellano", "cover_scene_index": 0}
             path = make_thumbnail(story, scenes, out / "cover.jpg")
             with Image.open(path) as cover:
                 red, green, blue = cover.getpixel((80, 80))
