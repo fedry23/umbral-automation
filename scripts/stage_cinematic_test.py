@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import shutil
 
-from scripts.thumbnail import make_thumbnail
+from thumbnail import make_thumbnail
 import subprocess
 from zoneinfo import ZoneInfo
 from stage_daily_reel import github_get, validate_cover, validate_mp4
