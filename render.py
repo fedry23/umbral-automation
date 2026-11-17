@@ -155,8 +155,17 @@ def generate_images(story, out):
     import torch
     from diffusers import AutoPipelineForText2Image
     torch.set_num_threads(min(4, os.cpu_count() or 1))
+    # The higher-quality backend is opt-in until CPU runtime is measured.
+    # Keep the known-working production model as the safe default.
+    backend = os.getenv('UMBRAL_IMAGE_BACKEND', 'turbo')
+    models = {
+        'turbo': 'stabilityai/sd-turbo',
+        'sd15': 'stable-diffusion-v1-5/stable-diffusion-v1-5',
+    }
+    if backend not in models:
+        raise ValueError('Modelo de imagen desconocido')
     pipe = AutoPipelineForText2Image.from_pretrained(
-        'stabilityai/sd-turbo', torch_dtype=torch.float32)
+        models[backend], torch_dtype=torch.float32)
     # On CPU, attention slicing serializes work and often makes inference slower.
     # Leave it off unless explicitly requested for a memory-constrained runner.
     if os.getenv('UMBRAL_LOW_MEMORY', '0') == '1':
@@ -167,8 +176,15 @@ def generate_images(story, out):
     profile = os.getenv('UMBRAL_IMAGE_PROFILE', 'quality')
     if profile not in ('fast', 'quality'):
         raise ValueError('Perfil de imágenes desconocido')
-    steps, height, width = (1, 640, 384) if profile == 'fast' else (4, 896, 512)
-    print(f'UMBRAL_IMAGE_PROFILE={profile} steps={steps} size={width}x{height}', flush=True)
+    if backend == 'sd15':
+        # SD 1.5 uses classifier-free guidance and a non-distilled scheduler.
+        # This option is intentionally not enabled in the daily workflow.
+        steps, height, width, guidance = 25, 768, 512, 7.0
+    else:
+        steps, height, width = (1, 640, 384) if profile == 'fast' else (4, 896, 512)
+        guidance = 0.0
+    print(f'UMBRAL_IMAGE_BACKEND={backend} profile={profile} '
+          f'steps={steps} size={width}x{height}', flush=True)
     from image_quality import assess_image
     paths, report = [], []
     total_start = time.monotonic()
@@ -182,7 +198,7 @@ def generate_images(story, out):
         attempts = []
         for attempt in range(max_attempts):
             seed = int(story.get('image_seed_base', 7300)) + i + attempt * 1009
-            image = pipe(prompt=prompt, num_inference_steps=steps, guidance_scale=0.0,
+            image = pipe(prompt=prompt, num_inference_steps=steps, guidance_scale=guidance,
                          height=height, width=width,
                          generator=torch.Generator('cpu').manual_seed(seed)).images[0]
             if paths:
