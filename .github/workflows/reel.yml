@@ -31,6 +31,8 @@ jobs:
       - uses: ./.github/actions/setup-render
         with:
           models: "true"
+      - name: Autorreparación segura y validación previa de relatos
+        run: python scripts/auto_repair.py --fix
       - name: Pruebas de sincronización y codificación
         run: python -m unittest discover -s tests -v
       - name: Crear Reel
