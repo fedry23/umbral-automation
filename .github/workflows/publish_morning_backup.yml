@@ -1,0 +1,18 @@
+name: UMBRAL - Respaldo independiente 09:00
+
+on:
+  # 05:35 / 06:05 UTC: preparation in both Spanish DST seasons.
+  schedule:
+    - cron: '35 5 * * *'
+    - cron: '5 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+  pages: write
+
+jobs:
+  respaldo:
+    uses: ./.github/workflows/publish_morning.yml
+    secrets: inherit
