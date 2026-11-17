@@ -1,0 +1,14 @@
+{
+  "account": "umbral.terror",
+  "target_id": "18121779709999190",
+  "target_timestamp": "2026-11-16T12:15:25+0000",
+  "target_permalink": "https://www.instagram.com/reel/DfzVO34BmPT/",
+  "target_is_oldest": true,
+  "token_valid": true,
+  "required_delete_permissions_present": false,
+  "missing_permissions": [
+    "instagram_manage_contents"
+  ],
+  "replacement_ready": false,
+  "action": "PREFLIGHT_ONLY_NO_DELETE_NO_PUBLISH"
+}
