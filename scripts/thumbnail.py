@@ -61,8 +61,12 @@ def make_thumbnail(story, images, destination):
     if not files or not all(f.is_file() for f in files):
         raise ValueError("Faltan imágenes de la historia para crear la portada")
 
-    # Middle scene: distinct, cinematic and representative of the story.
-    source = files[len(files) // 2]
+    # Default to the establishing shot: a middle scene can be only a texture or a wall.
+    # Editors may explicitly select a more representative scene per story.
+    index = story.get('cover_scene_index', 0)
+    if not isinstance(index, int) or isinstance(index, bool) or not 0 <= index < len(files):
+        raise ValueError('cover_scene_index fuera de rango')
+    source = files[index]
     with Image.open(source) as base:
         bg = ImageOps.fit(base.convert("RGB"), (WIDTH, HEIGHT),
                           method=Image.Resampling.LANCZOS,
