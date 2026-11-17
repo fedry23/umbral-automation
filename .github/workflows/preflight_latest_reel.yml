@@ -1,0 +1,32 @@
+name: UMBRAL - Identificar ultimo Reel sin eliminar
+on:
+  push:
+    branches: [main]
+    paths: ['ops/latest-reel-preflight-kick.txt']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: umbral-latest-reel-readonly
+  cancel-in-progress: false
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inventario y permisos (solo GET)
+        env:
+          IG_DELETE_ACCESS_TOKEN: ${{ secrets.IG_DELETE_ACCESS_TOKEN }}
+        run: python scripts/preflight_latest_reel.py
+      - name: Persistir informe de solo lectura
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/audit/latest-reel-preflight.json
+          git commit -m "audit: latest Instagram Reel read-only preflight" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
