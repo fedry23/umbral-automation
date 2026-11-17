@@ -41,6 +41,20 @@ class PublicationTests(unittest.TestCase):
                 self.assertFalse(publisher.test_release_allowed("2026-11-18"))
                 self.assertEqual(publisher.daily_marker("2026-11-18"), "🩸 UMBRAL · 2026-11-18")
 
+    def test_new_episode_separate_from_daily_and_earlier_test(self):
+        today = dt.datetime(2026, 11, 17, 8, 0, tzinfo=ZoneInfo("Europe/Madrid"))
+        with patch.object(publisher, "now_local", return_value=today):
+            daily = publisher.daily_marker("2026-11-17")
+            with patch.dict(os.environ, {"UMBRAL_TEST_MODE": "cinematic-episode-6"}):
+                older = publisher.daily_marker("2026-11-17")
+            with patch.dict(os.environ, {"UMBRAL_TEST_MODE": "cinematic-episode-7"}):
+                new = publisher.daily_marker("2026-11-17")
+                self.assertTrue(publisher.one_time_late_allowed("2026-11-17"))
+                self.assertEqual(publisher.intent_path("2026-11-17").name, "test-cinematic-episode-7.json")
+                self.assertFalse(publisher.test_release_allowed("2026-11-18"))
+            self.assertEqual(new, "🩸 UMBRAL · PRUEBA 7 · 2026-11-17")
+            self.assertEqual(len({new, older, daily}), 3)
+
     def test_winter_and_summer_21_local(self):
         winter = publisher.target_time("2026-11-17")
         summer = publisher.target_time("2027-07-17")
