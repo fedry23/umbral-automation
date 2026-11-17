@@ -17,13 +17,14 @@ def assess_image(image, previous=None):
                    np.abs(np.diff(gray, axis=1)).mean())
     mean = float(gray.mean())
     reasons = []
-    if contrast < 9:
+    # Low-key lighting is intentional in horror; reject only near-flat frames.
+    if contrast < 4:
         reasons.append('low_contrast')
-    if detail < 2.0:
+    if detail < 0.8 and contrast < 8:
         reasons.append('blur_or_flat')
-    if mean < 8 or mean > 248:
+    if mean < 3 or mean > 252:
         reasons.append('exposure')
-    if saturation < 2 and contrast < 18:
+    if saturation < 1 and contrast < 7:
         reasons.append('near_monochrome_flat')
     similarity = 0.0
     if previous is not None:
