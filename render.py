@@ -135,7 +135,7 @@ def generate_images(story, out):
     profile = os.getenv('UMBRAL_IMAGE_PROFILE', 'fast')
     if profile not in ('fast', 'quality'):
         raise ValueError('Perfil de imágenes desconocido')
-    steps, height, width = (3, 768, 448) if profile == 'fast' else (4, 896, 512)
+    steps, height, width = (1, 640, 384) if profile == 'fast' else (4, 896, 512)
     print(f'UMBRAL_IMAGE_PROFILE={profile} steps={steps} size={width}x{height}', flush=True)
     paths = []
     total_start = time.monotonic()
