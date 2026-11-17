@@ -1,3 +1,4 @@
 2026-11-16 | Prueba de respaldo de generación (después de las 21:00 Europe/Madrid). No autoriza ni activa publicación.
 
 2026-11-16T22:22 Europe/Madrid | Validación de producción sin publicar: intro roja separada, outro azul separada, portada JPEG 1080x1920 y audio 48k. No tocar Instagram.
+2026-11-17T06:16 Europe/Madrid | Respaldo de generación del relato 2026-11-17 «El piso menos dos»; solo render y artefacto, NO publicar.
