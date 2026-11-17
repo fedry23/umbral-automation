@@ -68,6 +68,11 @@ def verify_story(story, caption, date):
         raise ValueError("Relato fuera de la longitud esperada")
     if not story.get("title") or len(story.get("scenes", [])) != 6:
         raise ValueError("Relato o escenas incompletas")
+    episode = story.get("episode_number")
+    if type(episode) is not int or episode < 1:
+        raise ValueError("Número de episodio ausente o inválido")
+    if not all(isinstance(scene, str) and scene.strip() for scene in story["scenes"]):
+        raise ValueError("Hay escenas vacías o inválidas")
     if not caption.strip() or story.get("caption", "").strip() not in caption:
         raise ValueError("Descripción no coincide con el relato")
     return True
