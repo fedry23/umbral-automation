@@ -311,6 +311,18 @@ def render():
     voiced = time.monotonic()
     write_subtitles(cues, OUT / 'subtitles.ass')
     images = generate_images(story, OUT)
+    # Lightweight visual QA: a single contact sheet makes it easy to inspect
+    # all six generated scenes without downloading large intermediate PNGs.
+    from PIL import Image, ImageOps, ImageDraw
+    thumb_w, thumb_h, gap = 192, 320, 12
+    sheet = Image.new('RGB', (3 * thumb_w + 4 * gap, 2 * thumb_h + 3 * gap), '#111111')
+    for idx, scene_path in enumerate(images[:6]):
+        with Image.open(scene_path) as src:
+            tile = ImageOps.fit(src.convert('RGB'), (thumb_w, thumb_h))
+        x = gap + (idx % 3) * (thumb_w + gap)
+        y = gap + (idx // 3) * (thumb_h + gap)
+        sheet.paste(tile, (x, y))
+    sheet.save(OUT / 'scene_contact_sheet.jpg', quality=85, optimize=True)
     # Cover is a distinct downloadable JPEG. Brand cards are original
     # graphics; they NEVER reuse any generated story scene.
     from scripts.thumbnail import make_thumbnail
