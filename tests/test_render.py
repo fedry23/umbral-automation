@@ -59,6 +59,15 @@ class RenderTests(unittest.TestCase):
         self.assertIn('security booth', shots[4])
         self.assertIn('attendance terminal', shots[5])
 
+    def test_complex_future_scenes_get_simple_visual_fallback(self):
+        prompt = render.simplify_visual_prompt(
+            'Four technicians standing beside an industrial lathe in a factory.')
+        self.assertIn('an industrial metal lathe', prompt)
+        self.assertIn('no people', prompt)
+        self.assertNotIn('Four technicians', prompt)
+        simple = 'An empty apartment corridor with a closed wooden door.'
+        self.assertEqual(render.simplify_visual_prompt(simple), simple)
+
     def test_scene_boundaries_follow_spoken_cues(self):
         cues = [(2, 3, 'primera frase'), (3, 5, 'segunda frase con mas palabras'),
                 (5, 9, 'tercera frase bastante mas larga para cerrar')]
