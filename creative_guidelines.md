@@ -47,3 +47,11 @@ El motor audiovisual agrega automáticamente **«Historia número N: Título»**
 
 ## Resultados e hipótesis contrastadas
 Por determinar cuando haya suficientes datos.
+
+
+## Prompts de imagen: límite práctico
+Escribir 35–50 palabras inglesas por escena, empezando por la acción concreta y
+el encuadre. Añadir después solo los rasgos de continuidad imprescindibles. No
+anteponer un párrafo común largo: el codificador puede recortarlo y perder la
+acción. Revisar las imágenes generadas: pasar validación MP4 no demuestra que
+los seis dibujos representen correctamente los seis momentos de la historia.
