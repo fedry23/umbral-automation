@@ -378,7 +378,13 @@ def load_stories():
 
 def render():
     date = dt.date.fromisoformat(os.getenv('UMBRAL_DATE', dt.datetime.now(ZoneInfo('Europe/Madrid')).date().isoformat()))
+    morning = os.getenv('UMBRAL_SLOT') == '09'
     stories = load_stories()
+    if morning:
+        morning_file = BASE / 'stories_morning.json'
+        stories = json.loads(morning_file.read_text(encoding='utf-8'))
+        if not isinstance(stories, list):
+            raise ValueError('Archivo de historias matinales inválido')
     daily = next((s for s in stories if s.get('publish_date') == date.isoformat()), None)
     test_title = os.getenv('UMBRAL_STORY_TITLE', '')
     replacement_file = os.getenv('UMBRAL_REPLACEMENT_STORY_FILE', '')
@@ -438,7 +444,7 @@ def render():
     (OUT / 'brand_story.json').write_text(json.dumps(story, ensure_ascii=False))
     timing = json.loads((OUT / 'branding_timing.json').read_text(encoding='utf-8'))
     illustrated = time.monotonic()
-    outfile = OUT / f'umbral_{date:%Y%m%d}.mp4'
+    outfile = OUT / f'umbral_{date:%Y%m%d}{"_09" if morning else ""}.mp4'
     encode(OUT, images, duration, outfile, branding=timing, cues=cues)
     timings = {'voice_seconds': voiced - started, 'images_seconds': illustrated - voiced,
                'encoding_seconds': time.monotonic() - illustrated,
