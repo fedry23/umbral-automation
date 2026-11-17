@@ -27,7 +27,8 @@ class RenderTests(unittest.TestCase):
         prompt = render.scene_image_prompt("  An empty corridor  at night. ")
         self.assertIn("An empty corridor at night.", prompt)
         self.assertIn("one clear focal subject", prompt)
-        self.assertIn("no extra limbs", prompt.lower())
+        self.assertTrue(prompt.startswith("An empty corridor at night."))
+        self.assertIn("natural anatomy", prompt.lower())
         with self.assertRaises(ValueError):
             render.scene_image_prompt("  ")
         with self.assertRaises(ValueError):
