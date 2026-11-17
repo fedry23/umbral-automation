@@ -1,5 +1,6 @@
 """Regressions for bounded file hashing and publication scheduling order."""
 import hashlib
+import datetime as dt
 import io
 import json
 from pathlib import Path
@@ -39,7 +40,7 @@ class OptimizationsTests(unittest.TestCase):
             out=Path(tmp)
             (out/'prepared.json').write_text(json.dumps({'date':'2026-11-17','status':'prepared','container':'abc'}))
             events=[]
-            with patch.object(publisher,'OUT',out), patch.object(publisher,'intent_path',return_value=out/'absent.json'), patch.object(publisher,'already_published',return_value=None), patch.object(publisher,'one_time_late_allowed',return_value=False), patch.object(publisher,'persist_intent',side_effect=lambda *a:events.append('persist')), patch.object(publisher,'wait_until_target',side_effect=lambda *a:events.append('wait')), patch.object(publisher,'api',side_effect=lambda *a:(events.append('post') or {'id':'123'})) as api, patch.object(publisher,'record_verified',side_effect=lambda *a:events.append('verify')):
+            with patch.object(publisher,'OUT',out), patch.object(publisher,'intent_path',return_value=out/'absent.json'), patch.object(publisher,'already_published',return_value=None), patch.object(publisher,'now_local',return_value=dt.datetime(2026,11,17,20,30,tzinfo=publisher.TZ)), patch.object(publisher,'persist_intent',side_effect=lambda *a:events.append('persist')), patch.object(publisher,'wait_until_target',side_effect=lambda *a:events.append('wait')), patch.object(publisher,'api',side_effect=lambda *a:(events.append('post') or {'id':'123'})) as api, patch.object(publisher,'record_verified',side_effect=lambda *a:events.append('verify')):
                 publisher.publish('2026-11-17')
                 self.assertEqual(events,['persist','wait','post','verify'])
                 api.assert_called_once_with('POST',f'{publisher.ACCOUNT}/media_publish',{'creation_id':'abc'})
