@@ -32,7 +32,7 @@ class StageDailyReelTests(unittest.TestCase):
                 archive.writestr("large.mp4", b"abc")
             raw = bytearray(stream.getvalue())
             # ZIP central-directory uncompressed size field.
-            index = raw.index(b"PK\\x01\\x02")
+            index = raw.index(bytes((80, 75, 1, 2)))
             raw[index + 24:index + 28] = (250_000_001).to_bytes(4, "little")
             with patch.object(stage, "OUT", Path(tmp)):
                 with self.assertRaisesRegex(ValueError, "grande"):
