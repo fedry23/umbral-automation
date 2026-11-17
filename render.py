@@ -111,8 +111,7 @@ def generate_images(story, out):
     pipe.enable_attention_slicing()
     paths = []
     for i, scene in enumerate(story['scenes']):
-        prompt = ('Cinematic realistic psychological horror film still, vertical composition, '
-                  '35mm photography, dim practical lighting, detailed environment, no lettering. ' + scene)
+        prompt = scene + ' Cinematic horror film still, realistic, dim lighting, no text.'
         image = pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0.0,
                      height=896, width=512,
                      generator=torch.Generator('cpu').manual_seed(7300 + i)).images[0]
