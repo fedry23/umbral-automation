@@ -12,6 +12,32 @@ from scripts import stage_daily_reel as stage
 
 
 class StageDailyReelTests(unittest.TestCase):
+    def test_duplicate_zip_entry_rejected_before_extraction(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            stream = io.BytesIO()
+            with zipfile.ZipFile(stream, "w") as archive:
+                archive.writestr("same.txt", b"one")
+                import warnings
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", UserWarning)
+                    archive.writestr("same.txt", b"two")
+            with patch.object(stage, "OUT", Path(tmp)):
+                with self.assertRaisesRegex(ValueError, "duplicadas"):
+                    stage.extract_run_zip(stream.getvalue(), "2026-11-17")
+
+    def test_oversized_zip_metadata_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            stream = io.BytesIO()
+            with zipfile.ZipFile(stream, "w") as archive:
+                archive.writestr("large.mp4", b"abc")
+            raw = bytearray(stream.getvalue())
+            # ZIP central-directory uncompressed size field.
+            index = raw.index(b"PK\\x01\\x02")
+            raw[index + 24:index + 28] = (250_000_001).to_bytes(4, "little")
+            with patch.object(stage, "OUT", Path(tmp)):
+                with self.assertRaisesRegex(ValueError, "grande"):
+                    stage.extract_run_zip(bytes(raw), "2026-11-17")
+
     def test_extract_preserves_mp4_filename_after_story_validation(self):
         day = "2026-11-17"
         name = "umbral_20261117.mp4"
