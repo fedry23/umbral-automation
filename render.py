@@ -190,7 +190,7 @@ def simplify_visual_prompt(scene):
     location = ('Spanish industrial factory' if any(k in lower for k in
                 ('factory', 'industrial', 'technician', 'lathe', 'locker'))
                 else 'old Spanish apartment building')
-    return (f'One clear subject: {subject} in an {location}. '
+    return (f'One clear subject: {subject} in a {location}. '
             'Straight-on cinematic photograph, physically plausible objects, '
             'grounded architectural detail, tense low-key lighting, '
             'no people, no hands, no writing, no collage.')
