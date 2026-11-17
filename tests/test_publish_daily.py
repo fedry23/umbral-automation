@@ -39,7 +39,7 @@ class PublicationTests(unittest.TestCase):
                 self.assertEqual(special, "🩸 UMBRAL · PRUEBA 6 · 2026-11-17")
                 self.assertNotEqual(daily, special)
                 self.assertFalse(publisher.test_release_allowed("2026-11-18"))
-                self.assertEqual(publisher.daily_marker("2026-11-18"), "🩸 UMBRAL · 2026-11-18")
+                self.assertEqual(publisher.daily_marker("2026-11-18"), "🩸 UMBRAL · OFICIAL · 2026-11-18")
 
     def test_new_episode_separate_from_daily_and_earlier_test(self):
         today = dt.datetime(2026, 11, 17, 8, 0, tzinfo=ZoneInfo("Europe/Madrid"))
@@ -64,10 +64,13 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(summer.utcoffset(), dt.timedelta(hours=2))
 
     def test_daily_idempotency_marker(self):
-        text = publisher.full_caption("Esta noche, la puerta se abre.", "2026-11-17")
-        self.assertIn("UMBRAL · 2026-11-17", text)
-        self.assertEqual(publisher.full_caption(text, "2026-11-17"), text)
-        self.assertNotIn("2026-11-18", text)
+        story = {"episode_number": 9}
+        with patch.object(publisher, "OUT", Path("staged")), patch.object(
+                Path, "read_text", return_value=json.dumps(story)):
+            text = publisher.full_caption("Esta noche, la puerta se abre.", "2026-11-17")
+            self.assertIn("UMBRAL · OFICIAL · 2026-11-17 · EPISODIO 9", text)
+            self.assertEqual(publisher.full_caption(text, "2026-11-17"), text)
+            self.assertNotIn("2026-11-18", text)
 
     def test_select_today_only(self):
         base = {"name": stager.WORKFLOW, "event": "schedule",
@@ -99,21 +102,35 @@ class PublicationTests(unittest.TestCase):
             stager.verify_story(story, "Texto de otro relato", "2026-11-17")
 
     def test_existing_daily_reel_does_not_publish_twice(self):
-        duplicate = {"id": "1812345", "caption": publisher.daily_marker("2026-11-17")}
-        with patch.object(publisher, "api", return_value={"data": [duplicate]}) as call:
-            self.assertEqual(publisher.already_published("2026-11-17")["id"], "1812345")
-            self.assertEqual(call.call_count, 1)
+        marker = publisher.daily_marker("2026-11-17") + " · EPISODIO 9"
+        duplicate = {"id": "1812345", "caption": marker, "media_product_type": "REELS"}
+        with patch.object(publisher, "read_story", return_value=({"episode_number": 9}, "")):
+            with patch.object(publisher, "api", return_value={"data": [duplicate]}) as call:
+                self.assertEqual(publisher.already_published("2026-11-17")["id"], "1812345")
+                self.assertEqual(call.call_count, 1)
+
+    def test_test_reels_do_not_block_official_release(self):
+        day = "2026-11-17"
+        reels = [{"id": "test", "caption": "🩸 UMBRAL · PRUEBA 8 · " + day,
+                  "media_product_type": "REELS"},
+                 {"id": "legacy", "caption": "🩸 UMBRAL · " + day,
+                  "media_product_type": "REELS"}]
+        with patch.object(publisher, "read_story", return_value=({"episode_number": 9}, "")):
+            with patch.object(publisher, "api", return_value={"data": reels}):
+                self.assertIsNone(publisher.already_published(day))
 
     def test_pagination_finds_oldest_page_duplicate(self):
         day = "2026-11-17"
+        marker = publisher.daily_marker(day) + " · EPISODIO 9"
         def fake_api(method, path, params=None):
             if params.get("after") == "next-page":
-                return {"data": [{"id": "old", "caption": publisher.daily_marker(day)}]}
-            return {"data": [{"id": "new", "caption": "Otro Reel"}],
+                return {"data": [{"id": "old", "caption": marker, "media_product_type": "REELS"}]}
+            return {"data": [{"id": "new", "caption": "Otro Reel", "media_product_type": "REELS"}],
                     "paging": {"next": "https://graph.facebook.com/v25.0/123/media?after=next-page"}}
-        with patch.object(publisher, "api", side_effect=fake_api) as call:
-            self.assertEqual(publisher.already_published(day)["id"], "old")
-            self.assertEqual(call.call_count, 2)
+        with patch.object(publisher, "read_story", return_value=({"episode_number": 9}, "")):
+            with patch.object(publisher, "api", side_effect=fake_api) as call:
+                self.assertEqual(publisher.already_published(day)["id"], "old")
+                self.assertEqual(call.call_count, 2)
 
     def test_pagination_fails_closed_on_repeated_cursor(self):
         response = {"data": [], "paging":
