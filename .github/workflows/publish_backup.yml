@@ -1,0 +1,22 @@
+name: UMBRAL - Respaldo independiente de publicación
+
+on:
+  # UTC: 17:35 = 18:35 invierno / 19:35 verano;
+  # 18:05 = 19:05 invierno / 20:05 verano.
+  # Both remain within the publisher's 17:00-20:40 local preparation window.
+  schedule:
+    - cron: '35 17 * * *'
+    - cron: '5 18 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+  pages: write
+
+jobs:
+  respaldo:
+    # Use the same audited publisher, Meta credentials, and duplicate protection.
+    # Never create a second, independent publishing implementation.
+    uses: ./.github/workflows/publish_daily.yml
+    secrets: inherit
