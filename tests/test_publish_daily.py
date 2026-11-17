@@ -88,7 +88,7 @@ class PublicationTests(unittest.TestCase):
 
     def test_stale_story_is_rejected(self):
         story = {"date": "2026-11-16", "publish_date": "2026-11-16",
-                 "title": "Otra noche", "narration": "x " * 150,
+                 "title": "Otra noche", "episode_number": 10, "narration": "x " * 150,
                  "scenes": ["scene"] * 6, "caption": "Texto correcto"}
         with self.assertRaises(ValueError):
             stager.verify_story(story, "Texto correcto", "2026-11-17")
