@@ -104,6 +104,24 @@ class PublicationTests(unittest.TestCase):
             self.assertEqual(publisher.already_published("2026-11-17")["id"], "1812345")
             self.assertEqual(call.call_count, 1)
 
+    def test_pagination_finds_oldest_page_duplicate(self):
+        day = "2026-11-17"
+        def fake_api(method, path, params=None):
+            if params.get("after") == "next-page":
+                return {"data": [{"id": "old", "caption": publisher.daily_marker(day)}]}
+            return {"data": [{"id": "new", "caption": "Otro Reel"}],
+                    "paging": {"next": "https://graph.facebook.com/v25.0/123/media?after=next-page"}}
+        with patch.object(publisher, "api", side_effect=fake_api) as call:
+            self.assertEqual(publisher.already_published(day)["id"], "old")
+            self.assertEqual(call.call_count, 2)
+
+    def test_pagination_fails_closed_on_repeated_cursor(self):
+        response = {"data": [], "paging":
+                    {"next": "https://graph.facebook.com/v25.0/123/media?after=repeat"}}
+        with patch.object(publisher, "api", return_value=response):
+            with self.assertRaises(RuntimeError):
+                list(publisher.owned_media())
+
     def test_workflow_requires_explicit_activation_and_has_backup(self):
         import yaml
         yml = yaml.load((BASE / ".github/workflows/publish_daily.yml").read_text(), Loader=yaml.BaseLoader)
