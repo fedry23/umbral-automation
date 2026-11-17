@@ -1,6 +1,7 @@
 """Read-only inventory for an explicitly requested latest-Reel replacement."""
 import json
 import os
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -39,8 +40,11 @@ def main():
     reels = [x for x in items if x.get("media_product_type") == "REELS"]
     if not reels: raise RuntimeError("No Reels found")
     newest = max(reels, key=lambda x: datetime.fromisoformat(x["timestamp"].replace("Z","+00:00")))
+    caption = newest.get("caption") or ""
+    match = re.search(r"(?i)(?:historia\\s*(?:n[uú]mero\\s*)?|episodio\\s*|historia\\s*0*)(\\d{1,4})", caption)
+    episode = int(match.group(1)) if match else None
     report = {"status":"PREFLIGHT_ONLY_NO_DELETE_NO_PUBLISH","account":"umbral.terror",
-              "latest_reel_id":newest["id"],"latest_reel_timestamp":newest["timestamp"],
+              "latest_reel_id":newest["id"],"latest_episode_number":episode,"latest_reel_timestamp":newest["timestamp"],
               "latest_reel_permalink":newest.get("permalink"),"total_reels":len(reels),
               "delete_permissions_granted":True,"replacement_ready":False}
     Path("docs/audit").mkdir(parents=True,exist_ok=True)
