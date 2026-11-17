@@ -147,7 +147,53 @@ def visual_shots(story):
         if len(curated) != len(story['scenes']):
             raise ValueError('Las escenas visuales revisadas no coinciden con el relato')
         return curated
-    return story['scenes']
+    return [simplify_visual_prompt(scene) for scene in story['scenes']]
+
+
+def simplify_visual_prompt(scene):
+    """Default storyboard safety for future episodes, without per-title editing.
+
+    Complex human interactions are SD-Turbo's most common failure mode on CPU.
+    Preserve the original scene when it is simple; otherwise extract a
+    recognisable prop/location and request a single-object photographic shot.
+    """
+    source = ' '.join(scene.split())
+    lower = source.lower()
+    complex_people = any(term in lower for term in (
+        'four workers', 'four technicians', 'two people', 'two men',
+        'two women', 'several people', 'group of', 'speaking with',
+        'talking to', 'holding hands', 'pointing toward',
+        'watching from behind', 'standing beside', 'man and woman',
+        'electrician and', 'woman and', 'person and'))
+    if not complex_people:
+        return source
+    props = (
+        ('electricity meter', 'an old mechanical electricity meter'),
+        ('attendance terminal', 'a factory attendance terminal'),
+        ('time clock', 'an old mechanical time clock'),
+        ('intercom', 'a wall-mounted intercom'),
+        ('locker', 'a metal locker'),
+        ('security monitor', 'a security monitor'),
+        ('surveillance monitor', 'a surveillance monitor'),
+        ('lathe', 'an industrial metal lathe'),
+        ('armchair', 'an empty armchair'),
+        ('pendant lamp', 'a hanging ceiling lamp'),
+        ('doorway', 'an open apartment doorway'),
+        ('corridor', 'an empty corridor'),
+        ('staircase', 'an empty staircase'),
+        ('window', 'a rain-streaked window'),
+        ('telephone', 'an old telephone'),
+        ('camera', 'an old camera'),
+        ('door', 'a closed wooden door'),
+    )
+    subject = next((value for term, value in props if term in lower), 'an empty room')
+    location = ('Spanish industrial factory' if any(k in lower for k in
+                ('factory', 'industrial', 'technician', 'lathe', 'locker'))
+                else 'old Spanish apartment building')
+    return (f'One clear subject: {subject} in an {location}. '
+            'Straight-on cinematic photograph, physically plausible objects, '
+            'grounded architectural detail, tense low-key lighting, '
+            'no people, no hands, no writing, no collage.')
 
 
 def generate_images(story, out):
