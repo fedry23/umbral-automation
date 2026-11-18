@@ -166,7 +166,7 @@ def read_story(day):
     caption = (OUT / "caption.txt").read_text(encoding="utf-8")
     if story.get("date") != day or story.get("publish_date") != day:
         raise ValueError("No se puede publicar: no coincide la fecha del relato")
-    if not story.get("caption", "").strip() in caption:
+    if not story.get("caption", "").strip() or story["caption"].strip() not in caption:
         raise ValueError("La descripción no corresponde al relato verificado")
     return story, caption
 
@@ -206,11 +206,12 @@ def prepare(day, video_url, cover_url=None):
             raise ValueError("La portada debe ser un JPEG público de GitHub Pages")
     token_preflight()
     story, caption = read_story(day)
+    metadata = render_metadata(day, story)
     previous = already_published(day)
     if previous:
         status = {"status": "already_published", "media_id": previous["id"], "date": day,
                   "title": story["title"], "episode_number": story.get("episode_number"),
-                  "cover_url": cover_url}
+                  "cover_url": cover_url, **metadata}
         (OUT / "prepared.json").write_text(json.dumps(status))
         print("Un Reel del mismo día ya existe; omitiendo preparación")
         return
@@ -232,7 +233,7 @@ def prepare(day, video_url, cover_url=None):
         if code == "FINISHED":
             result = {"status": "prepared", "container": container,
                       "date": day, "title": story["title"], "cover_url": cover_url,
-                      "episode_number": story.get("episode_number")}
+                      "episode_number": story.get("episode_number"), **metadata}
             (OUT / "prepared.json").write_text(json.dumps(result))
             print("Contenedor terminado; listo para las 21:00")
             return
@@ -275,6 +276,8 @@ def publish(day):
         persist_intent(day, data)
         if now_local() < target_time(day):
             wait_until_target(day)
+        if now_local().date().isoformat() != day:
+            raise RuntimeError("Expired date before POST; do not publish")
         # Shared workflow concurrency plus the durable intent protects this POST.
         # Perform ONE publish request. If the network drops, inspect media before retrying.
         try:
@@ -293,6 +296,26 @@ def intent_path(day):
     key = ("test-cinematic-episode-7" if os.getenv("UMBRAL_TEST_MODE") == "cinematic-episode-7"
            else "test-cinematic-episode-6") if test_release_allowed(day) else day
     return Path("docs/pending") / (key + ("_09" if SLOT == "09" else "") + ".json")
+
+
+def render_metadata(day, story):
+    if os.getenv("UMBRAL_DYNAMIC_EPISODES") != "1" or test_release_allowed(day):
+        return {}
+    try:
+        from .technical_learning import load_profile
+    except ImportError:
+        from technical_learning import load_profile
+    profile = load_profile(day, SLOT)
+    if story.get("technical_profile") != profile:
+        raise ValueError("Stale render profile")
+    _, caption = read_story(day)
+    if not caption.startswith(f"Historia {story['episode_number']}: {story['title']}\n"):
+        raise ValueError("Stale caption number")
+    duration = json.loads((OUT / "branding_timing.json").read_text())["duration"]
+    import math
+    if type(duration) not in (int, float) or not math.isfinite(duration) or duration <= 0:
+        raise ValueError("Invalid render duration")
+    return {"slot": SLOT, "technical_profile": profile, "duration_seconds": duration}
 
 
 def check_episode(day, number):
@@ -314,9 +337,19 @@ def persist_intent(day, data):
     if path.exists():
         raise RuntimeError("Existing intent after refresh; do not POST")
     check_episode(day, data.get("episode_number"))
+    story, _ = read_story(day)
+    if story.get("episode_number") != data.get("episode_number"):
+        raise ValueError("Prepared container episode mismatch")
+    for key, value in render_metadata(day, story).items():
+        if data.get(key) != value:
+            raise ValueError("Prepared container metadata mismatch")
+    if now_local().date().isoformat() != day:
+        raise RuntimeError("Expired publication date")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"date": day, "container": data["container"],
-                               "status": "publish_intent", "episode_number": data.get("episode_number"), "slot": SLOT}, indent=2))
+                               "status": "publish_intent", "episode_number": data.get("episode_number"), "slot": SLOT,
+                               "title": data.get("title"), "technical_profile": data.get("technical_profile"),
+                               "duration_seconds": data.get("duration_seconds"), "cover_url": data.get("cover_url")}, indent=2))
     for args in (["git","add",str(path)],
                  ["git","commit","-m","UMBRAL: registrar intento antes de publicar " + day],
                  ["git","push","origin","HEAD:main"]):
@@ -329,12 +362,17 @@ def record_verified(day, media_id, data):
               "episode_number":data.get("episode_number"),
               "instagram_media_id":media_id,"published_at":now_local().isoformat(),
               "verification":"pending","cover_url_sent":data.get("cover_url")}
+    for key in ("slot", "technical_profile", "duration_seconds"):
+        if key in data:
+            output[key] = data[key]
     path = OUT / "published.json"
     path.write_text(json.dumps(output,indent=2,ensure_ascii=False))
     for attempt in range(12):
         media = api("GET",media_id,{"fields":"id,permalink,media_type,media_product_type,thumbnail_url,timestamp"})
         if media.get("permalink") and media.get("media_product_type") == "REELS":
             output.update(permalink=media["permalink"],verification="published_media_read_back")
+            if media.get("timestamp"):
+                output["published_at"] = media["timestamp"]
             if media.get("thumbnail_url") and (OUT/"cover.jpg").exists():
                 output["cover_verification"] = compare_cover(media["thumbnail_url"],OUT/"cover.jpg")
             path.write_text(json.dumps(output,indent=2,ensure_ascii=False))
