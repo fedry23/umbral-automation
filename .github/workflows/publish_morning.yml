@@ -69,6 +69,11 @@ jobs:
             exit 1
           fi
 
+      - name: Reconciliar intentos pendientes (solo lectura Meta)
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python scripts/reconcile_publications.py
+
       - name: Comprobar día, hora y duplicados
         id: guard
         shell: bash
