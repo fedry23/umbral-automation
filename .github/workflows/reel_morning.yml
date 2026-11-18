@@ -38,6 +38,7 @@ jobs:
       - name: Crear Reel con regeneración limitada si falla el render
         env:
           UMBRAL_SPEED: '1.08'
+          UMBRAL_DYNAMIC_EPISODES: '1'
           UMBRAL_SLOT: '09'
           UMBRAL_REQUIRE_DATED_STORY: ${{ (github.event_name == 'schedule' || github.event_name == 'push') && '1' || '0' }}
         shell: bash
