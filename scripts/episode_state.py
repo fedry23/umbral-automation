@@ -33,6 +33,15 @@ def inventory(root=Path("."), baseline=10):
         if not OFFICIAL_KEY.fullmatch(path.stem):
             continue  # Historical tests are not part of the official sequence.
         row = _read(path)
+        # Immutable pre-migration receipt verified against the Windsor snapshot.
+        # It blocks the historical day but does not supply a numbered episode.
+        if (path.stem == "2026-11-16" and row.get("date") == "2026-11-16"
+                and row.get("instagram_media_id") == "18096307043444916"
+                and row.get("title") == "La costura" and "episode_number" not in row
+                and "verification" not in row):
+            receipts[path.stem] = row
+            ids.add(row["instagram_media_id"])
+            continue
         number, media_id = row.get("episode_number"), row.get("instagram_media_id")
         if row.get("verification") != "published_media_read_back":
             raise ValueError(f"Unverified receipt: {path}")
@@ -58,6 +67,8 @@ def planned_episode(day, slot, root=Path("."), *, anticipate_morning=False):
     key = receipt_key(day, slot)
     last, receipts = inventory(root)
     if key in receipts:
+        if "episode_number" not in receipts[key]:
+            raise ValueError("Historical unnumbered slot is closed")
         return receipts[key]["episode_number"]
     if slot == "09" and receipt_key(day, "21") in receipts:
         raise ValueError("Morning slot closed by confirmed evening publication")
