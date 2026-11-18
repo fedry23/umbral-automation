@@ -144,13 +144,20 @@ def already_published(day):
     Durable publish intent and receipt remain enforced separately.
     """
     story, _ = read_story(day)
-    marker = daily_marker(day) + " · EPISODIO "
+    marker = daily_marker(day)
+    if test_release_allowed(day):
+        expected = marker
+    else:
+        expected = marker + " · EPISODIO " + str(story["episode_number"])
+    prefix = marker + " · EPISODIO "
     for item in owned_media():
-        if (item.get("media_product_type") == "REELS"
-                and marker in (item.get("caption") or "")):
-            if marker + str(story["episode_number"]) not in (item.get("caption") or ""):
-                raise RuntimeError("Official slot already published with a different number; reconcile, do not POST")
+        if item.get("media_product_type") != "REELS":
+            continue
+        lines = (item.get("caption") or "").splitlines()
+        if expected in lines:
             return item
+        if not test_release_allowed(day) and any(line.startswith(prefix) for line in lines):
+            raise RuntimeError("Official slot already published with a different number; reconcile, do not POST")
     return None
 
 
@@ -161,9 +168,6 @@ def read_story(day):
         raise ValueError("No se puede publicar: no coincide la fecha del relato")
     if not story.get("caption", "").strip() in caption:
         raise ValueError("La descripción no corresponde al relato verificado")
-    if os.getenv("UMBRAL_DYNAMIC_EPISODES") == "1" and not test_release_allowed(day):
-        from episode_state import validate_episode
-        validate_episode(day, SLOT, story.get("episode_number"))
     return story, caption
 
 
@@ -212,6 +216,7 @@ def prepare(day, video_url, cover_url=None):
         return
     if intent_path(day).exists():
         raise RuntimeError("Hay un intento persistente sin resolver; verificar Instagram, NO publicar de nuevo")
+    check_episode(day, story.get("episode_number"))
     payload = {"media_type": "REELS", "video_url": video_url,
                "caption": full_caption(caption, day), "share_to_feed": "true"}
     if cover_url:
@@ -290,18 +295,30 @@ def intent_path(day):
     return Path("docs/pending") / (key + ("_09" if SLOT == "09" else "") + ".json")
 
 
+def check_episode(day, number):
+    if os.getenv("UMBRAL_DYNAMIC_EPISODES") == "1" and not test_release_allowed(day):
+        try:
+            from .episode_state import validate_episode
+        except ImportError:
+            from episode_state import validate_episode
+        validate_episode(day, SLOT, number)
+
+
 def persist_intent(day, data):
     """Durable before POST: a crashed run cannot silently publish twice."""
     import subprocess
     if os.getenv("UMBRAL_DURABLE_GUARD") != "1":
         raise RuntimeError("Publicación bloqueada: falta activar registro persistente")
+    subprocess.run(["git","pull","--rebase","origin","main"], check=True)
     path = intent_path(day)
+    if path.exists():
+        raise RuntimeError("Existing intent after refresh; do not POST")
+    check_episode(day, data.get("episode_number"))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"date": day, "container": data["container"],
                                "status": "publish_intent", "episode_number": data.get("episode_number"), "slot": SLOT}, indent=2))
     for args in (["git","add",str(path)],
                  ["git","commit","-m","UMBRAL: registrar intento antes de publicar " + day],
-                 ["git","pull","--rebase","origin","main"],
                  ["git","push","origin","HEAD:main"]):
         subprocess.run(args,check=True)
 
