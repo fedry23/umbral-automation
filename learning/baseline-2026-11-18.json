@@ -1,0 +1,80 @@
+{
+  "source": "Windsor.ai Instagram",
+  "date_from": "2026-11-12",
+  "date_to": "2026-11-18",
+  "cached_possible": true,
+  "rows": [
+    {
+      "media_id": "18120436877062076",
+      "media_reach": 19,
+      "media_reel_avg_watch_time": 5457,
+      "media_reel_skip_rate": 0.739,
+      "media_shares": 0,
+      "media_saved": 0,
+      "media_permalink": "https://www.instagram.com/reel/Df0SVRli3hs/"
+    },
+    {
+      "media_id": "18096307043444916",
+      "media_reach": 22,
+      "media_reel_avg_watch_time": 11862,
+      "media_reel_skip_rate": 0.64,
+      "media_shares": 0,
+      "media_saved": 0,
+      "media_permalink": "https://www.instagram.com/reel/Df0PBH2B09n/"
+    },
+    {
+      "media_id": "18103374980654451",
+      "media_reach": 51,
+      "media_reel_avg_watch_time": 16641,
+      "media_reel_skip_rate": 0.525,
+      "media_shares": 0,
+      "media_saved": 0,
+      "media_permalink": "https://www.instagram.com/reel/DfzWLiiMo92/"
+    },
+    {
+      "media_id": "18121779709999190",
+      "media_reach": 51,
+      "media_reel_avg_watch_time": 12651,
+      "media_reel_skip_rate": 0.6,
+      "media_shares": 0,
+      "media_saved": 0,
+      "media_permalink": "https://www.instagram.com/reel/DfzVO34BmPT/"
+    },
+    {
+      "media_id": "17946123696091057",
+      "media_reach": 54,
+      "media_reel_avg_watch_time": 11337,
+      "media_reel_skip_rate": 0.732,
+      "media_shares": 0,
+      "media_saved": 0,
+      "media_permalink": "https://www.instagram.com/reel/Df2xBkKh7Te/"
+    },
+    {
+      "media_id": "18497985145109554",
+      "media_reach": 20,
+      "media_reel_avg_watch_time": 10390,
+      "media_reel_skip_rate": 0.75,
+      "media_shares": 0,
+      "media_saved": 0,
+      "media_permalink": "https://www.instagram.com/reel/Df1YN8loaf8/"
+    },
+    {
+      "media_id": "18113016677238522",
+      "media_reach": 35,
+      "media_reel_avg_watch_time": 5405,
+      "media_reel_skip_rate": 0.854,
+      "media_shares": 0,
+      "media_saved": 0,
+      "media_permalink": "https://www.instagram.com/reel/Df1Ntb8AK3K/"
+    },
+    {
+      "media_id": "17945943738096746",
+      "media_reach": 16,
+      "media_reel_avg_watch_time": 10309,
+      "media_reel_skip_rate": 0.588,
+      "media_shares": 0,
+      "media_saved": 0,
+      "media_permalink": "https://www.instagram.com/reel/Df3wTC_h1m8/"
+    }
+  ]
+}
