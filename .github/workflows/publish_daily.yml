@@ -25,7 +25,7 @@ permissions:
   pages: write
 
 concurrency:
-  group: umbral-instagram-21
+  group: umbral-instagram-official
   cancel-in-progress: false
 
 jobs:
@@ -38,11 +38,13 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ github.token }}
       UMBRAL_DURABLE_GUARD: '1'
+      UMBRAL_DYNAMIC_EPISODES: '1'
     steps:
       - name: Código y autorización
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+          ref: main
 
       - name: Preparar Python
         uses: actions/setup-python@v5
