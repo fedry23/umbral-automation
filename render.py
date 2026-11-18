@@ -328,7 +328,7 @@ def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=
     vf = ("[0:v]scale=720:1280:force_original_aspect_ratio=increase,"
           "crop=720:1280,setsar=1,fps=24,"
           + ("zoompan=z='min(zoom+0.000055,1.08)':" if zoom_step == 0.000055 else
-             "zoompan=z='min(1+mod(on,240)*0.00012,1.08)':") +
+             "zoompan=z='min(1+on*0.00012,1.08)':") +
           "x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
           "d=1:s=720x1280:fps=24,ass=subtitles.ass[v]")
     if branding is not None:
