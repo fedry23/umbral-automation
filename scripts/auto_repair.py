@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Conservative, deterministic preflight repair. Never invents editorial data."""
 import argparse
+import os
 import json
 from pathlib import Path
 import re
@@ -36,7 +37,7 @@ def repair(path: Path, apply: bool = False):
             if not isinstance(day, str) or datetime.date.fromisoformat(day).isoformat() != day or day in seen_dates:
                 raise ValueError(f"{title}: invalid or duplicate publish_date")
             seen_dates.add(day)
-            if episode is None or len(scenes) != 6:
+            if (episode is None and os.getenv('UMBRAL_DYNAMIC_EPISODES') != '1') or len(scenes) != 6:
                 raise ValueError(f"{title}: dated story needs episode_number and six scenes")
         if story.get("test_date") and day:
             raise ValueError(f"{title}: test_date conflicts with publish_date")
