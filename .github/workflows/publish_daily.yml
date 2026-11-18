@@ -32,7 +32,7 @@ jobs:
   publicar:
     # Publicación programada autorizada. La tarea antigua de ChatGPT está desactivada.
     # Bloqueo manual de emergencia: UMBRAL_META_PUBLISH_ENABLED=false en Variables.
-    if: ${{ (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_call' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push') && github.event.workflow_run.head_repository.full_name == github.repository)) && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' }}
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_call' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push') && github.event.workflow_run.head_repository.full_name == github.repository)) && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 240
     env:
@@ -87,8 +87,31 @@ jobs:
           fi
 
       - name: Recuperar y verificar Reel generado de madrugada
+        id: stage
         if: steps.guard.outputs.skip == 'false'
+        continue-on-error: true
         run: python scripts/stage_daily_reel.py
+
+      - name: Verificar que es seguro regenerar
+        if: steps.stage.outcome == 'failure'
+        run: |
+          python -c 'from scripts.episode_state import planned_episode; import os; planned_episode(os.environ["RECOVERY_DAY"], os.environ.get("UMBRAL_SLOT", "21"))'
+        env:
+          RECOVERY_DAY: ${{ steps.guard.outputs.date }}
+
+      - name: Preparar modelos solo si el artefacto no es válido
+        if: steps.stage.outcome == 'failure'
+        uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+
+      - name: Regenerar y validar con el número confirmado
+        if: steps.stage.outcome == 'failure'
+        env:
+          UMBRAL_SPEED: '1.08'
+        run: |
+          rm -rf -- output staged
+          python scripts/stage_daily_reel.py --local-render
 
       - name: Validar formato Meta y autocorregir audio si hace falta
         if: steps.guard.outputs.skip == 'false'
