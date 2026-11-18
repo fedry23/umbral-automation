@@ -413,6 +413,12 @@ def render():
         if os.getenv('UMBRAL_REQUIRE_DATED_STORY') == '1' and daily is None:
             raise ValueError('Falta un relato original fechado para ' + date.isoformat())
         story = daily if daily is not None else stories[(date - dt.date(2026, 11, 15)).days % len(stories)]
+    if (os.getenv('UMBRAL_DYNAMIC_EPISODES') == '1' and daily is not None
+            and not test_title and not replacement_file):
+        from scripts.episode_state import planned_episode
+        story = {**story, 'episode_number': planned_episode(
+            date.isoformat(), '09' if morning else '21', BASE,
+            anticipate_morning=os.getenv('UMBRAL_ANTICIPATE_MORNING') == '1')}
     if 'episode_number' not in story:
         raise ValueError('La historia seleccionada no tiene número de episodio fijo')
     OUT.mkdir(exist_ok=True)
