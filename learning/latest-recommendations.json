@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "date": "2026-11-18",
+  "status": "advisory",
+  "source": "learning/baseline-2026-11-18.json",
+  "sample_size": 8,
+  "reach_sum": 268,
+  "reach_weighted_skip": 0.6691,
+  "reach_weighted_watch_seconds": 11.316,
+  "external_evidence": [],
+  "recommendations": [
+    {
+      "priority": "opening_hook",
+      "instruction": "Comenzar con una anomalía concreta e intrigante en la primera frase; evitar exposición genérica.",
+      "scope": "editorial",
+      "confidence": "low"
+    }
+  ],
+  "experiment": {
+    "control": 0.8,
+    "challenger": 0.2,
+    "minimum_posts_per_arm": 10,
+    "minimum_reach_per_arm": 500
+  },
+  "automatic_renderer_changes": false
+}
