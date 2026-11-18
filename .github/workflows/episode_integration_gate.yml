@@ -7,6 +7,9 @@ on:
     branches: [main]
     paths:
       - 'scripts/episode_state.py'
+      - 'scripts/technical_learning.py'
+      - 'scripts/reconcile_publications.py'
+      - 'tests/test_technical_learning_reconciliation.py'
       - 'tests/test_episode_learning_integration.py'
       - 'render.py'
       - 'scripts/publish_daily.py'
@@ -17,7 +20,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: umbral-integration-gate-${{ github.ref }}
+  group: umbral-integration-gate-${{ github.sha }}
   cancel-in-progress: true
 jobs:
   tests:
@@ -71,6 +74,9 @@ jobs:
           for path in (video, voice, music, source / "subtitles.ass", source / "cover.jpg"):
               assert path.is_file() and path.stat().st_size > 100, str(path)
           assert "Dialogue:" in (source / "subtitles.ass").read_text()
+          story = json.loads((source / 'story_used.json').read_text())
+          assert story['technical_profile']['music_gain'] == 1.0
+          assert story['episode_number'] > 0
           with Image.open(source / "cover.jpg") as image:
               assert image.size == (1080, 1920) and image.format == "JPEG"
           with Image.open(source / "scene_contact_sheet.jpg") as image:
