@@ -72,8 +72,12 @@ def episode_intro(story):
 
 def generate_branded_voice(story, out):
     from audio_engine import generate_branded_narration
+    options = {}
+    if 'technical_profile' in story:
+        from scripts.technical_learning import parameters_for
+        options['story_speed'] = parameters_for(story['technical_profile'])['story_speed']
     return generate_branded_narration(
-        episode_intro(story), story['narration'], OUTRO_PHRASE, out, phrases)
+        episode_intro(story), story['narration'], OUTRO_PHRASE, out, phrases, **options)
 
 
 def ass_time(seconds):
@@ -81,7 +85,9 @@ def ass_time(seconds):
     return f'{ticks // 360000}:{ticks // 6000 % 60:02}:{ticks // 100 % 60:02}.{ticks % 100:02}'
 
 
-def write_subtitles(cues, dest):
+def write_subtitles(cues, dest, outline=3):
+    if type(outline) is not int or outline not in (3, 4):
+        raise ValueError('Invalid subtitle outline')
     header = '''[Script Info]
 ScriptType: v4.00+
 PlayResX: 720
@@ -93,6 +99,7 @@ Style: Default,DejaVu Sans,34,&H00FFFFFF,&H00FFFFFF,&H00101010,&H90000000,1,0,0,
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 '''
+    header = header.replace(',1,3,1,2,85,95,280,1', f',1,{outline},1,2,85,95,280,1')
     events = []
     for start, end, text in cues:
         # No se permiten comandos ASS procedentes del relato.
@@ -150,6 +157,17 @@ def visual_shots(story):
     return story['scenes']
 
 
+def apply_visual_tone(image, tone):
+    """Apply a bounded common film grade; not a claim of character continuity."""
+    if tone == "original":
+        return image
+    if tone != "cool-film":
+        raise ValueError("Invalid film tone")
+    from PIL import Image, ImageEnhance
+    image = ImageEnhance.Color(image.convert("RGB")).enhance(0.92)
+    lut = [min(255, round(x * factor)) for factor in (0.98, 1.0, 1.035) for x in range(256)]
+    return image.point(lut)
+
 def generate_images(story, out):
     from PIL import Image
     import torch
@@ -186,6 +204,8 @@ def generate_images(story, out):
     print(f'UMBRAL_IMAGE_BACKEND={backend} profile={profile} '
           f'steps={steps} size={width}x{height}', flush=True)
     from image_quality import assess_image
+    from scripts.technical_learning import parameters_for
+    tone = parameters_for(story["technical_profile"])["visual_tone"] if "technical_profile" in story else "original"
     paths, report = [], []
     total_start = time.monotonic()
     max_attempts = int(os.getenv('UMBRAL_IMAGE_ATTEMPTS', '3'))
@@ -201,6 +221,7 @@ def generate_images(story, out):
             image = pipe(prompt=prompt, num_inference_steps=steps, guidance_scale=guidance,
                          height=height, width=width,
                          generator=torch.Generator('cpu').manual_seed(seed)).images[0]
+            image = apply_visual_tone(image, tone)
             if paths:
                 with Image.open(paths[-1]) as prev:
                     score, reasons = assess_image(image, prev)
@@ -258,7 +279,9 @@ def scene_boundaries_from_cues(cues, branding, count):
     return boundaries + [end]
 
 
-def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=1.0):
+def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=1.0, zoom_step=0.000055):
+    if type(zoom_step) is not float or zoom_step not in (0.000055, 0.00012):
+        raise ValueError('Perfil de cámara no autorizado')
     if type(music_gain) not in (int, float) or music_gain not in (1.0, 0.85):
         raise ValueError('Perfil de mezcla no autorizado')
     if not images:
@@ -304,7 +327,8 @@ def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=
     # Sin bibliotecas de música, material de terceros ni servicios de pago.
     vf = ("[0:v]scale=720:1280:force_original_aspect_ratio=increase,"
           "crop=720:1280,setsar=1,fps=24,"
-          "zoompan=z='min(zoom+0.000055,1.08)':"
+          + ("zoompan=z='min(zoom+0.000055,1.08)':" if zoom_step == 0.000055 else
+             "zoompan=z='min(1+mod(on,240)*0.00012,1.08)':") +
           "x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
           "d=1:s=720x1280:fps=24,ass=subtitles.ass[v]")
     if branding is not None:
@@ -433,7 +457,9 @@ def render():
     from music_engine import generate_ambient_score
     generate_ambient_score(duration, cues, OUT, seed=7300 + date.toordinal() % 10000)
     voiced = time.monotonic()
-    write_subtitles(cues, OUT / 'subtitles.ass')
+    from scripts.technical_learning import parameters_for, DEFAULT_PARAMETERS
+    params = parameters_for(active_profile) if active_profile is not None else DEFAULT_PARAMETERS
+    write_subtitles(cues, OUT / 'subtitles.ass', outline=params['subtitle_outline'])
     images = generate_images(story, OUT)
     # Lightweight visual QA: a single contact sheet makes it easy to inspect
     # all six generated scenes without downloading large intermediate PNGs.
@@ -461,7 +487,7 @@ def render():
         encode(OUT, images, duration, outfile, branding=timing, cues=cues)
     else:
         encode(OUT, images, duration, outfile, branding=timing, cues=cues,
-               music_gain=active_profile['music_gain'])
+               music_gain=params['music_gain'], zoom_step=params['zoom_step'])
     timings = {'voice_seconds': voiced - started, 'images_seconds': illustrated - voiced,
                'encoding_seconds': time.monotonic() - illustrated,
                'total_seconds': time.monotonic() - started}
