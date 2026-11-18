@@ -1,0 +1,54 @@
+name: UMBRAL - Technical evidence (read-only Meta)
+on:
+  schedule:
+    - cron: '20 7,8,19,20 * * *'
+  push:
+    branches: ['integration/av-learning-v2']
+    paths: ['.github/workflows/technical_evidence.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'false'
+      - run: python -m compileall -q render.py audio_engine.py scripts tests
+      - run: python -m unittest discover -s tests -v
+      - run: python -m scripts.technical_evidence
+  collect:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: umbral-technical-evidence
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Capture current live observations, never publish
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python -m scripts.collect_technical_insights
+      - name: Store immutable observation files only
+        run: |
+          if [ ! -d learning/technical-measurements ]; then exit 0; fi
+          git add learning/technical-measurements
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'UMBRAL: capture matched-age technical observations'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Evaluate observations without changing publication policy
+        run: python -m scripts.technical_evidence
