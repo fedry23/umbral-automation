@@ -1,0 +1,133 @@
+name: UMBRAL - One-shot gated AV deployment
+on:
+  push:
+    branches: ['integration/av-release-20261118']
+    paths: ['.github/workflows/av_release_once.yml']
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: umbral-av-release-20261118
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.ref == 'refs/heads/integration/av-release-20261118'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      OLD: '0079bbca89fcc758b219dd4374487fc3925aaac1'
+      RENDER_SHA: '2693ea0c315eff3724fa658770c315f75e3dc355'
+      TARGET: '9d89dc41c6b382dd3ce5fd32ad2c1bdef92606b6'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '9d89dc41c6b382dd3ce5fd32ad2c1bdef92606b6'
+          fetch-depth: 0
+      - name: Require both exact CI gates (never publish)
+        run: |
+          python - <<'PY'
+          import json, os, subprocess, time
+          def get(path):
+              return json.loads(subprocess.check_output(["gh","api",path],text=True))
+          repo=os.environ["GH_REPO"]
+          gates={44392693254:(os.environ["RENDER_SHA"], {"tests",*("private-variants ("+x+")" for x in ["music-balance-v1","voice-speed-v1","camera-motion-v1","visual-tone-v1","subtitle-outline-v1"])}),
+                 44393394564:(os.environ["TARGET"],{"validate"})}
+          deadline=time.monotonic()+1800
+          while gates and time.monotonic()<deadline:
+              for run_id,(sha,required) in list(gates.items()):
+                  run=get(f"repos/{repo}/actions/runs/{run_id}")
+                  assert run["head_sha"]==sha and run["head_branch"]=="integration/av-learning-v2"
+                  if run["status"]!="completed": continue
+                  assert run["conclusion"]=="success", f"Gate {run_id}: {run['conclusion']}"
+                  jobs=get(f"repos/{repo}/actions/runs/{run_id}/jobs?per_page=100")["jobs"]
+                  actual={j["name"]:j for j in jobs}
+                  assert required.issubset(actual)
+                  for name in required:
+                      job=actual[name]
+                      assert job["conclusion"]=="success", name
+                      if name.startswith("private-variants"):
+                          assert any(s["name"]=="Validate challenger metadata, media, audio and staging" and s["conclusion"]=="success" for s in job["steps"])
+                  print("Gate verified:",run_id,sha,flush=True)
+                  del gates[run_id]
+              if gates: time.sleep(30)
+          assert not gates,"Timed out; no changes to main"
+          PY
+      - name: Check exact tested delta and fast-forward only
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$OLD"
+          test "$(git rev-parse HEAD)" = "$TARGET"
+          git merge-base --is-ancestor "$OLD" "$TARGET"
+          git merge-base --is-ancestor "$RENDER_SHA" "$TARGET"
+          python - <<'PY'
+          import os,subprocess
+          allowed={".github/workflows/technical_evidence.yml","learning/av-experiment-plan.md",
+                   "scripts/collect_technical_insights.py","scripts/publish_daily.py",
+                   "scripts/reconcile_publications.py","scripts/stage_daily_reel.py",
+                   "scripts/stage_morning_reel.py","scripts/technical_evidence.py","tests/test_technical_evidence.py"}
+          changed=set(subprocess.check_output(["git","diff","--name-only",os.environ["RENDER_SHA"],os.environ["TARGET"]],text=True).splitlines())
+          assert changed==allowed, changed
+          PY
+          git push origin "$TARGET:refs/heads/main"
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$TARGET"
+      - name: Run production quality gate
+        run: |
+          gh workflow run quality_gate.yml --ref main
+          python - <<'PY'
+          import json, os, subprocess, time
+          repo=os.environ["GH_REPO"]
+          target=os.environ["TARGET"]
+          deadline=time.monotonic()+420
+          while time.monotonic()<deadline:
+              data=json.loads(subprocess.check_output(["gh","api",f"repos/{repo}/actions/workflows/quality_gate.yml/runs?branch=main&event=workflow_dispatch&per_page=20"],text=True))
+              matches=[r for r in data["workflow_runs"] if r["head_sha"]==target]
+              if matches and matches[0]["status"]=="completed":
+                  assert matches[0]["conclusion"]=="success", "Production verification failed; policy remains hold"
+                  print("Production verified:",matches[0]["html_url"])
+                  break
+              time.sleep(15)
+          else: raise RuntimeError("Production gate not confirmed. Policy remains hold.")
+          PY
+      # Activation is deliberately separate from deployment, and limited to a
+      # narrow safe window. No publication credentials are present in this job.
+      - name: Enable the validated music experiment only when idle
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$TARGET"
+          python - <<'PY'
+          import datetime as dt,json,os,subprocess
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+          now=dt.datetime.now(ZoneInfo("Europe/Madrid"))
+          if not (now.hour>=22 or now.hour<4):
+              print("Outside safe activation window; retain hold")
+              raise SystemExit(0)
+          for workflow in ("publish_daily.yml","publish_morning.yml"):
+              data=json.loads(subprocess.check_output(["gh","api","repos/"+os.environ["GH_REPO"]+"/actions/workflows/"+workflow+"/runs?branch=main&per_page=20"],text=True))
+              if any(r["status"]!="completed" for r in data["workflow_runs"]):
+                  print("Publisher busy; retain hold")
+                  raise SystemExit(0)
+          published=Path("docs/published")
+          for intent in Path("docs/pending").glob("*.json"):
+              if not intent.name.startswith("test-"):
+                  receipt=published/intent.name
+                  if not receipt.exists() or json.loads(receipt.read_text()).get("verification")!="published_media_read_back":
+                      print("Unresolved publication; retain hold")
+                      raise SystemExit(0)
+          path=Path("learning/technical-policy.json")
+          p=json.loads(path.read_text())
+          assert p=={"schema":1,"experiment":"music-balance-v1","mode":"hold"}
+          p["mode"]="experiment"
+          path.write_text(json.dumps(p,indent=2)+"\n")
+          PY
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add learning/technical-policy.json
+          git commit -m 'UMBRAL: activate validated music experiment (80/20)'
+          git push origin HEAD:main
+          echo 'Music experiment enabled; no test publication.'
