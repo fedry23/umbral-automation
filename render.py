@@ -258,7 +258,9 @@ def scene_boundaries_from_cues(cues, branding, count):
     return boundaries + [end]
 
 
-def encode(out, images, duration, outfile, branding=None, cues=None):
+def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=1.0):
+    if type(music_gain) not in (int, float) or music_gain not in (1.0, 0.85):
+        raise ValueError('Perfil de mezcla no autorizado')
     if not images:
         raise ValueError('Se necesitan imágenes para renderizar')
     # Rutas relativas controladas; subprocess nunca utiliza shell.
@@ -312,7 +314,7 @@ def encode(out, images, duration, outfile, branding=None, cues=None):
                f"[base][intro]overlay=eof_action=pass:enable='lt(t,{intro_end})'[opened];"
                f"[opened][outro]overlay=eof_action=pass:enable='gte(t,{outro_start})',"
                "ass=subtitles.ass[v]")
-    af = ("[1:a]volume=1[voice];[2:a]volume=1[music];"
+    af = (f"[1:a]volume=1[voice];[2:a]volume={music_gain:g}[music];"
           "[voice][music]amix=inputs=2:duration=first:normalize=0,"
           "alimiter=limit=0.92[mixed]")
     run('ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-f', 'concat',
@@ -369,7 +371,7 @@ def load_stories():
             if day in seen_dates:
                 raise ValueError('Dos historias diarias con la misma fecha ' + day)
             seen_dates.add(day)
-            if episode is None or len(story['scenes']) != 6:
+            if (episode is None and os.getenv('UMBRAL_DYNAMIC_EPISODES') != '1') or len(story['scenes']) != 6:
                 raise ValueError('Un episodio diario necesita número fijo y seis escenas')
         if story.get('test_date') and story.get('publish_date'):
             raise ValueError('Un episodio de prueba no debe ocupar una fecha diaria')
@@ -413,12 +415,16 @@ def render():
         if os.getenv('UMBRAL_REQUIRE_DATED_STORY') == '1' and daily is None:
             raise ValueError('Falta un relato original fechado para ' + date.isoformat())
         story = daily if daily is not None else stories[(date - dt.date(2026, 11, 15)).days % len(stories)]
+    active_profile = None
     if (os.getenv('UMBRAL_DYNAMIC_EPISODES') == '1' and daily is not None
             and not test_title and not replacement_file):
         from scripts.episode_state import planned_episode
         story = {**story, 'episode_number': planned_episode(
             date.isoformat(), '09' if morning else '21', BASE,
             anticipate_morning=os.getenv('UMBRAL_ANTICIPATE_MORNING') == '1')}
+        from scripts.technical_learning import load_profile
+        active_profile = load_profile(date.isoformat(), '09' if morning else '21', BASE)
+        story['technical_profile'] = active_profile
     if 'episode_number' not in story:
         raise ValueError('La historia seleccionada no tiene número de episodio fijo')
     OUT.mkdir(exist_ok=True)
@@ -451,7 +457,11 @@ def render():
     timing = json.loads((OUT / 'branding_timing.json').read_text(encoding='utf-8'))
     illustrated = time.monotonic()
     outfile = OUT / f'umbral_{date:%Y%m%d}{"_09" if morning else ""}.mp4'
-    encode(OUT, images, duration, outfile, branding=timing, cues=cues)
+    if active_profile is None:
+        encode(OUT, images, duration, outfile, branding=timing, cues=cues)
+    else:
+        encode(OUT, images, duration, outfile, branding=timing, cues=cues,
+               music_gain=active_profile['music_gain'])
     timings = {'voice_seconds': voiced - started, 'images_seconds': illustrated - voiced,
                'encoding_seconds': time.monotonic() - illustrated,
                'total_seconds': time.monotonic() - started}
