@@ -152,7 +152,7 @@ def extract_run_zip(raw, date):
                 raise ValueError("Artefacto obsoleto: perfil audiovisual distinto al vigente")
             if not caption.startswith(f"Historia {story['episode_number']}: {story['title']}\n"):
                 raise ValueError("Descripción y número de episodio no coinciden")
-            comparison_keys = ("title", "narration", "caption", "scenes")
+            comparison_keys = ("title", "narration", "caption", "scenes", "editorial_protocol")
         else:
             comparison_keys = ("title", "episode_number", "narration")
         if len(scheduled_stories) != 1 or any(
