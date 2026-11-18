@@ -144,6 +144,14 @@ def extract_run_zip(raw, date):
             except ImportError:
                 from episode_state import validate_episode
             validate_episode(date, "21", story.get("episode_number"))
+            try:
+                from .technical_learning import load_profile
+            except ImportError:
+                from technical_learning import load_profile
+            if story.get("technical_profile") != load_profile(date, "21"):
+                raise ValueError("Artefacto obsoleto: perfil audiovisual distinto al vigente")
+            if not caption.startswith(f"Historia {story['episode_number']}: {story['title']}\n"):
+                raise ValueError("Descripción y número de episodio no coinciden")
             comparison_keys = ("title", "narration", "caption", "scenes")
         else:
             comparison_keys = ("title", "episode_number", "narration")
