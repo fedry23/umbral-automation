@@ -69,7 +69,7 @@ def reconcile_one(key, intent, old, media_rows, fetch_media):
                "verification": "published_media_read_back",
                "reconciliation": "unique_official_marker_and_media_read_back"}
     # No claim about historical cover matching without its pixels.
-    for name in ("technical_profile", "duration_seconds"):
+    for name in ("technical_profile", "duration_seconds", "editorial_protocol"):
         if name in intent and name not in receipt:
             receipt[name] = intent[name]
     if intent.get("cover_url") and "cover_url_sent" not in receipt:
