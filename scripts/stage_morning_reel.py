@@ -139,7 +139,10 @@ def extract_run_zip(raw, date):
         scheduled = json.loads(Path("stories_morning.json").read_text(encoding="utf-8"))
         scheduled_stories = [s for s in scheduled if s.get("publish_date") == date]
         if os.getenv("UMBRAL_DYNAMIC_EPISODES") == "1":
-            from episode_state import validate_episode
+            try:
+                from .episode_state import validate_episode
+            except ImportError:
+                from episode_state import validate_episode
             validate_episode(date, "09", story.get("episode_number"))
             comparison_keys = ("title", "narration", "caption", "scenes")
         else:
@@ -170,6 +173,29 @@ def main():
         print("UMBRAL: ya hay un recibo para esta fecha, no se publica dos veces")
         (OUT / "already_published").parent.mkdir(exist_ok=True)
         (OUT / "already_published").write_text(date)
+        return
+    if "--local-render" in __import__("sys").argv:
+        # The fallback is generated locally after the publisher refreshes main.
+        # It passes exactly the same checks as a downloaded artifact.
+        import sys
+        os.environ["UMBRAL_DATE"] = date
+        os.environ["UMBRAL_SLOT"] = "09"
+        os.environ["UMBRAL_REQUIRE_DATED_STORY"] = "1"
+        os.environ["UMBRAL_DYNAMIC_EPISODES"] = "1"
+        os.environ.pop("UMBRAL_ANTICIPATE_MORNING", None)
+        for name in ("UMBRAL_TEST_MODE", "UMBRAL_STORY_TITLE", "UMBRAL_REPLACEMENT_STORY_FILE"):
+            os.environ.pop(name, None)
+        subprocess.run([sys.executable, "render.py"], check=True)
+        source = Path("output")
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as archive:
+            for file in source.iterdir():
+                if file.is_file() and (file.suffix == ".mp4" or file.name in (
+                    "story_used.json", "caption.txt", "music.wav", "cover.jpg",
+                    "intro_card.png", "outro_card.png", "branding_timing.json")):
+                    archive.write(file, file.name)
+        result = extract_run_zip(buffer.getvalue(), date)
+        print("Local recovery validated:", result)
         return
     data = github_get(f"repos/{REPO}/actions/workflows/reel_morning.yml/runs?per_page=30")
     run = select_run(data.get("workflow_runs", []), date)
