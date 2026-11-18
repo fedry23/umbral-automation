@@ -144,10 +144,12 @@ def already_published(day):
     Durable publish intent and receipt remain enforced separately.
     """
     story, _ = read_story(day)
-    marker = daily_marker(day) + " · EPISODIO " + str(story["episode_number"])
+    marker = daily_marker(day) + " · EPISODIO "
     for item in owned_media():
         if (item.get("media_product_type") == "REELS"
                 and marker in (item.get("caption") or "")):
+            if marker + str(story["episode_number"]) not in (item.get("caption") or ""):
+                raise RuntimeError("Official slot already published with a different number; reconcile, do not POST")
             return item
     return None
 
@@ -159,6 +161,9 @@ def read_story(day):
         raise ValueError("No se puede publicar: no coincide la fecha del relato")
     if not story.get("caption", "").strip() in caption:
         raise ValueError("La descripción no corresponde al relato verificado")
+    if os.getenv("UMBRAL_DYNAMIC_EPISODES") == "1" and not test_release_allowed(day):
+        from episode_state import validate_episode
+        validate_episode(day, SLOT, story.get("episode_number"))
     return story, caption
 
 
@@ -293,7 +298,7 @@ def persist_intent(day, data):
     path = intent_path(day)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"date": day, "container": data["container"],
-                               "status": "publish_intent"}, indent=2))
+                               "status": "publish_intent", "episode_number": data.get("episode_number"), "slot": SLOT}, indent=2))
     for args in (["git","add",str(path)],
                  ["git","commit","-m","UMBRAL: registrar intento antes de publicar " + day],
                  ["git","pull","--rebase","origin","main"],
