@@ -32,7 +32,9 @@ jobs:
         with:
           models: "true"
       - name: Autorreparación segura y validación previa de relatos
-        run: python scripts/auto_repair.py --fix
+        env:
+          UMBRAL_DYNAMIC_EPISODES: '1'
+        run: python scripts/auto_repair.py --fix --file stories_morning.json
       - name: Pruebas de sincronización y codificación
         run: python -m unittest discover -s tests -v
       - name: Crear Reel con regeneración limitada si falla el render
