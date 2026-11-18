@@ -1,0 +1,76 @@
+"""Constrained audiovisual experiments. No network, writes, secrets or downloads."""
+import datetime as dt
+import math
+import statistics
+
+PROFILES = {"control": 1.0, "music-minus-1.4db": 0.85}
+EXPERIMENT = "music-balance-v1"
+
+def profile_for(day, slot, policy):
+    """Fail back to the established production mix on an unknown policy."""
+    day = dt.date.fromisoformat(day)
+    if slot not in ("09", "21"):
+        raise ValueError("Invalid slot")
+    name = "control"
+    # Stable per-date assignment, balanced 1/5 independently in each slot.
+    if policy == {"schema": 1, "experiment": EXPERIMENT, "mode": "experiment"}:
+        if (day.toordinal() + (2 if slot == "21" else 0)) % 5 == 0:
+            name = "music-minus-1.4db"
+    elif policy == {"schema": 1, "experiment": EXPERIMENT, "mode": "promoted"}:
+        name = "music-minus-1.4db"
+    return {"experiment": EXPERIMENT, "arm": name, "music_gain": PROFILES[name]}
+
+def evaluate(rows):
+    """Compare comparable, quality-passed posts at a fixed 7-day measurement age.
+
+    No individual viewer data; post-level estimates are descriptive. Do not
+    promote on reach/likes alone. Reversal is allowed in case of clear harm.
+    """
+    groups = {(slot, arm): [] for slot in ("09", "21") for arm in PROFILES}
+    seen = set()
+    def number(x):
+        return type(x) in (int, float) and math.isfinite(x)
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        media_id = row.get("media_id")
+        if not isinstance(media_id, str) or not media_id or media_id in seen:
+            continue
+        key = (row.get("slot"), row.get("arm"))
+        if not all(isinstance(x, str) for x in key) or key not in groups:
+            continue
+        if (row.get("experiment") != EXPERIMENT or row.get("quality_passed") is not True
+                or row.get("editorial_arm") != "fixed"):
+            continue
+        reach, skip, watch, age, duration = [row.get(k) for k in
+            ("reach", "skip", "watch_seconds", "age_hours", "duration_seconds")]
+        if not all(number(x) for x in (reach, skip, watch, age, duration)):
+            continue
+        if not (reach > 0 and 0 <= skip <= 1 and watch >= 0 and
+                166 <= age <= 170 and 30 <= duration <= 120):
+            continue
+        seen.add(media_id)
+        groups[key].append((reach, skip, watch / duration))
+    totals = {arm: [v for (slot, a), vals in groups.items() if a == arm for v in vals]
+              for arm in PROFILES}
+    summary = {arm: {"posts": len(vals), "reach": sum(v[0] for v in vals)}
+               for arm, vals in totals.items()}
+    if any(v["posts"] < 10 or v["reach"] < 500 for v in summary.values()) or any(
+            len(g) < 3 for g in groups.values()):
+        return {"decision": "hold", "reason": "insufficient_comparable_posts", "sample": summary}
+    effects = []
+    for slot in ("09", "21"):
+        control, candidate = [groups[(slot, arm)] for arm in PROFILES]
+        x, y = [[v[1] for v in group] for group in (control, candidate)]
+        delta = statistics.mean(y) - statistics.mean(x)
+        margin = 2.5 * math.sqrt(statistics.variance(x)/len(x) + statistics.variance(y)/len(y))
+        watch_delta = statistics.mean(v[2] for v in candidate) - statistics.mean(v[2] for v in control)
+        effects.append({"slot": slot, "skip_delta": delta, "margin": margin, "watch_delta": watch_delta})
+    # Conservative post-level heuristic; not a formal causal guarantee.
+    if any(e["skip_delta"] - e["margin"] > .05 or e["watch_delta"] < -.10 for e in effects):
+        decision = "revert"
+    elif all(e["skip_delta"] + e["margin"] < -.02 and e["watch_delta"] >= -.02 for e in effects):
+        decision = "eligible_for_promotion"
+    else:
+        decision = "hold"
+    return {"decision": decision, "sample": summary, "effects": effects}
