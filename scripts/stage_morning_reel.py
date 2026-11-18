@@ -138,9 +138,15 @@ def extract_run_zip(raw, date):
         # Reject stale renders from earlier runs on the same date.
         scheduled = json.loads(Path("stories_morning.json").read_text(encoding="utf-8"))
         scheduled_stories = [s for s in scheduled if s.get("publish_date") == date]
+        if os.getenv("UMBRAL_DYNAMIC_EPISODES") == "1":
+            from episode_state import validate_episode
+            validate_episode(date, "09", story.get("episode_number"))
+            comparison_keys = ("title", "narration", "caption", "scenes")
+        else:
+            comparison_keys = ("title", "episode_number", "narration")
         if len(scheduled_stories) != 1 or any(
             story.get(key) != scheduled_stories[0].get(key)
-            for key in ("title", "episode_number", "narration")
+            for key in comparison_keys
         ):
             raise ValueError("Artefacto obsoleto: no coincide con episodio oficial vigente")
         if z.getinfo("music.wav").file_size < 20000:
