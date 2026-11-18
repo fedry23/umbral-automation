@@ -39,7 +39,7 @@ def join_observations(receipts, snapshots):
     for snapshot in snapshots:
         if not isinstance(snapshot, dict) or snapshot.get("account") != ACCOUNT:
             continue
-        if snapshot.get("source") != "Windsor.ai Instagram" or not isinstance(snapshot.get("rows"),list):
+        if snapshot.get("source") not in ("Windsor.ai Instagram", "Meta Graph API") or not isinstance(snapshot.get("rows"),list):
             continue
         for raw in snapshot["rows"]:
             if not isinstance(raw,dict):
@@ -49,10 +49,14 @@ def join_observations(receipts, snapshots):
                 continue
             key, receipt = index[media]
             try:
-                if not snapshot.get("measurement_time_verified") is True:
-                    raise ValueError("unverified metric measurement timestamp")
-                measured = timestamp(raw.get("measured_at",snapshot.get("measured_at")))
                 retrieved = timestamp(snapshot.get("retrieved_at"))
+                if snapshot.get("source") == "Meta Graph API" and snapshot.get("retrieval_mode") == "live_http":
+                    # Compare identical *retrieval* ages; Meta warns that source data can lag up to 48h.
+                    measured = retrieved
+                elif snapshot.get("measurement_time_verified") is True:
+                    measured = timestamp(raw.get("measured_at",snapshot.get("measured_at")))
+                else:
+                    raise ValueError("unverified metric measurement timestamp")
                 if measured > retrieved:
                     raise ValueError("measurement after retrieval")
                 published = timestamp(receipt.get("published_at"))
@@ -75,13 +79,14 @@ def join_observations(receipts, snapshots):
                 row = {"media_id":media,"experiment":profile["experiment"],
                        "arm":profile["arm"],"slot":slot,
                        "quality_passed":True,"editorial_arm":"fixed",
-                       "reach":raw.get("media_reach"),
+                       "source":snapshot["source"],"reach":raw.get("media_reach"),
                        "skip":raw.get("media_reel_skip_rate"),
                        "watch_seconds":watch/1000,
                        "age_hours":age,"duration_seconds":receipt.get("duration_seconds")}
                 distance=abs(age-168)
-                if media not in rows or distance < rows[media][0]:
-                    rows[media]=(distance,row)
+                observation_key=(snapshot["source"],media)
+                if observation_key not in rows or distance < rows[observation_key][0]:
+                    rows[observation_key]=(distance,row)
             except (ValueError,TypeError,AttributeError,KeyError) as exc:
                 rejected.append({"media_id":media,"reason":str(exc)})
     return [v[1] for v in rows.values()], rejected
@@ -93,7 +98,11 @@ def report(root=Path(".")):
     rows,rejected=join_observations(receipts,snapshots)
     return {"sources":len(snapshots),"eligible_observations":len(rows),
             "rejected":rejected,
-            "results":{exp:evaluate(rows,exp) for exp in VARIANTS},
+            "results_by_source":{source:{exp:evaluate([row for row in rows if row["source"]==source],exp)
+                                        for exp in VARIANTS}
+                                 for source in ("Windsor.ai Instagram","Meta Graph API")},
+            "limitations":["Meta metrics may lag up to 48 hours; retrieval age is not viewer-level retention.",
+                           "Sources are never mixed in an experiment."],
             "automatic_write":False}
 
 if __name__ == "__main__":
