@@ -60,14 +60,14 @@ def text_cues(unit, audio, start_s, split_phrases):
              phrase) for i, phrase in enumerate(phrases)]
 
 
-def generate_narration(text, out, split_phrases, pipeline=None):
+def generate_narration(text, out, split_phrases, pipeline=None, speed_override=None):
     """Synthesise one whole sentence per TTS request and retain short natural pauses."""
     import torch
     torch.set_num_threads(min(4, os.cpu_count() or 1))
     if pipeline is None:
         from kokoro import KPipeline
         pipeline = KPipeline(lang_code='e', repo_id='hexgrad/Kokoro-82M', device='cpu')
-    speed = float(os.getenv('UMBRAL_SPEED', '1.08'))
+    speed = float(os.getenv('UMBRAL_SPEED', '1.08')) if speed_override is None else speed_override
     if not 0.75 <= speed <= 1.25:
         raise ValueError('Velocidad de voz fuera del rango permitido')
     parts, cues, cursor = [], [], 0
@@ -129,7 +129,7 @@ def generate_ambient_score(duration, cues, out, seed=7300):
     return dest
 
 
-def generate_branded_narration(intro, story, outro, out, split_phrases, pipeline=None):
+def generate_branded_narration(intro, story, outro, out, split_phrases, pipeline=None, story_speed=None):
     """Intro/outro lowered by ~3 semitones; story waveform is NOT pitch-shifted.
 
     A single Kokoro pipeline is reused for all three segments to keep CPU cost down.
@@ -155,8 +155,11 @@ def generate_branded_narration(intro, story, outro, out, split_phrases, pipeline
             segment_start = cursor / RATE
             segment = Path(tmp) / key
             segment.mkdir()
+            options = {"pipeline": pipeline}
+            if key == "story" and story_speed is not None:
+                options["speed_override"] = story_speed
             part_cues, original_duration = generate_narration(
-                text, segment, split_phrases, pipeline=pipeline)
+                text, segment, split_phrases, **options)
             src = segment / 'voice.wav'
             final_path = src
             if key != "story":
