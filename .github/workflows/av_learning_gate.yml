@@ -1,0 +1,115 @@
+name: UMBRAL - AV profiles validation (no publication)
+on:
+  push:
+    branches: ['integration/av-learning-v2']
+    paths: ['.github/workflows/av_learning_gate.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: umbral-av-gate-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  tests:
+    if: github.ref == 'refs/heads/integration/av-learning-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'false'
+      - run: python -m compileall -q render.py audio_engine.py scripts tests
+      - run: python -m unittest discover -s tests -v
+  private-variants:
+    needs: tests
+    if: github.ref == 'refs/heads/integration/av-learning-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        experiment: [music-balance-v1, voice-speed-v1, camera-motion-v1, visual-tone-v1, subtitle-outline-v1]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Select challenger locally (never write to main)
+        env:
+          EXPERIMENT: ${{ matrix.experiment }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          Path("learning/technical-policy.json").write_text(json.dumps({"schema":1,"experiment":os.environ["EXPERIMENT"],"mode":"promoted"}))
+          PY
+      - name: Full CPU render without Meta credentials
+        env:
+          UMBRAL_DYNAMIC_EPISODES: '1'
+          UMBRAL_REQUIRE_DATED_STORY: '1'
+          UMBRAL_DATE: '2026-11-19'
+          UMBRAL_SLOT: '09'
+          UMBRAL_SPEED: '1.08'
+        run: python -u render.py
+      - name: Validate challenger metadata, media, audio and staging
+        env:
+          EXPERIMENT: ${{ matrix.experiment }}
+          UMBRAL_DYNAMIC_EPISODES: '1'
+        run: |
+          python - <<'PY'
+          import io, json, os, subprocess, tempfile, zipfile
+          import numpy as np
+          import soundfile as sf
+          from pathlib import Path
+          from PIL import Image
+          from scripts import stage_morning_reel as stage
+          from scripts.technical_learning import load_profile, parameters_for, VARIANTS
+          src = Path("output")
+          story = json.loads((src/"story_used.json").read_text())
+          expected = load_profile("2026-11-19","09")
+          assert story["technical_profile"] == expected
+          assert expected["arm"] == VARIANTS[os.environ["EXPERIMENT"]][0]
+          params = parameters_for(expected)
+          print("Verified profile:", json.dumps(params))
+          video = src/"umbral_20261119_09.mp4"
+          for name in ("voice.wav","music.wav"):
+              wave, sr = sf.read(src/name)
+              assert sr == 24000 and np.isfinite(wave).all()
+              rms = float(np.sqrt(np.mean(wave**2)))
+              peak = float(np.max(np.abs(wave)))
+              assert .001 < rms < .5 and .002 < peak <= 1
+              print(name, "RMS", rms, "peak", peak)
+          pcm = subprocess.check_output(["ffmpeg","-v","error","-i",str(video),"-vn","-ac","1","-ar","24000","-f","f32le","-"])
+          wave = np.frombuffer(pcm,dtype="<f4")
+          rms = float(np.sqrt(np.mean(wave**2)))
+          peak = float(np.max(np.abs(wave)))
+          assert np.isfinite(wave).all() and .001 < rms < .5 and .002 < peak < 1.05
+          print("Decoded mix RMS",rms,"peak",peak)
+          with Image.open(src/"cover.jpg") as img:
+              assert img.size == (1080,1920) and img.format == "JPEG"
+              img.verify()
+          scenes = list(src.glob("scene_*.png"))
+          assert len(scenes)==6
+          for scene in scenes:
+              with Image.open(scene) as img: img.verify()
+          subs=(src/"subtitles.ass").read_text()
+          assert "Dialogue:" in subs and f",1,{params['subtitle_outline']},1,2,85,95,280,1" in subs
+          subprocess.run(["ffmpeg","-v","error","-xerror","-i",str(video),"-f","null","-"],check=True)
+          buffer=io.BytesIO()
+          with zipfile.ZipFile(buffer,"w") as archive:
+              for name in (video.name,"story_used.json","caption.txt","music.wav","cover.jpg",
+                           "intro_card.png","outro_card.png","branding_timing.json"):
+                  archive.write(src/name,name)
+          with tempfile.TemporaryDirectory() as folder:
+              stage.OUT=Path(folder)
+              print("Validated staging:",stage.extract_run_zip(buffer.getvalue(),"2026-11-19"))
+          print("AV CHALLENGER VALIDATED",os.environ["EXPERIMENT"])
+          PY
+      - name: Remove test video and generated assets
+        if: always()
+        run: rm -rf -- output
