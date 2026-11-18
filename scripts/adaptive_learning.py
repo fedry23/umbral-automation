@@ -7,7 +7,12 @@ import statistics
 def analyze(rows):
     unique = {}
     for row in rows:
-        key = str(row.get("media_id", ""))
+        if not isinstance(row, dict):
+            continue
+        raw_id = row.get("media_id")
+        if not isinstance(raw_id, str) or not raw_id.strip():
+            continue
+        key = raw_id.strip()
         if not key or key in unique:
             continue
         reach = row.get("media_reach")
