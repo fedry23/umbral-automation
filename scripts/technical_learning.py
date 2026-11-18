@@ -2,6 +2,8 @@
 import datetime as dt
 import math
 import statistics
+import json
+from pathlib import Path
 
 PROFILES = {"control": 1.0, "music-minus-1.4db": 0.85}
 EXPERIMENT = "music-balance-v1"
@@ -19,6 +21,13 @@ def profile_for(day, slot, policy):
     elif policy == {"schema": 1, "experiment": EXPERIMENT, "mode": "promoted"}:
         name = "music-minus-1.4db"
     return {"experiment": EXPERIMENT, "arm": name, "music_gain": PROFILES[name]}
+
+def load_profile(day, slot, root=Path(".")):
+    try:
+        policy = json.loads((Path(root) / "learning/technical-policy.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        policy = None
+    return profile_for(day, slot, policy)
 
 def evaluate(rows):
     """Compare comparable, quality-passed posts at a fixed 7-day measurement age.
