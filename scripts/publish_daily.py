@@ -315,7 +315,11 @@ def render_metadata(day, story):
     import math
     if type(duration) not in (int, float) or not math.isfinite(duration) or duration <= 0:
         raise ValueError("Invalid render duration")
-    return {"slot": SLOT, "technical_profile": profile, "duration_seconds": duration}
+    editorial = story.get("editorial_protocol")
+    if editorial is not None and editorial != "fixed-v1":
+        raise ValueError("Unknown editorial protocol")
+    return {"slot": SLOT, "technical_profile": profile, "duration_seconds": duration,
+            "editorial_protocol": editorial}
 
 
 def check_episode(day, number):
@@ -349,7 +353,8 @@ def persist_intent(day, data):
     path.write_text(json.dumps({"date": day, "container": data["container"],
                                "status": "publish_intent", "episode_number": data.get("episode_number"), "slot": SLOT,
                                "title": data.get("title"), "technical_profile": data.get("technical_profile"),
-                               "duration_seconds": data.get("duration_seconds"), "cover_url": data.get("cover_url")}, indent=2))
+                               "duration_seconds": data.get("duration_seconds"), "editorial_protocol": data.get("editorial_protocol"),
+                               "cover_url": data.get("cover_url")}, indent=2))
     for args in (["git","add",str(path)],
                  ["git","commit","-m","UMBRAL: registrar intento antes de publicar " + day],
                  ["git","push","origin","HEAD:main"]):
@@ -362,7 +367,7 @@ def record_verified(day, media_id, data):
               "episode_number":data.get("episode_number"),
               "instagram_media_id":media_id,"published_at":now_local().isoformat(),
               "verification":"pending","cover_url_sent":data.get("cover_url")}
-    for key in ("slot", "technical_profile", "duration_seconds"):
+    for key in ("slot", "technical_profile", "duration_seconds", "editorial_protocol"):
         if key in data:
             output[key] = data[key]
     path = OUT / "published.json"
