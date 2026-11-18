@@ -1,0 +1,374 @@
+{
+  "date": "2026-11-18",
+  "status": "candidate_catalog_not_complete_benchmark",
+  "target": 30,
+  "accounts": [
+    {
+      "handle": "RELATOSOSCUROS1",
+      "platform": "YouTube",
+      "category": "relato breve",
+      "source": "https://www.youtube.com/channel/UCXvm1kA5S2hWEANxx-0OoIg",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "sc.relatosTV",
+      "platform": "YouTube",
+      "category": "relato breve",
+      "source": "https://www.youtube.com/channel/UCShfptif-D1smvqy8WY6K2A",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "LaTumbadeMisty",
+      "platform": "YouTube",
+      "category": "relato paranormal breve",
+      "source": "https://www.youtube.com/channel/UC2qaen8Us9LOsVTMhdooORw",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "horrorshortsparty",
+      "platform": "YouTube",
+      "category": "animación",
+      "source": "https://www.youtube.com/watch?v=HqqlGMptPSM",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "wanseeentertainment",
+      "platform": "YouTube",
+      "category": "animación",
+      "source": "https://vidiq.com/youtube-stats/channel/%40wanseeentertainment/",
+      "source_reported_youtube_subscribers_approx": 1840000,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "acmofficial",
+      "platform": "YouTube",
+      "category": "cortometraje",
+      "source": "https://theshortflix.com/creators/acmofficial",
+      "source_reported_youtube_subscribers_approx": 1300000,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "watchalter",
+      "platform": "YouTube/Instagram/TikTok",
+      "category": "cortometraje",
+      "source": "https://linktr.ee/watchalter",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "crypttv",
+      "platform": "YouTube/Instagram",
+      "category": "cortometraje",
+      "source": "https://trari.com/en/c/crypttv/",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "spangerlookrey",
+      "platform": "YouTube/Instagram/TikTok",
+      "category": "cortometraje paranormal",
+      "source": "https://creatordb.app/creatorstats/spangerlookrey/",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "shatoot3d",
+      "platform": "Instagram",
+      "category": "CGI",
+      "source": "https://marketing4all.es/listas/las-mejores-cuentas-de-terror-en-instagram/",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "tatahorrordovnar",
+      "platform": "Instagram",
+      "category": "ficción paranormal",
+      "source": "https://marketing4all.es/listas/las-mejores-cuentas-de-terror-en-instagram/",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "stiffsullivan",
+      "platform": "Instagram",
+      "category": "cortometraje español",
+      "source": "https://marketing4all.es/listas/las-mejores-cuentas-de-terror-en-instagram/",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "deadtempovisions",
+      "platform": "Instagram",
+      "category": "terror generativo",
+      "source": "https://marketing4all.es/listas/las-mejores-cuentas-de-terror-en-instagram/",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "its0259",
+      "platform": "Instagram/TikTok/YouTube",
+      "category": "terror generativo emergente",
+      "source": "https://linktr.ee/its0259",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "terrorsreels",
+      "platform": "Instagram",
+      "category": "agregador; comparación contextual solamente",
+      "source": "https://creatordb.app/creatorstats/terrorsreels/",
+      "source_reported_youtube_subscribers_approx": null,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "nsparanormal",
+      "platform": "YouTube",
+      "category": "relato paranormal",
+      "source": "https://channeldb.com/es/c/@diloretohorror/similar",
+      "source_reported_youtube_subscribers_approx": 55600,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "historiasdeterrordelainternet",
+      "platform": "YouTube",
+      "category": "relato narrado",
+      "source": "https://channeldb.com/es/c/@diloretohorror/similar",
+      "source_reported_youtube_subscribers_approx": 7700,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "magnohorror_oficial",
+      "platform": "YouTube",
+      "category": "leyenda urbana",
+      "source": "https://channeldb.com/es/c/@diloretohorror/similar",
+      "source_reported_youtube_subscribers_approx": 25300,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "elrincondelhorroroficial",
+      "platform": "YouTube",
+      "category": "relato narrado",
+      "source": "https://channeldb.com/es/c/@diloretohorror/similar",
+      "source_reported_youtube_subscribers_approx": 18200,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "lanocheoscura-cuentosdeterror",
+      "platform": "YouTube",
+      "category": "relato narrado español",
+      "source": "https://channeldb.com/es/c/@diloretohorror/similar",
+      "source_reported_youtube_subscribers_approx": 60600,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "ultimohuesped",
+      "platform": "YouTube",
+      "category": "relato narrado",
+      "source": "https://channeldb.com/es/c/@diloretohorror/similar",
+      "source_reported_youtube_subscribers_approx": 198000,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "desdeelmasalla2023",
+      "platform": "YouTube",
+      "category": "relato narrado",
+      "source": "https://channeldb.com/es/c/@diloretohorror/similar",
+      "source_reported_youtube_subscribers_approx": 89800,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "relatosenlaoscuridadhd",
+      "platform": "YouTube",
+      "category": "relato paranormal",
+      "source": "https://channeldb.com/es/c/@diloretohorror/similar",
+      "source_reported_youtube_subscribers_approx": 36800,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "purodesmadre-q3d",
+      "platform": "YouTube",
+      "category": "animación breve",
+      "source": "https://channeldb.com/es/c/@doctorterror1/similar",
+      "source_reported_youtube_subscribers_approx": 44000,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "momentocreepy",
+      "platform": "YouTube",
+      "category": "creepypasta",
+      "source": "https://channeldb.com/es/c/@doctorterror1/similar",
+      "source_reported_youtube_subscribers_approx": 279000,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "cartoonhorrorshow_es",
+      "platform": "YouTube",
+      "category": "animación",
+      "source": "https://channeldb.com/es/c/@doctorterror1/similar",
+      "source_reported_youtube_subscribers_approx": 12600,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "soysap",
+      "platform": "YouTube",
+      "category": "terror analógico",
+      "source": "https://channeldb.com/es/c/@doctorterror1/similar",
+      "source_reported_youtube_subscribers_approx": 168000,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "pridehablemosdeterror",
+      "platform": "YouTube",
+      "category": "creepypasta",
+      "source": "https://channeldb.com/es/c/@doctorterror1/similar",
+      "source_reported_youtube_subscribers_approx": 356000,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "carlincartoon",
+      "platform": "YouTube",
+      "category": "animación breve humor; contextual",
+      "source": "https://channeldb.com/es/c/@doctorterror1/similar",
+      "source_reported_youtube_subscribers_approx": 5300,
+      "verification": "public source identity; direct clip inspection pending"
+    },
+    {
+      "handle": "santomorett",
+      "platform": "YouTube",
+      "category": "paranormal",
+      "source": "https://channeldb.com/es/c/@diloretohorror/similar",
+      "source_reported_youtube_subscribers_approx": 71800,
+      "verification": "public source identity; direct clip inspection pending"
+    }
+  ],
+  "public_post_observations": [
+    {
+      "creator": "crypttv",
+      "platform": "YouTube Shorts",
+      "url": "https://www.youtube.com/watch?v=h8dwiFl8X44",
+      "published_date": "2026-11-02",
+      "duration_seconds": 29,
+      "views": 4340,
+      "likes": 93,
+      "comments": 1,
+      "source": "https://trari.com/en/c/crypttv/",
+      "source_as_of": "2026-11-15",
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "crypttv",
+      "platform": "YouTube Shorts",
+      "url": "https://www.youtube.com/watch?v=HDiFdGJP5GA",
+      "published_date": "2026-11-01",
+      "duration_seconds": 31,
+      "views": 5708,
+      "likes": 84,
+      "comments": 2,
+      "source": "https://trari.com/en/c/crypttv/",
+      "source_as_of": "2026-11-15",
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "crypttv",
+      "platform": "YouTube Shorts",
+      "url": "https://www.youtube.com/watch?v=WteyVVRiMKg",
+      "published_date": "2026-10-31",
+      "duration_seconds": 67,
+      "views": 3180,
+      "likes": 160,
+      "comments": 1,
+      "source": "https://trari.com/en/c/crypttv/",
+      "source_as_of": "2026-11-15",
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "spangerlookrey",
+      "platform": "TikTok",
+      "url": "https://www.tiktok.com/@spangerlookrey/video/7686913602757905677",
+      "views_approx": 546000,
+      "source": "https://creatordb.app/creatorstats/spangerlookrey/",
+      "source_updated": "2026-10-06",
+      "relative_age_as_reported": "17 days",
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "crypttv",
+      "platform": "Instagram Reels",
+      "published_date": "2026-11-13",
+      "views": 2946,
+      "likes": 129,
+      "comments": 20,
+      "source": "https://trari.com/en/c/crypttv/",
+      "source_as_of": "2026-11-14",
+      "url": null,
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "crypttv",
+      "platform": "Instagram Reels",
+      "published_date": "2026-11-12",
+      "views": 3675,
+      "likes": 87,
+      "comments": 1,
+      "source": "https://trari.com/en/c/crypttv/",
+      "source_as_of": "2026-11-14",
+      "url": null,
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "crypttv",
+      "platform": "Instagram Reels",
+      "published_date": "2026-11-06",
+      "views": 5460,
+      "likes": 163,
+      "comments": 5,
+      "source": "https://trari.com/en/c/crypttv/",
+      "source_as_of": "2026-11-14",
+      "url": null,
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "crypttv",
+      "platform": "Instagram Reels",
+      "published_date": "2026-11-04",
+      "views": 3474,
+      "likes": 85,
+      "comments": 1,
+      "source": "https://trari.com/en/c/crypttv/",
+      "source_as_of": "2026-11-14",
+      "url": null,
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "crypttv",
+      "platform": "Instagram Reels",
+      "published_date": "2026-11-03",
+      "views": 1938,
+      "likes": 70,
+      "comments": 1,
+      "source": "https://trari.com/en/c/crypttv/",
+      "source_as_of": "2026-11-14",
+      "url": null,
+      "retention": null,
+      "audiovisual_review": null
+    }
+  ],
+  "limitations": [
+    "Third-party public snapshots may be stale; exact views are not inferred.",
+    "TikTok direct links blocked; YouTube Shorts pages throttled or disabled; no direct audio/video inspection.",
+    "Missing links or durations remain null. No competitors' private retention, skip rate or watch time is available.",
+    "Directories identify accounts including long-form and aggregator references; only short original posts qualify for matched benchmarking.",
+    "No external data may automatically promote a technical profile. No claim of 30 completed audiovisual audits."
+  ]
+}
