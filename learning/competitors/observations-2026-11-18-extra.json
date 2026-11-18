@@ -1,0 +1,76 @@
+{
+  "observed_on": "2026-11-18",
+  "status": "public_metadata_only_not_audiovisual_review",
+  "observations": [
+    {
+      "creator": "horrorshortsparty",
+      "platform": "YouTube Shorts",
+      "title": "CREEPY TEACHER",
+      "url": "https://www.youtube.com/watch?v=ojHCtRQDd6o",
+      "published_date": "2026-11-13",
+      "views_approx": 11500,
+      "source_as_of": "2026-11-16",
+      "source": "https://trendreport.com/channels/stats/horrorshortsparty/",
+      "duration_seconds": null,
+      "comments": null,
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "horrorshortsparty",
+      "platform": "YouTube Shorts",
+      "title": "ONE WISH WILLOW NIKKI",
+      "url": "https://www.youtube.com/watch?v=XbnVPZrCz8k",
+      "published_date": "2026-11-05",
+      "views_approx": 25000,
+      "source_as_of": "2026-11-16",
+      "source": "https://trendreport.com/channels/stats/horrorshortsparty/",
+      "duration_seconds": null,
+      "comments": null,
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "acmofficial",
+      "platform": "YouTube",
+      "title": "Trick or Treat",
+      "url": "https://www.youtube.com/watch?v=LsBwtZs6a_0",
+      "published_date": "2026-10-30",
+      "views_approx": 491000,
+      "source": "https://socialcounts.org/youtube-video-analytics/LsBwtZs6a_0/growth",
+      "format": "short film; vertical format unconfirmed",
+      "duration_seconds": null,
+      "comments": null,
+      "retention": null,
+      "audiovisual_review": null
+    },
+    {
+      "creator": "watchalter",
+      "platform": "YouTube",
+      "title": "Help",
+      "url": "https://www.youtube.com/watch?v=zrPXyb6wutI",
+      "published_date": "2026-07-20",
+      "views": 2727,
+      "likes": 370,
+      "source": "https://www.youtube.com/watch?v=zrPXyb6wutI",
+      "source_snapshot_age": "search crawl approximately 4 months earlier",
+      "format": "short film; not assumed to be vertical",
+      "duration_seconds": null,
+      "comments": null,
+      "retention": null,
+      "audiovisual_review": null
+    }
+  ],
+  "limitations": [
+    "No direct footage or sound was inspected. YouTube direct requests for the two Shorts were throttled.",
+    "Third-party view counts are approximate and captured at different post ages. Do not rank against UMBRAL retention or treat the descriptions as proof of quality.",
+    "No source indicates exact audiovisual techniques for these Shorts. The ALTER director statement is contextual; not a measured result."
+  ],
+  "hypotheses": [
+    {
+      "idea": "Common familiar locations or objects in the title can supply a specific premise without copying a story.",
+      "status": "unvalidated editorial hypothesis",
+      "evidence": "public titles only"
+    }
+  ]
+}
