@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-19",
+  "container": "17937715245185965",
+  "status": "publish_intent",
+  "episode_number": 12,
+  "slot": "09",
+  "title": "El peso del barro",
+  "technical_profile": {
+    "experiment": "music-balance-v1",
+    "arm": "control",
+    "music_gain": 1.0
+  },
+  "duration_seconds": 71.26708333333333,
+  "editorial_protocol": null,
+  "cover_url": "https://fedry23.github.io/umbral-automation/reels/2026-11-19_09.jpg"
+}
