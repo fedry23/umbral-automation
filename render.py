@@ -171,7 +171,7 @@ def apply_visual_tone(image, tone):
     lut = [min(255, round(x * factor)) for factor in (0.98, 1.0, 1.035) for x in range(256)]
     return image.point(lut)
 
-def generate_images(story, out):
+def generate_images(story, out, *, model_revision=None):
     from PIL import Image
     import torch
     from diffusers import AutoPipelineForText2Image
@@ -186,7 +186,8 @@ def generate_images(story, out):
     if backend not in models:
         raise ValueError('Modelo de imagen desconocido')
     pipe = AutoPipelineForText2Image.from_pretrained(
-        models[backend], torch_dtype=torch.float32)
+        models[backend], torch_dtype=torch.float32,
+        **({'revision': model_revision} if model_revision is not None else {}))
     # On CPU, attention slicing serializes work and often makes inference slower.
     # Leave it off unless explicitly requested for a memory-constrained runner.
     if os.getenv('UMBRAL_LOW_MEMORY', '0') == '1':
@@ -470,7 +471,7 @@ def render():
                               active_profile=active_profile)
 
 
-def render_story_media(story, out, date, filename, *, active_profile=None):
+def render_story_media(story, out, date, filename, *, active_profile=None, reserve_store=None, reserve_slot=None):
     """Render media only; never publish or select a production episode."""
     if not isinstance(filename, str) or Path(filename).name != filename or not filename.endswith('.mp4'):
         raise ValueError('Invalid output filename')
@@ -498,7 +499,18 @@ def render_story_media(story, out, date, filename, *, active_profile=None):
              'narration': shot['narration']}
             for i, shot in enumerate(storyboard)
         ], ensure_ascii=False, indent=2), encoding='utf-8')
-    images = generate_images(story, out)
+    if reserve_store is None:
+        images = generate_images(story, out)
+    else:
+        from scripts.umbral3_prepare import visual_recipe
+        from scripts.umbral3_storage import get_or_prepare
+        recipe = visual_recipe()
+        images, reserve_status = get_or_prepare(
+            reserve_store, story, date.isoformat(), reserve_slot, recipe, out,
+            lambda s, folder: generate_images(s, folder, model_revision=recipe['revision']))
+        (out / 'reserve_status.json').write_text(json.dumps({
+            'status': reserve_status, 'visual_approved': False
+        }), encoding='utf-8')
     # Lightweight visual QA: a single contact sheet makes it easy to inspect
     # all six generated scenes without downloading large intermediate PNGs.
     from PIL import Image, ImageOps, ImageDraw
