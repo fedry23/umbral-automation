@@ -30,5 +30,21 @@
     ],
     "publish_date": "2026-11-19",
     "episode_number": 12
+  },
+  {
+    "title": "La cámara de frío",
+    "hook": "Un mosquito volaba a dieciocho grados bajo cero.",
+    "narration": "Un mosquito volaba dentro del congelador, a dieciocho grados bajo cero. Estaba limpiando el bar de mi hermana, cerrado por vacaciones. Al abrir una bolsa de gambas, encontré varias moviendo las patas. Pensé que el aparato se había estropeado, pero el termómetro marcaba dieciocho grados bajo cero. Cogí una gamba y la dejé sobre la encimera. Dejó de moverse inmediatamente. La devolví al congelador y volvió a agitarse. Llamé a mi hermana para enseñárselo. Sacamos del fondo una merluza entera, sin vísceras, que abría y cerraba la boca. Fuera del arcón también se quedó inmóvil. Decidimos vaciarlo. Al retirar los últimos cubitos, encontré un trozo de piel enganchado a la escarcha. Me había cortado un dedo limpiando aquel mismo arcón la víspera. Lo saqué con unas pinzas. Se quedó inmóvil. Antes de tirarlo, lo devolví al arcón para confirmar lo que temía. Volvió a retorcerse. No eran animales que habían sobrevivido al frío. Era carne muerta que seguía intentando vivir.",
+    "caption": "Hay cosas que el frío no debería conservar. Relato de terror original de UMBRAL.",
+    "scenes": [
+      "Close-up of a mosquito flying just inside an open white chest freezer above frosted ice cubes, a startled male cleaner in a grey T-shirt leaning back, shuttered Spanish neighborhood bar, pale summer daylight through blinds, realistic cinematic photography, vertical composition, no text.",
+      "Overhead shot of the cleaner opening a clear frozen prawn bag beside the chest freezer, several prawns visibly curling their legs, his gloved left hand holding the plastic, cold blue freezer light against the dim bar interior, realistic vertical horror, no text.",
+      "Close-up of the cleaner placing a single motionless prawn on a stainless steel countertop beside the open freezer, his bare right index finger showing a small fresh cut, muted daylight and cold shadows, realistic tactile details, vertical framing, no text.",
+      "Medium shot of the cleaner showing his dark-haired sister in a green shirt the open chest freezer, both bending over a bag containing a whole gutted hake with its mouth open, cramped closed bar kitchen, subdued natural lighting, vertical cinematic realism, no text.",
+      "Medium shot of the sister in a green shirt lifting the gutted hake from the open chest freezer onto the steel counter while the grey-shirted cleaner empties bags into a container, motionless fish, subdued daylight, cinematic realism, vertical framing, no text.",
+      "Extreme close-up of metal tweezers lowering a tiny curled fragment of human skin beside frosted ice cubes inside the white chest freezer, the cleaner's cut index finger visible nearby, tense muted blue light, photorealistic vertical macro framing, no text."
+    ],
+    "publish_date": "2026-11-20",
+    "editorial_protocol": "fixed-v1"
   }
 ]
