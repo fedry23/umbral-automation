@@ -19,3 +19,6 @@ artifacts are not private; experimental media must not be uploaded there
 without a private inspection route. No production migration until tests,
 three real private renders and direct visual review, license/cost verification,
 rollback and publication reconciliation are complete.
+
+## Editorial fixtures
+Three fictional stories for isolated testing: rail infrastructure, hotel room, woodland surveillance. Tests exercise real speech segmentation with synthetic timestamps, not real TTS timing or visual quality. No publish dates, official numbering or public media artifacts. Full renders and visual review remain required.

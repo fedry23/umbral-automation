@@ -1,0 +1,252 @@
+[
+  {
+    "title": "La última baliza",
+    "narration": "La noche que clausuraron la vía, la baliza roja se encendió sola. Yo debía desconectar el último cuadro eléctrico de la estación antes de entregar las llaves. Abrí el cuadro verde. Todos los interruptores estaban bajados, pero un cable temblaba como si algo tirase de él desde el otro extremo. En el manual encontré una advertencia antigua: si la baliza seguía encendida sin corriente, había que esperar a que pasara el último tren. Miré las vías. No había ningún tren, aunque los raíles vibraban y la grava saltaba bajo una lluvia que caía cada vez más fuerte. La baliza cambió a verde y volvió al rojo. Recordé que la señal protegía el paso del tren, no a quienes trabajábamos fuera de él. Corrí al otro lado de la verja. Al revisar el lugar al amanecer, encontré el cuadro aplastado por unas ruedas que nunca llegué a ver.",
+    "caption": "Ficción original de prueba interna. No publicar.",
+    "episode_number": 9001,
+    "scenes": [
+      "Red railway signal glowing beside wet railway tracks at night, empty rural station, cinematic photograph.",
+      "Disconnected cable hanging inside an open green metal cabinet beside wet railway tracks, cold photographic lighting.",
+      "Open weathered manual resting inside a green metal cabinet, pages in soft focus, cinematic close-up.",
+      "Low angle photograph of wet railway tracks with rain splashing onto loose gravel, red railway signal in distance.",
+      "Close photographic view of a red railway signal, glowing red lens, rain streaks on black metal.",
+      "Crushed green metal cabinet next to wet railway tracks at dawn, empty railway yard, realistic cinematic photograph."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "track": "wet railway tracks",
+        "signal": "red railway signal",
+        "box": "green metal cabinet"
+      },
+      "shots": [
+        {
+          "narration": "La noche que clausuraron la vía, la baliza roja se encendió sola. Yo debía desconectar el último cuadro eléctrico de la estación antes de entregar las llaves.",
+          "action": "signal glowing",
+          "camera": "Wide",
+          "prompt": "Red railway signal glowing beside wet railway tracks at night, empty rural station, cinematic photograph.",
+          "references": [
+            "track",
+            "signal"
+          ]
+        },
+        {
+          "narration": "Abrí el cuadro verde. Todos los interruptores estaban bajados, pero un cable temblaba como si algo tirase de él desde el otro extremo.",
+          "action": "loose cable",
+          "camera": "Close",
+          "prompt": "Disconnected cable hanging inside an open green metal cabinet beside wet railway tracks, cold photographic lighting.",
+          "references": [
+            "box",
+            "track"
+          ]
+        },
+        {
+          "narration": "En el manual encontré una advertencia antigua: si la baliza seguía encendida sin corriente, había que esperar a que pasara el último tren.",
+          "action": "warning manual",
+          "camera": "Detail",
+          "prompt": "Open weathered manual resting inside a green metal cabinet, pages in soft focus, cinematic close-up.",
+          "references": [
+            "box"
+          ]
+        },
+        {
+          "narration": "Miré las vías. No había ningún tren, aunque los raíles vibraban y la grava saltaba bajo una lluvia que caía cada vez más fuerte.",
+          "action": "vibrating rails",
+          "camera": "Low",
+          "prompt": "Low angle photograph of wet railway tracks with rain splashing onto loose gravel, red railway signal in distance.",
+          "references": [
+            "track",
+            "signal"
+          ]
+        },
+        {
+          "narration": "La baliza cambió a verde y volvió al rojo. Recordé que la señal protegía el paso del tren, no a quienes trabajábamos fuera de él.",
+          "action": "red light",
+          "camera": "Detail",
+          "prompt": "Close photographic view of a red railway signal, glowing red lens, rain streaks on black metal.",
+          "references": [
+            "signal"
+          ]
+        },
+        {
+          "narration": "Corrí al otro lado de la verja. Al revisar el lugar al amanecer, encontré el cuadro aplastado por unas ruedas que nunca llegué a ver.",
+          "action": "crushed cabinet",
+          "camera": "Wide",
+          "prompt": "Crushed green metal cabinet next to wet railway tracks at dawn, empty railway yard, realistic cinematic photograph.",
+          "references": [
+            "box",
+            "track"
+          ]
+        }
+      ]
+    },
+    "image_seed_base": 92000
+  },
+  {
+    "title": "El huésped del armario",
+    "narration": "El dueño del hostal me pidió que nunca dejara la llave de la habitación dentro del armario. Pensé que era una broma para asustar a los turistas. Esa noche la dejé allí por descuido. Cuando cerré la puerta del armario, alguien tosió dentro, con una voz idéntica a la mía. Abrí de golpe y encontré solamente mi llave. La saqué, pero desde el pasillo alguien empezó a llamar con insistencia a la puerta de la habitación. Una voz al otro lado decía que había perdido su llave. Reconocí mi propia voz y entendí que aquel armario fabricaba huéspedes para el hotel. Metí la llave otra vez en el armario y cerré. Los golpes cesaron de inmediato, pero algo empezó a arañar la madera por dentro. Por la mañana escapé sin recogerla. En recepción habían anotado dos huéspedes con mi nombre, aunque solamente uno había devuelto la llave antes de marcharse.",
+    "caption": "Ficción original de prueba interna. No publicar.",
+    "episode_number": 9002,
+    "scenes": [
+      "Brass room key on a wooden dresser against faded floral wallpaper, old modest hotel room, realistic photograph.",
+      "Closed oak wardrobe against faded floral wallpaper, single warm bedside lamp, unsettling realistic hotel interior.",
+      "Brass room key lying alone on a shelf inside an open oak wardrobe, low warm light, cinematic photograph.",
+      "Closed hotel room door surrounded by faded floral wallpaper, shadow beneath the door, realistic cinematic photograph.",
+      "Brass room key on a shelf inside an oak wardrobe, claw marks on dark wood, isolated object, realistic close-up.",
+      "Brass room key lying alone on old hotel reception counter, morning light, realistic cinematic still."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "room": "faded floral wallpaper",
+        "wardrobe": "oak wardrobe",
+        "key": "brass room key"
+      },
+      "shots": [
+        {
+          "narration": "El dueño del hostal me pidió que nunca dejara la llave de la habitación dentro del armario. Pensé que era una broma para asustar a los turistas.",
+          "action": "key on dresser",
+          "camera": "Detail",
+          "prompt": "Brass room key on a wooden dresser against faded floral wallpaper, old modest hotel room, realistic photograph.",
+          "references": [
+            "key",
+            "room"
+          ]
+        },
+        {
+          "narration": "Esa noche la dejé allí por descuido. Cuando cerré la puerta del armario, alguien tosió dentro, con una voz idéntica a la mía.",
+          "action": "closed wardrobe",
+          "camera": "Wide",
+          "prompt": "Closed oak wardrobe against faded floral wallpaper, single warm bedside lamp, unsettling realistic hotel interior.",
+          "references": [
+            "wardrobe",
+            "room"
+          ]
+        },
+        {
+          "narration": "Abrí de golpe y encontré solamente mi llave. La saqué, pero desde el pasillo alguien empezó a llamar con insistencia a la puerta de la habitación.",
+          "action": "key inside",
+          "camera": "Close",
+          "prompt": "Brass room key lying alone on a shelf inside an open oak wardrobe, low warm light, cinematic photograph.",
+          "references": [
+            "key",
+            "wardrobe"
+          ]
+        },
+        {
+          "narration": "Una voz al otro lado decía que había perdido su llave. Reconocí mi propia voz y entendí que aquel armario fabricaba huéspedes para el hotel.",
+          "action": "closed room door",
+          "camera": "Wide",
+          "prompt": "Closed hotel room door surrounded by faded floral wallpaper, shadow beneath the door, realistic cinematic photograph.",
+          "references": [
+            "room"
+          ]
+        },
+        {
+          "narration": "Metí la llave otra vez en el armario y cerré. Los golpes cesaron de inmediato, pero algo empezó a arañar la madera por dentro.",
+          "action": "key on shelf",
+          "camera": "Detail",
+          "prompt": "Brass room key on a shelf inside an oak wardrobe, claw marks on dark wood, isolated object, realistic close-up.",
+          "references": [
+            "key",
+            "wardrobe"
+          ]
+        },
+        {
+          "narration": "Por la mañana escapé sin recogerla. En recepción habían anotado dos huéspedes con mi nombre, aunque solamente uno había devuelto la llave antes de marcharse.",
+          "action": "key returned",
+          "camera": "Detail",
+          "prompt": "Brass room key lying alone on old hotel reception counter, morning light, realistic cinematic still.",
+          "references": [
+            "key"
+          ]
+        }
+      ]
+    },
+    "image_seed_base": 102000
+  },
+  {
+    "title": "El último flash",
+    "narration": "Instalé una cámara de fauna para descubrir qué animal destrozaba las vallas. La fijé a un pino partido que dominaba un claro del bosque. Al revisar las fotos encontré siempre la misma figura de espaldas. No aparecía al principio de la noche, sino justo antes del último disparo de cada madrugada. La tercera noche encontré mi gorra colgada del pino. Llevaba una semana buscándola y nadie sabía que había colocado allí la cámara oculta. Decidí llevarme la cámara antes de anochecer. Al desatarla, el aparato disparó sin que yo hubiera pasado por delante de su sensor de movimiento. La foto recién hecha mostraba el claro desde detrás de mí. Comprendí que la figura de las fotografías llevaba mi ropa y estaba cada noche más cerca. Dejé la cámara mirando hacia el bosque y salí corriendo. Desde la carretera vi un último flash, dirigido desde el claro hacia mi espalda.",
+    "caption": "Ficción original de prueba interna. No publicar.",
+    "episode_number": 9003,
+    "scenes": [
+      "Black trail camera strapped to a split pine trunk overlooking a foggy forest clearing, realistic woodland photograph.",
+      "Distant lone human silhouette facing away in a foggy forest clearing at night, realistic infrared wildlife photograph.",
+      "Weathered navy baseball cap hanging on a split pine trunk beside a black trail camera, realistic forest photograph.",
+      "Black trail camera resting on pine needles beneath a split pine trunk, dusk woodland, small illuminated lens.",
+      "Lone distant figure wearing a navy baseball cap in a foggy forest clearing viewed from behind a split pine trunk, cinematic photograph.",
+      "Distant white camera flash in a foggy forest clearing beside a dark road at night, realistic cinematic photograph."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "camera": "black trail camera",
+        "tree": "split pine trunk",
+        "clearing": "foggy forest clearing"
+      },
+      "shots": [
+        {
+          "narration": "Instalé una cámara de fauna para descubrir qué animal destrozaba las vallas. La fijé a un pino partido que dominaba un claro del bosque.",
+          "action": "camera mounted",
+          "camera": "Wide",
+          "prompt": "Black trail camera strapped to a split pine trunk overlooking a foggy forest clearing, realistic woodland photograph.",
+          "references": [
+            "camera",
+            "tree",
+            "clearing"
+          ]
+        },
+        {
+          "narration": "Al revisar las fotos encontré siempre la misma figura de espaldas. No aparecía al principio de la noche, sino justo antes del último disparo de cada madrugada.",
+          "action": "distant silhouette",
+          "camera": "Long",
+          "prompt": "Distant lone human silhouette facing away in a foggy forest clearing at night, realistic infrared wildlife photograph.",
+          "references": [
+            "clearing"
+          ]
+        },
+        {
+          "narration": "La tercera noche encontré mi gorra colgada del pino. Llevaba una semana buscándola y nadie sabía que había colocado allí la cámara oculta.",
+          "action": "cap on pine",
+          "camera": "Close",
+          "prompt": "Weathered navy baseball cap hanging on a split pine trunk beside a black trail camera, realistic forest photograph.",
+          "references": [
+            "tree",
+            "camera"
+          ]
+        },
+        {
+          "narration": "Decidí llevarme la cámara antes de anochecer. Al desatarla, el aparato disparó sin que yo hubiera pasado por delante de su sensor de movimiento.",
+          "action": "camera on ground",
+          "camera": "Detail",
+          "prompt": "Black trail camera resting on pine needles beneath a split pine trunk, dusk woodland, small illuminated lens.",
+          "references": [
+            "camera",
+            "tree"
+          ]
+        },
+        {
+          "narration": "La foto recién hecha mostraba el claro desde detrás de mí. Comprendí que la figura de las fotografías llevaba mi ropa y estaba cada noche más cerca.",
+          "action": "figure in clearing",
+          "camera": "Wide",
+          "prompt": "Lone distant figure wearing a navy baseball cap in a foggy forest clearing viewed from behind a split pine trunk, cinematic photograph.",
+          "references": [
+            "clearing",
+            "tree"
+          ]
+        },
+        {
+          "narration": "Dejé la cámara mirando hacia el bosque y salí corriendo. Desde la carretera vi un último flash, dirigido desde el claro hacia mi espalda.",
+          "action": "flash in forest",
+          "camera": "Long",
+          "prompt": "Distant white camera flash in a foggy forest clearing beside a dark road at night, realistic cinematic photograph.",
+          "references": [
+            "clearing"
+          ]
+        }
+      ]
+    },
+    "image_seed_base": 112000
+  }
+]
