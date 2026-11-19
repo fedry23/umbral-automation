@@ -1,0 +1,26 @@
+name: UMBRAL 3 - isolated storyboard gate
+on:
+  push:
+    branches: [integration/umbral-3]
+    paths:
+      - 'scripts/storyboard.py'
+      - 'tests/test_storyboard.py'
+      - 'render.py'
+      - '.github/workflows/umbral3_storyboard.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  storyboard:
+    if: github.ref == 'refs/heads/integration/umbral-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m py_compile render.py scripts/storyboard.py tests/test_storyboard.py
+      - run: python -m unittest discover -s tests -p test_storyboard.py -v

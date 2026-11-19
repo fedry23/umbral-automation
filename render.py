@@ -149,6 +149,9 @@ CURATED_VISUAL_SHOTS = {
 
 
 def visual_shots(story):
+    if 'storyboard' in story:
+        from scripts.storyboard import validate_storyboard
+        return [shot['prompt'] for shot in validate_storyboard(story)]
     curated = CURATED_VISUAL_SHOTS.get(story.get('title'))
     if curated is not None:
         if len(curated) != len(story['scenes']):
@@ -214,6 +217,13 @@ def generate_images(story, out):
     for i, scene in enumerate(visual_shots(story)):
         scene_start = time.monotonic()
         prompt = scene_image_prompt(scene)
+        if 'storyboard' in story:
+            # Authored prompts already contain camera, action and continuity.
+            # Fail instead of silently dropping information at CLIP's limit.
+            prompt = scene
+            tokens = pipe.tokenizer(prompt, truncation=False).input_ids
+            if len(tokens) > pipe.tokenizer.model_max_length:
+                raise ValueError(f'Shot {i + 1}: prompt exceeds model token limit')
         best_image, best_score, best_reasons = None, float('-inf'), []
         attempts = []
         for attempt in range(max_attempts):
@@ -228,10 +238,11 @@ def generate_images(story, out):
             else:
                 score, reasons = assess_image(image)
             attempts.append({'seed': seed, 'score': score, 'reasons': reasons})
+            if not reasons:
+                best_image, best_score, best_reasons = image, score, reasons
+                break
             if score > best_score:
                 best_image, best_score, best_reasons = image, score, reasons
-            if not reasons:
-                break
             print(f'Imagen {i + 1}: intento {attempt + 1} rechazado '
                   f'({", ".join(reasons)}); regenerando', flush=True)
         if best_reasons:
@@ -279,7 +290,7 @@ def scene_boundaries_from_cues(cues, branding, count):
     return boundaries + [end]
 
 
-def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=1.0, zoom_step=0.000055):
+def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=1.0, zoom_step=0.000055, storyboard=None):
     if type(zoom_step) is not float or zoom_step not in (0.000055, 0.00012):
         raise ValueError('Perfil de cámara no autorizado')
     if type(music_gain) not in (int, float) or music_gain not in (1.0, 0.85):
@@ -303,6 +314,11 @@ def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=
         bounds = (scene_boundaries_from_cues(cues, branding, len(images))
                   if cues else [intro_end + (outro_start - intro_end) * i / len(images)
                                 for i in range(len(images) + 1)])
+        if storyboard is not None:
+            from scripts.storyboard import shot_boundaries
+            bounds = shot_boundaries(storyboard, cues, branding)
+            if len(bounds) != len(images) + 1:
+                raise ValueError('Storyboard/image count mismatch')
         timeline = ([(intro, intro_end)]
                     + [(img, bounds[i + 1] - bounds[i]) for i, img in enumerate(images)]
                     + [(outro, duration - outro_start)])
@@ -451,6 +467,10 @@ def render():
         story['technical_profile'] = active_profile
     if 'episode_number' not in story:
         raise ValueError('La historia seleccionada no tiene número de episodio fijo')
+    storyboard = None
+    if 'storyboard' in story:
+        from scripts.storyboard import validate_storyboard
+        storyboard = validate_storyboard(story)
     OUT.mkdir(exist_ok=True)
     started = time.monotonic()
     cues, duration = generate_branded_voice(story, OUT)
@@ -460,6 +480,15 @@ def render():
     from scripts.technical_learning import parameters_for, DEFAULT_PARAMETERS
     params = parameters_for(active_profile) if active_profile is not None else DEFAULT_PARAMETERS
     write_subtitles(cues, OUT / 'subtitles.ass', outline=params['subtitle_outline'])
+    if storyboard is not None:
+        from scripts.storyboard import shot_boundaries
+        branding = json.loads((OUT / 'branding_timing.json').read_text(encoding='utf-8'))
+        bounds = shot_boundaries(storyboard, cues, branding)
+        (OUT / 'shot_timeline.json').write_text(json.dumps([
+            {'shot': i + 1, 'start': bounds[i], 'end': bounds[i + 1],
+             'narration': shot['narration']}
+            for i, shot in enumerate(storyboard)
+        ], ensure_ascii=False, indent=2), encoding='utf-8')
     images = generate_images(story, OUT)
     # Lightweight visual QA: a single contact sheet makes it easy to inspect
     # all six generated scenes without downloading large intermediate PNGs.
@@ -483,11 +512,12 @@ def render():
     timing = json.loads((OUT / 'branding_timing.json').read_text(encoding='utf-8'))
     illustrated = time.monotonic()
     outfile = OUT / f'umbral_{date:%Y%m%d}{"_09" if morning else ""}.mp4'
+    shot_options = {'storyboard': storyboard} if storyboard is not None else {}
     if active_profile is None:
-        encode(OUT, images, duration, outfile, branding=timing, cues=cues)
+        encode(OUT, images, duration, outfile, branding=timing, cues=cues, **shot_options)
     else:
         encode(OUT, images, duration, outfile, branding=timing, cues=cues,
-               music_gain=params['music_gain'], zoom_step=params['zoom_step'])
+               music_gain=params['music_gain'], zoom_step=params['zoom_step'], **shot_options)
     timings = {'voice_seconds': voiced - started, 'images_seconds': illustrated - voiced,
                'encoding_seconds': time.monotonic() - illustrated,
                'total_seconds': time.monotonic() - started}
