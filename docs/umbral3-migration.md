@@ -22,3 +22,6 @@ rollback and publication reconciliation are complete.
 
 ## Editorial fixtures
 Three fictional stories for isolated testing: rail infrastructure, hotel room, woodland surveillance. Tests exercise real speech segmentation with synthetic timestamps, not real TTS timing or visual quality. No publish dates, official numbering or public media artifacts. Full renders and visual review remain required.
+
+## Isolated full-render gate
+Three fixtures now have an explicit media-only render entry point. Each runs separately with a bounded timeout, one at a time, no Meta environment, no publishable date, no public artifact, and automatic temporary directory cleanup. It emits technical reports, including image QA and actual shot durations, but does NOT establish visual approval. A private media inspection route is still required; do not claim review from scalar metrics. Official render selection and output naming are preserved by the shared function.

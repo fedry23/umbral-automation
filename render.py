@@ -465,31 +465,40 @@ def render():
         from scripts.technical_learning import load_profile
         active_profile = load_profile(date.isoformat(), '09' if morning else '21', BASE)
         story['technical_profile'] = active_profile
+    return render_story_media(story, OUT, date,
+                              f'umbral_{date:%Y%m%d}{"_09" if morning else ""}.mp4',
+                              active_profile=active_profile)
+
+
+def render_story_media(story, out, date, filename, *, active_profile=None):
+    """Render media only; never publish or select a production episode."""
+    if not isinstance(filename, str) or Path(filename).name != filename or not filename.endswith('.mp4'):
+        raise ValueError('Invalid output filename')
     if 'episode_number' not in story:
         raise ValueError('La historia seleccionada no tiene número de episodio fijo')
     storyboard = None
     if 'storyboard' in story:
         from scripts.storyboard import validate_storyboard
         storyboard = validate_storyboard(story)
-    OUT.mkdir(exist_ok=True)
+    out.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
-    cues, duration = generate_branded_voice(story, OUT)
+    cues, duration = generate_branded_voice(story, out)
     from music_engine import generate_ambient_score
-    generate_ambient_score(duration, cues, OUT, seed=7300 + date.toordinal() % 10000)
+    generate_ambient_score(duration, cues, out, seed=7300 + date.toordinal() % 10000)
     voiced = time.monotonic()
     from scripts.technical_learning import parameters_for, DEFAULT_PARAMETERS
     params = parameters_for(active_profile) if active_profile is not None else DEFAULT_PARAMETERS
-    write_subtitles(cues, OUT / 'subtitles.ass', outline=params['subtitle_outline'])
+    write_subtitles(cues, out / 'subtitles.ass', outline=params['subtitle_outline'])
     if storyboard is not None:
         from scripts.storyboard import shot_boundaries
-        branding = json.loads((OUT / 'branding_timing.json').read_text(encoding='utf-8'))
+        branding = json.loads((out / 'branding_timing.json').read_text(encoding='utf-8'))
         bounds = shot_boundaries(storyboard, cues, branding)
-        (OUT / 'shot_timeline.json').write_text(json.dumps([
+        (out / 'shot_timeline.json').write_text(json.dumps([
             {'shot': i + 1, 'start': bounds[i], 'end': bounds[i + 1],
              'narration': shot['narration']}
             for i, shot in enumerate(storyboard)
         ], ensure_ascii=False, indent=2), encoding='utf-8')
-    images = generate_images(story, OUT)
+    images = generate_images(story, out)
     # Lightweight visual QA: a single contact sheet makes it easy to inspect
     # all six generated scenes without downloading large intermediate PNGs.
     from PIL import Image, ImageOps, ImageDraw
@@ -501,34 +510,35 @@ def render():
         x = gap + (idx % 3) * (thumb_w + gap)
         y = gap + (idx // 3) * (thumb_h + gap)
         sheet.paste(tile, (x, y))
-    sheet.save(OUT / 'scene_contact_sheet.jpg', quality=85, optimize=True)
+    sheet.save(out / 'scene_contact_sheet.jpg', quality=85, optimize=True)
     # Cover is a distinct downloadable JPEG. Brand cards are original
     # graphics; they NEVER reuse any generated story scene.
     from scripts.thumbnail import make_thumbnail
     from scripts.brand_cards import make_brand_cards
-    make_thumbnail(story, images, OUT / 'cover.jpg')
-    make_brand_cards(story, OUT)
-    (OUT / 'brand_story.json').write_text(json.dumps(story, ensure_ascii=False))
-    timing = json.loads((OUT / 'branding_timing.json').read_text(encoding='utf-8'))
+    make_thumbnail(story, images, out / 'cover.jpg')
+    make_brand_cards(story, out)
+    (out / 'brand_story.json').write_text(json.dumps(story, ensure_ascii=False))
+    timing = json.loads((out / 'branding_timing.json').read_text(encoding='utf-8'))
     illustrated = time.monotonic()
-    outfile = OUT / f'umbral_{date:%Y%m%d}{"_09" if morning else ""}.mp4'
+    outfile = out / filename
     shot_options = {'storyboard': storyboard} if storyboard is not None else {}
     if active_profile is None:
-        encode(OUT, images, duration, outfile, branding=timing, cues=cues, **shot_options)
+        encode(out, images, duration, outfile, branding=timing, cues=cues, **shot_options)
     else:
-        encode(OUT, images, duration, outfile, branding=timing, cues=cues,
+        encode(out, images, duration, outfile, branding=timing, cues=cues,
                music_gain=params['music_gain'], zoom_step=params['zoom_step'], **shot_options)
     timings = {'voice_seconds': voiced - started, 'images_seconds': illustrated - voiced,
                'encoding_seconds': time.monotonic() - illustrated,
                'total_seconds': time.monotonic() - started}
-    (OUT / 'timings.json').write_text(json.dumps(timings, indent=2))
+    (out / 'timings.json').write_text(json.dumps(timings, indent=2))
     print(json.dumps(timings), flush=True)
-    (OUT / 'story_used.json').write_text(json.dumps({'date': str(date), **story}, ensure_ascii=False, indent=2))
-    (OUT / 'caption.txt').write_text(
+    (out / 'story_used.json').write_text(json.dumps({'date': str(date), **story}, ensure_ascii=False, indent=2))
+    (out / 'caption.txt').write_text(
         f"Historia {story['episode_number']}: {story['title']}\n"
         + story['caption'] + '\n#UmbralTerror #RelatosDeTerror\n',
         encoding='utf-8')
     print(f'Vídeo verificado: {outfile} ({duration:.2f}s)')
+    return outfile
 
 
 if __name__ == '__main__':
