@@ -9,6 +9,10 @@ on:
         description: 'Explicitly render a full private trial Reel'
         type: boolean
         default: false
+      audit_private:
+        description: 'Audit existing private archive inventory without generating media'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -45,6 +49,9 @@ jobs:
         run: python -m scripts.umbral3_hf_roundtrip
       - name: Prove full v2 audiovisual archive contract using synthetic private files
         run: python -m scripts.umbral3_hf_full_archive_smoke
+      - name: Verify persisted private archives after workflow restart
+        if: (github.event_name == 'workflow_dispatch' && inputs.audit_private == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL private inventory'))
+        run: python -m scripts.umbral3_hf_inventory
 
   render-fixture:
     needs: verify
