@@ -179,5 +179,21 @@
     ],
     "publish_date": "2026-11-20",
     "editorial_protocol": "fixed-v1"
+  },
+  {
+    "title": "El último doblaje",
+    "hook": "La grabadora reprodujo mi voz, pero yo no había hablado.",
+    "narration": "La grabadora reprodujo mi voz, pero yo no había hablado. Trabajaba restaurando cintas en un pequeño estudio de sonido y aquella noche probaba una bobina sin etiqueta. Mi voz decía que tenía sed. Al escucharlo, noté que la boca se me secaba. Bebí agua y volví a reproducir la frase. La sed regresó inmediatamente. Rebobiné otro tramo. Esta vez mi voz decía que no podía mover la mano izquierda. En cuanto terminó la frase, se me quedó inmóvil sobre la mesa. Detuve la máquina con la derecha y recuperé el movimiento. Comprendí que la cinta imponía lo que describía mientras estuviera sonando. Decidí cortarla para impedir que alguien volviera a reproducirla. Al levantar la cuchilla, rocé accidentalmente el botón de reproducción. Mi voz pronunció una última frase: no puedo mover ningún músculo. La cuchilla cayó al suelo. Desde entonces permanezco sentado frente a la grabadora. La frase se repite porque la bobina tiene un bucle.",
+    "caption": "Una cinta que no debería volver a sonar. Relato de ficción original. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Close up of a vintage reel to reel tape recorder spinning on a dark wooden studio desk, two metal reels and black magnetic tape, small sound studio with grey acoustic panels, warm desk lamp, cinematic realistic horror, vertical frame, no text.",
+      "Medium shot of a forty year old man with short brown hair and navy sweater drinking water beside a vintage reel to reel tape recorder on a dark wooden studio desk, grey acoustic panels, warm desk lamp, realistic horror, vertical frame, no text.",
+      "Close up of an open left hand resting motionless on a dark wooden studio desk beside a vintage reel to reel tape recorder. Navy sweater sleeve, grey acoustic panels, warm desk lamp, realistic restrained cinematic horror, vertical frame, no text.",
+      "Close up of a right index finger pressing the stop button on a vintage reel to reel tape recorder. Navy sweater sleeve, dark wooden studio desk, grey acoustic panels, warm desk lamp, cinematic realistic horror, vertical frame, no text.",
+      "Close up of a small steel blade held above black magnetic tape beside a vintage reel to reel tape recorder. Navy sweater sleeve, dark wooden studio desk, grey acoustic panels, warm desk lamp, cinematic realistic horror, vertical frame, no text.",
+      "Medium shot of a forty year old man with short brown hair and navy sweater sitting rigidly before a spinning vintage reel to reel tape recorder, dark wooden studio desk, grey acoustic panels, warm desk lamp, cinematic realistic horror, vertical frame, no text."
+    ],
+    "publish_date": "2026-11-21",
+    "editorial_protocol": "fixed-v1"
   }
 ]
