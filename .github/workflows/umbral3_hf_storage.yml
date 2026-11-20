@@ -38,3 +38,34 @@ jobs:
           python -m scripts.umbral3_hf_probe
       - name: Round-trip validated six-scene bundle with immutable metadata
         run: python -m scripts.umbral3_hf_roundtrip
+
+  render-fixture:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_PRIVATE_STORE: hf_bucket
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_IMAGE_BACKEND: turbo
+      UMBRAL_IMAGE_PROFILE: quality
+      UMBRAL_IMAGE_ATTEMPTS: '3'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_PROGRESS_BARS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Install private SDK in independent environment
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Render real private test Reel and verify remote full media readback
+        run: python -u -m scripts.umbral3_private_render --index 0 --private-evidence
