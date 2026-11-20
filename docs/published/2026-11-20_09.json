@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-20",
+  "title": "La cámara de frío",
+  "episode_number": 14,
+  "instagram_media_id": "18652431493057985",
+  "published_at": "2026-11-20T14:24:28+0000",
+  "verification": "published_media_read_back",
+  "cover_url_sent": "https://fedry23.github.io/umbral-automation/reels/2026-11-20_09.jpg",
+  "slot": "09",
+  "technical_profile": {
+    "experiment": "music-balance-v1",
+    "arm": "music-minus-1.4db",
+    "music_gain": 0.85
+  },
+  "duration_seconds": 74.23941666666667,
+  "editorial_protocol": "fixed-v1",
+  "permalink": "https://www.instagram.com/reel/Df93LHFMV_S/",
+  "cover_verification": {
+    "matched": true,
+    "mean_pixel_error": 0.0,
+    "method": "center-crop resize mean absolute RGB error <18/255"
+  }
+}
