@@ -125,6 +125,12 @@ def verify_media_bundle(data):
                 or any("/" in name or chr(92) in name or name.startswith(".") for name in actual)
                 or "manifest.json" not in actual):
             raise ValueError("Unsafe ZIP members")
+        # Fail closed before reading any potentially untrusted archive content.
+        if (sum(info.file_size for info in infos) > LIMIT
+                or any(info.file_size < 0 for info in infos)
+                or any(info.compress_type != zipfile.ZIP_STORED for info in infos)
+                or archive.getinfo("manifest.json").file_size > 100_000):
+            raise ValueError("Private media ZIP exceeds safe bounds")
         manifest = json.loads(archive.read("manifest.json"))
         if (manifest.get("version") != 2 or manifest.get("visual_approved") is not False
                 or manifest.get("publishable") is not False
@@ -133,8 +139,6 @@ def verify_media_bundle(data):
         assets = manifest.get("assets")
         if not isinstance(assets, dict) or set(assets) != set(actual) - {"manifest.json"}:
             raise ValueError("Private media inventory mismatch")
-        if sum(i.file_size for i in infos) > LIMIT:
-            raise ValueError("Oversized expanded media ZIP")
         for info in infos:
             if info.filename == "manifest.json":
                 continue
