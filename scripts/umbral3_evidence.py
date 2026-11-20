@@ -12,8 +12,20 @@ from scripts.umbral3_storage import DropboxStore, LIMIT
 HEADROOM = 100_000_000
 
 def quota(store):
-    if hasattr(store, "quota"):
-        return store.quota()
+    # Avoid MagicMock's fabricated attributes: only a concrete class-defined
+    # quota method is a remote store capability. Validate its response strictly.
+    provider_quota = getattr(type(store), "quota", None)
+    if callable(provider_quota):
+        try:
+            result = provider_quota(store)
+            if (not isinstance(result, dict)
+                    or any(type(result.get(k)) is not int for k in ("used", "allocated", "free"))
+                    or not 0 <= result["used"] <= result["allocated"]
+                    or result["free"] != result["allocated"] - result["used"]):
+                raise ValueError("Invalid private quota response")
+            return result
+        except (ValueError, KeyError, TypeError, AttributeError):
+            raise RuntimeError("Private storage quota check failed") from None
     req = urllib.request.Request(
         "https://api.dropboxapi.com/2/users/get_space_usage",
         data=b"null", headers={"Authorization": "Bearer " + store.token,
