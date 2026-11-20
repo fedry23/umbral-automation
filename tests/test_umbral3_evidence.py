@@ -2,12 +2,12 @@ import hashlib
 import io
 import json
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 from scripts.umbral3_evidence import quota, persist, probe, HEADROOM
 
 class PrivateEvidenceTests(unittest.TestCase):
     def store(self):
-        store = Mock()
+        store = MagicMock()
         store.token = "test-only"
         response = io.BytesIO(json.dumps({"used": 100, "allocation": {".tag": "individual", "allocated": 200_000_000}}).encode())
         store.opener.open.return_value.__enter__.return_value = response
