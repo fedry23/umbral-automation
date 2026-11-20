@@ -56,7 +56,15 @@ def main():
     matches=[s for s in json.loads(catalog.read_text()) if s.get('publish_date')==args.date]
     if len(matches)!=1 or 'storyboard' not in matches[0]:
         raise ValueError('Exactly one authored storyboard required for date and slot')
-    store=LocalStore(args.local_store) if args.local_store else DropboxStore.from_env()
+    if args.local_store:
+        store = LocalStore(args.local_store)
+    elif os.getenv("UMBRAL_PRIVATE_STORE", "hf_bucket") == "hf_bucket":
+        from scripts.umbral3_hf_storage import HfBucketStore
+        store = HfBucketStore.from_oidc()
+    elif os.getenv("UMBRAL_PRIVATE_STORE") == "dropbox":
+        store = DropboxStore.from_env()
+    else:
+        raise ValueError("Unsupported private storage backend")
     print('Visual reserve status:',prepare(matches[0],args.date,args.slot,store))
 
 if __name__=='__main__':
