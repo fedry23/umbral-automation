@@ -46,5 +46,21 @@
     ],
     "publish_date": "2026-11-20",
     "editorial_protocol": "fixed-v1"
+  },
+  {
+    "title": "La pintura fresca",
+    "hook": "La pintura de la pared se abombó con la forma de una mano.",
+    "narration": "La pintura de la pared se abombó con la forma de una mano. Soy pintor y aquella mañana estaba reformando una habitación vacía de una casa antigua. Pensé que había humedad. Rasqué la pintura con la espátula y el relieve desapareció. Entonces descubrí que la mano había dejado cinco marcas profundas en el yeso. Para descartar que alguien estuviera al otro lado, golpeé la pared con el mango. Sonó maciza. Cubrí las marcas con una capa de pintura blanca. Antes de que secara, apareció el relieve de un antebrazo, unido a la misma mano. Retiré la pintura y encontré otro surco, mucho más profundo. Comprendí que cada capa nueva permitía que aquello avanzara un poco hacia la superficie. Cerré el bote y recogí mis herramientas. Al llegar a la puerta recordé que, antes de empezar la habitación, había dado dos manos de pintura al techo. Levanté la vista. Sobre mi cabeza sobresalía un hombro.",
+    "caption": "Hay paredes que es mejor no volver a pintar. Relato de ficción original. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Close up of a hand shaped bulge in wet white paint on a plaster wall. Empty rectangular room, bare wooden floor, cool daylight from a single window, realistic subtle raised surface, cinematic horror, vertical composition, no text.",
+      "Close up of a steel scraper removing wet white paint from a plaster wall. A thirty year old painter with short dark hair and grey work overalls stands in an empty rectangular room, cool window daylight, realistic cinematic horror, vertical frame, no text.",
+      "Medium shot of a thirty year old painter with short dark hair and grey work overalls tapping a plaster wall with a steel scraper handle. Empty rectangular room, bare wooden floor, cool window daylight, realistic cinematic horror, vertical frame, no text.",
+      "Close up of a paint roller spreading white paint over five shallow grooves in a plaster wall. Grey work overalls visible at the edge, empty rectangular room, cool window daylight, realistic wet paint texture, cinematic horror, vertical frame, no text.",
+      "Close up of an elongated forearm shaped relief protruding from fresh white paint on a plaster wall. Empty rectangular room, bare wooden floor, cool window daylight, restrained realistic plaster texture, cinematic horror, vertical frame, no text.",
+      "Upward shot of a shoulder shaped bulge emerging from a white plaster ceiling above the doorway. Empty rectangular room, cool window daylight, thirty year old painter with short dark hair and grey work overalls looking upward, cinematic horror, vertical frame, no text."
+    ],
+    "publish_date": "2026-11-21",
+    "editorial_protocol": "fixed-v1"
   }
 ]
