@@ -2,13 +2,14 @@ name: UMBRAL - Verificar montaje, caratulas y Meta
 
 on:
   push:
-    branches: [main, fix/validated-artifact-recovery]
+    branches: [main, release/editorial-week-2026-11-21]
     paths:
       - 'render.py'
       - 'music_engine.py'
       - 'requirements*.txt'
       - '.github/actions/**'
       - 'stories.json'
+      - 'stories_morning.json'
       - 'audio_engine.py'
       - 'scripts/**'
       - 'tests/**'
