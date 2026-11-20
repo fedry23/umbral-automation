@@ -4,6 +4,11 @@ on:
     branches: [integration/umbral-3]
     paths: ['ops/umbral3-storage-kick.txt']
   workflow_dispatch:
+    inputs:
+      render_private:
+        description: 'Explicitly render a full private trial Reel'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -38,10 +43,12 @@ jobs:
           python -m scripts.umbral3_hf_probe
       - name: Round-trip validated six-scene bundle with immutable metadata
         run: python -m scripts.umbral3_hf_roundtrip
+      - name: Prove full v2 audiovisual archive contract using synthetic private files
+        run: python -m scripts.umbral3_hf_full_archive_smoke
 
   render-fixture:
     needs: verify
-    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3'
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.render_private == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL private full render')))
     runs-on: ubuntu-latest
     timeout-minutes: 150
     permissions:
