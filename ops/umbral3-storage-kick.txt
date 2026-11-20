@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-20: verify trusted publisher and private storage round trip
+2026-11-20: verify private full reserve ZIP upload + readback + reuse
