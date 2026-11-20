@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-20",
+  "container": "17938229445185965",
+  "status": "publish_intent",
+  "episode_number": 15,
+  "slot": "21",
+  "title": "La cuerda de regreso",
+  "technical_profile": {
+    "experiment": "music-balance-v1",
+    "arm": "control",
+    "music_gain": 1.0
+  },
+  "duration_seconds": 64.31720833333334,
+  "editorial_protocol": "fixed-v1",
+  "cover_url": "https://fedry23.github.io/umbral-automation/reels/2026-11-20.jpg"
+}
