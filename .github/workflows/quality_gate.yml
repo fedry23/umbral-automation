@@ -2,7 +2,7 @@ name: UMBRAL - Verificar montaje, caratulas y Meta
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix/validated-artifact-recovery]
     paths:
       - 'render.py'
       - 'music_engine.py'
@@ -21,7 +21,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: umbral-quality-gate
+  group: umbral-quality-gate-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
