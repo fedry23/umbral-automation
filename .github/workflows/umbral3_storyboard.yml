@@ -7,6 +7,8 @@ on:
       - 'scripts/umbral3_*.py'
       - 'tests/**'
       - 'render.py'
+      - 'stories*.json'
+      - 'docs/published/*.json'
       - '.github/workflows/umbral3_storyboard.yml'
   workflow_dispatch:
 permissions:

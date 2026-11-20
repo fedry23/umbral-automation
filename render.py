@@ -273,7 +273,16 @@ def generate_images(story, out, *, model_revision=None):
                   f'({", ".join(reasons)}); regenerando', flush=True)
         if ranker is not None:
             from scripts.umbral3_semantic import choose_candidate
-            selected = choose_candidate(attempts)
+            try:
+                selected = choose_candidate(attempts)
+            except (RuntimeError, ValueError):
+                report.append({'scene': i + 1, 'attempts': attempts,
+                               'accepted_score': None, 'selected_candidate': None,
+                               'semantic_revision': revision, 'visual_approved': False,
+                               'failure': 'no_acceptable_semantic_candidate'})
+                (out / 'image_quality_report.json').write_text(
+                    json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+                raise
             best_image = candidates[selected]
             best_score, best_reasons = attempts[selected]['score'], []
         if best_reasons:

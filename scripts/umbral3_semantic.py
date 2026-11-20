@@ -5,7 +5,8 @@ MODEL = "openai/clip-vit-base-patch32"
 
 def choose_candidate(candidates):
     """Select the valid candidate with strongest target-vs-other-shot margin.
-    No calibrated threshold or claims about anatomy or identity continuity.
+    Require a positive relative margin; no calibrated absolute threshold or
+    claims about anatomy or identity continuity.
     """
     valid = []
     for i, c in enumerate(candidates):
@@ -14,9 +15,13 @@ def choose_candidate(candidates):
         score, margin, technical = c["semantic_score"], c["semantic_margin"], c["score"]
         if not all(isinstance(x, (int, float)) and math.isfinite(x) for x in (score, margin, technical)):
             raise ValueError("Non-finite semantic result")
+        # Being the best of several wrong images is not evidence of alignment.
+        # A non-positive margin means another authored shot matches at least as well.
+        if margin <= 0:
+            continue
         valid.append(((margin, score, technical, -i), i))
     if not valid:
-        raise RuntimeError("No technically valid semantic candidate")
+        raise RuntimeError("No technically valid candidate with positive target-shot margin")
     return max(valid)[1]
 
 class SceneRanker:

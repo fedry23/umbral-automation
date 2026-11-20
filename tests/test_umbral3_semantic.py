@@ -17,3 +17,10 @@ class SemanticTests(unittest.TestCase):
     def test_all_bad(self):
         with self.assertRaises(RuntimeError):
             choose_candidate([candidate(reasons=["blur"])])
+
+    def test_all_semantically_ambiguous_candidates_fail_closed(self):
+        with self.assertRaisesRegex(RuntimeError, "positive target-shot margin"):
+            choose_candidate([candidate(-1, 99), candidate(0, 98)])
+    def test_positive_margin_never_overrides_hard_technical_rejection(self):
+        with self.assertRaises(RuntimeError):
+            choose_candidate([candidate(10, 99, reasons=["near_duplicate"]), candidate(-1)])
