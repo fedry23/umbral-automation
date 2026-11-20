@@ -11,8 +11,28 @@ import render
 
 
 class RenderTests(unittest.TestCase):
+    def load_dynamic_stories(self):
+        with patch.dict('os.environ', {'UMBRAL_DYNAMIC_EPISODES': '1'}):
+            return render.load_stories()
+
+    def test_dynamic_catalog_keeps_legacy_guard(self):
+        story = {'title': 'Fixture', 'narration': ' '.join(['palabra'] * 150),
+                 'scenes': ['Scene'] * 6, 'publish_date': '2027-01-01'}
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            (base / 'stories.json').write_text(json.dumps([story]))
+            with patch.object(render, 'BASE', base):
+                with patch.dict('os.environ', {'UMBRAL_DYNAMIC_EPISODES': '0'}):
+                    with self.assertRaises(ValueError):
+                        render.load_stories()
+                self.assertEqual(self.load_dynamic_stories(), [story])
+                story['scenes'].pop()
+                (base / 'stories.json').write_text(json.dumps([story]))
+                with self.assertRaises(ValueError):
+                    self.load_dynamic_stories()
+
     def test_stories(self):
-        stories = render.load_stories()
+        stories = self.load_dynamic_stories()
         self.assertGreaterEqual(len(stories), 3)
         for story in stories:
             self.assertEqual(' '.join(render.phrases(story['narration'])), story['narration'])
@@ -44,7 +64,7 @@ class RenderTests(unittest.TestCase):
         self.assertIn("profile not in ('fast', 'quality')", source)
 
     def test_curated_meter_shots_avoid_anatomical_chaos(self):
-        story = next(s for s in render.load_stories() if s['title'] == 'El contador inverso')
+        story = next(s for s in self.load_dynamic_stories() if s['title'] == 'El contador inverso')
         shots = render.visual_shots(story)
         self.assertEqual(len(shots), 6)
         self.assertTrue(all('no people' in s and 'no hands' in s for s in shots))
@@ -52,7 +72,7 @@ class RenderTests(unittest.TestCase):
         self.assertIn('intercom', shots[4])
 
     def test_tomorrows_factory_story_has_safe_storyboard(self):
-        story = next(s for s in render.load_stories() if s['title'] == 'El turno que faltaba')
+        story = next(s for s in self.load_dynamic_stories() if s['title'] == 'El turno que faltaba')
         shots = render.visual_shots(story)
         self.assertEqual(len(shots), 6)
         self.assertTrue(all('no people' in shot and 'no hands' in shot for shot in shots))
@@ -132,7 +152,7 @@ class RenderTests(unittest.TestCase):
 
 
     def test_new_reels_have_six_scenes(self):
-        stories = render.load_stories()
+        stories = self.load_dynamic_stories()
         dated = [s for s in stories if s.get('publish_date') == '2026-11-17']
         self.assertEqual(len(dated), 1)
         self.assertEqual(len(dated[0]['scenes']), 6)
