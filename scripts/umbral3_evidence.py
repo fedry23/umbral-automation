@@ -122,7 +122,7 @@ def verify_media_bundle(data):
         infos = archive.infolist()
         actual = [i.filename for i in infos]
         if (len(actual) != len(set(actual)) or len(actual) > 40
-                or any("/" in name or "\\\\" in name or name.startswith(".") for name in actual)
+                or any("/" in name or chr(92) in name or name.startswith(".") for name in actual)
                 or "manifest.json" not in actual):
             raise ValueError("Unsafe ZIP members")
         manifest = json.loads(archive.read("manifest.json"))
