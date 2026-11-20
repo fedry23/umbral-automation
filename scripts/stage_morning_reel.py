@@ -47,7 +47,7 @@ def github_get(path, binary=False):
     return data if binary else json.loads(data)
 
 
-def select_run(runs, date):
+def select_runs(runs, date):
     candidates = []
     for run in runs:
         if (run.get("name") == WORKFLOW
@@ -58,7 +58,12 @@ def select_run(runs, date):
             started = dt.datetime.fromisoformat(run["created_at"].replace("Z", "+00:00"))
             if started.astimezone(ZoneInfo("Europe/Madrid")).date().isoformat() == date:
                 candidates.append(run)
-    return max(candidates, key=lambda r: r["created_at"]) if candidates else None
+    return sorted(candidates, key=lambda r: r["created_at"], reverse=True)
+
+
+def select_run(runs, date):
+    candidates = select_runs(runs, date)
+    return candidates[0] if candidates else None
 
 
 def verify_story(story, caption, date):
@@ -206,16 +211,28 @@ def main():
         print("Local recovery validated:", result)
         return
     data = github_get(f"repos/{REPO}/actions/workflows/reel_morning.yml/runs?per_page=30")
-    run = select_run(data.get("workflow_runs", []), date)
-    if not run:
+    candidates = select_runs(data.get("workflow_runs", []), date)
+    if not candidates:
         raise RuntimeError("No hay una generación programada correcta para hoy; no se reutilizan vídeos")
-    art = github_get(f"repos/{REPO}/actions/runs/{run['id']}/artifacts")
-    matches = [a for a in art.get("artifacts", []) if a.get("name") == "umbral-reel-09" and not a.get("expired")]
-    if len(matches) != 1:
-        raise RuntimeError("No existe el artefacto único esperado del Reel diario")
-    blob = github_get(f"repos/{REPO}/actions/artifacts/{matches[0]['id']}/zip", binary=True)
-    result = extract_run_zip(blob, date)
-    print("Reel verificado:", result["title"], result["duration"], "s; run", run["id"])
+    # A newer run can have an expired or stale artifact. Try older same-day
+    # runs, but apply every existing editorial, numbering and media check.
+    for run in candidates[:5]:
+        try:
+            art = github_get(f"repos/{REPO}/actions/runs/{run['id']}/artifacts")
+            matches = [a for a in art.get("artifacts", [])
+                       if a.get("name") == "umbral-reel-09" and not a.get("expired")]
+            if len(matches) != 1:
+                raise ValueError("No existe el artefacto único esperado")
+            blob = github_get(f"repos/{REPO}/actions/artifacts/{matches[0]['id']}/zip", binary=True)
+            result = extract_run_zip(blob, date)
+        except (ValueError, RuntimeError, OSError, KeyError, StopIteration,
+                zipfile.BadZipFile, subprocess.CalledProcessError) as exc:
+            # Do not echo URLs, tokens or untrusted artifact text.
+            print(f"Artefacto rechazado: run {run['id']} ({type(exc).__name__})")
+            continue
+        print("Reel verificado:", result["title"], result["duration"], "s; run", run["id"])
+        return
+    raise RuntimeError("Ningún artefacto reciente del día supera las validaciones")
 
 
 if __name__ == "__main__":
