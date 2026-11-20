@@ -62,5 +62,503 @@
     ],
     "publish_date": "2026-11-21",
     "editorial_protocol": "fixed-v1"
+  },
+  {
+    "title": "El ascensor de servicio",
+    "hook": "Cada vez que el ascensor perdía un piso, en mi acreditación aparecía un año menos.",
+    "narration": "Cada vez que el ascensor perdía un piso, en mi acreditación aparecía un año menos. Eran las seis y acababa de entrar a limpiar un edificio de oficinas. Encontré la cabina abierta en la cuarta planta. Bajé al tercero y vi que mi año de nacimiento había cambiado. Pensé que alguien había sustituido mi tarjeta. Pulsé el segundo para salir por las escaleras. El año retrocedió otra vez y la alianza de mi dedo desapareció. Ya no recordaba el nombre de mi mujer. La salida estaba tapiada. Pulsé el tercero y la alianza volvió, pero la puerta de la cabina se quedó detenida unos centímetros por debajo del rellano. Comprendí que el ascensor me borraba un año de vida por cada planta que descendía. Quise llamar a mantenimiento, pero el teléfono no tenía cobertura. Entonces se encendió el botón del sótano sin que nadie lo tocara. La cabina empezó a bajar y el pasamanos fue quedando por encima de mi cabeza.",
+    "caption": "El ascensor de servicio. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Close-up of a plastic ID badge held beside the floor display of a steel service elevator, cinematic realistic horror, vertical frame, no text",
+      "Open doors of a steel service elevator facing an empty office landing, cinematic realistic horror, vertical frame, no text",
+      "Bare ring finger and plastic ID badge beside elevator buttons, navy cleaning uniform, cinematic realistic horror, vertical frame, no text",
+      "Steel service elevator misaligned with the floor beneath a bricked-up doorway, cinematic realistic horror, vertical frame, no text",
+      "Worker in navy cleaning uniform holds an unlit phone inside a steel service elevator, cinematic realistic horror, vertical frame, no text",
+      "Low child-height view of the handrail in a steel service elevator, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-22",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "steel service elevator",
+        "anchor1": "navy cleaning uniform",
+        "anchor2": "plastic ID badge"
+      },
+      "shots": [
+        {
+          "narration": "Cada vez que el ascensor perdía un piso, en mi acreditación aparecía un año menos. Eran las seis y acababa de entrar a limpiar un edificio de oficinas.",
+          "action": "Close-up of a plastic ID badge held beside the floor display of a steel service elevator",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Close-up of a plastic ID badge held beside the floor display of a steel service elevator, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Encontré la cabina abierta en la cuarta planta. Bajé al tercero y vi que mi año de nacimiento había cambiado. Pensé que alguien había sustituido mi tarjeta.",
+          "action": "Open doors of a steel service elevator facing an empty office landing",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Open doors of a steel service elevator facing an empty office landing, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Pulsé el segundo para salir por las escaleras. El año retrocedió otra vez y la alianza de mi dedo desapareció. Ya no recordaba el nombre de mi mujer.",
+          "action": "Bare ring finger and plastic ID badge beside elevator buttons, navy cleaning uniform",
+          "camera": "close-up",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Bare ring finger and plastic ID badge beside elevator buttons, navy cleaning uniform, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "La salida estaba tapiada. Pulsé el tercero y la alianza volvió, pero la puerta de la cabina se quedó detenida unos centímetros por debajo del rellano.",
+          "action": "Steel service elevator misaligned with the floor beneath a bricked-up doorway",
+          "camera": "wide",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Steel service elevator misaligned with the floor beneath a bricked-up doorway, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Comprendí que el ascensor me borraba un año de vida por cada planta que descendía. Quise llamar a mantenimiento, pero el teléfono no tenía cobertura.",
+          "action": "Worker in navy cleaning uniform holds an unlit phone inside a steel service elevator",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Worker in navy cleaning uniform holds an unlit phone inside a steel service elevator, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Entonces se encendió el botón del sótano sin que nadie lo tocara. La cabina empezó a bajar y el pasamanos fue quedando por encima de mi cabeza.",
+          "action": "Low child-height view of the handrail in a steel service elevator",
+          "camera": "detail",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Low child-height view of the handrail in a steel service elevator, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
+  },
+  {
+    "title": "El carrete sin revelar",
+    "hook": "En la primera fotografía de la cámara aparecía mi casa vista desde dentro del armario.",
+    "narration": "En la primera fotografía de la cámara aparecía mi casa vista desde dentro del armario. Había comprado aquel aparato de segunda mano esa tarde, en un mercadillo. Al mirar las demás imágenes descubrí que todas mostraban habitaciones de mi casa desde rincones oscuros. En una vi una taza que acababa de romper, junto a la alfombra. Hice una fotografía del salón para comprobar el objetivo. La imagen mostraba el mismo salón, pero tomada desde debajo del sofá, a cinco metros de donde yo estaba. Comprendí que la cámara no fotografiaba aquello que tenía delante, sino lo que veía algo situado en el rincón más oscuro de la habitación. No volví a disparar. Metí el aparato en una caja y encendí todas las luces. Cuando fui a tirar las fotos, encontré una nueva imagen saliendo lentamente de la cámara apagada. Mostraba mi dormitorio iluminado a pleno día. Estaba tomada desde el interior de mi boca. En el borde inferior de la fotografía reconocí dos de mis dientes.",
+    "caption": "El carrete sin revelar. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Black instant camera beside a print showing pale oak furniture through a wardrobe gap, cinematic realistic horror, vertical frame, no text",
+      "Instant prints and a broken white mug on a table, pale oak furniture, cinematic realistic horror, vertical frame, no text",
+      "Hands in black wool sweater holding a black instant camera toward an empty sofa, cinematic realistic horror, vertical frame, no text",
+      "Floor-level view beneath an empty sofa toward pale oak furniture, cinematic realistic horror, vertical frame, no text",
+      "Black instant camera in a cardboard box beside a bright lamp, cinematic realistic horror, vertical frame, no text",
+      "Close-up of an instant print emerging from a black instant camera, a frightened man in black wool sweater, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-23",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "pale oak furniture",
+        "anchor1": "black instant camera",
+        "anchor2": "black wool sweater"
+      },
+      "shots": [
+        {
+          "narration": "En la primera fotografía de la cámara aparecía mi casa vista desde dentro del armario. Había comprado aquel aparato de segunda mano esa tarde, en un mercadillo.",
+          "action": "Black instant camera beside a print showing pale oak furniture through a wardrobe gap",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Black instant camera beside a print showing pale oak furniture through a wardrobe gap, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Al mirar las demás imágenes descubrí que todas mostraban habitaciones de mi casa desde rincones oscuros. En una vi una taza que acababa de romper, junto a la alfombra.",
+          "action": "Instant prints and a broken white mug on a table, pale oak furniture",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Instant prints and a broken white mug on a table, pale oak furniture, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Hice una fotografía del salón para comprobar el objetivo. La imagen mostraba el mismo salón, pero tomada desde debajo del sofá, a cinco metros de donde yo estaba.",
+          "action": "Hands in black wool sweater holding a black instant camera toward an empty sofa",
+          "camera": "close-up",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Hands in black wool sweater holding a black instant camera toward an empty sofa, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Comprendí que la cámara no fotografiaba aquello que tenía delante, sino lo que veía algo situado en el rincón más oscuro de la habitación. No volví a disparar.",
+          "action": "Floor-level view beneath an empty sofa toward pale oak furniture",
+          "camera": "wide",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Floor-level view beneath an empty sofa toward pale oak furniture, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Metí el aparato en una caja y encendí todas las luces. Cuando fui a tirar las fotos, encontré una nueva imagen saliendo lentamente de la cámara apagada.",
+          "action": "Black instant camera in a cardboard box beside a bright lamp",
+          "camera": "medium",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Black instant camera in a cardboard box beside a bright lamp, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Mostraba mi dormitorio iluminado a pleno día. Estaba tomada desde el interior de mi boca. En el borde inferior de la fotografía reconocí dos de mis dientes.",
+          "action": "Close-up of an instant print emerging from a black instant camera, a frightened man in black wool sweater",
+          "camera": "detail",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of an instant print emerging from a black instant camera, a frightened man in black wool sweater, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
+  },
+  {
+    "title": "El grifo del patio",
+    "hook": "El agua del grifo caía hacia arriba y desaparecía por el agujero de la manguera.",
+    "narration": "El agua del grifo caía hacia arriba y desaparecía por el agujero de la manguera. Lo descubrí un domingo mientras limpiaba el patio de casa de mi padre. Cerré la llave y el chorro se detuvo. Volví a abrirla con un cubo debajo. El agua regresó al grifo y dejó una marca de cal en el plástico. Probé con el bebedero del perro. El nivel descendió hasta vaciarse, aunque la manguera no llegaba al recipiente. Cada vez que abría la llave, desaparecía agua del entorno. Mi padre dormía en una silla junto a la puerta. Cerré el grifo cuando advertí que el vaso que tenía en la mano se estaba quedando seco. Quise desenroscar la llave para impedir que volviera a abrirse. Al hacerlo, el vástago salió entero y la tubería comenzó a tragar aire con un silbido agudo. Busqué desesperadamente el paso general. Cuando regresé al patio, mi padre seguía en la silla. Sus manos parecían de papel. Dentro de la tubería alguien estaba respirando.",
+    "caption": "El grifo del patio. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Water droplets rising into a hose under a brass garden tap, terracotta tiled courtyard, cinematic realistic horror, vertical frame, no text",
+      "Blue bucket beneath an open brass garden tap, terracotta tiled courtyard, cinematic realistic horror, vertical frame, no text",
+      "Empty ceramic dog bowl on a terracotta tiled courtyard, cinematic realistic horror, vertical frame, no text",
+      "Elderly man in beige shirt asleep holding an almost empty glass, terracotta tiled courtyard, cinematic realistic horror, vertical frame, no text",
+      "Hand unscrewing a brass garden tap from a white wall, cinematic realistic horror, vertical frame, no text",
+      "Dry wrinkled hands of an elderly man in beige shirt resting on a wooden chair, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-24",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "terracotta tiled courtyard",
+        "anchor1": "brass garden tap",
+        "anchor2": "elderly man in beige shirt"
+      },
+      "shots": [
+        {
+          "narration": "El agua del grifo caía hacia arriba y desaparecía por el agujero de la manguera. Lo descubrí un domingo mientras limpiaba el patio de casa de mi padre.",
+          "action": "Water droplets rising into a hose under a brass garden tap, terracotta tiled courtyard",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Water droplets rising into a hose under a brass garden tap, terracotta tiled courtyard, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Cerré la llave y el chorro se detuvo. Volví a abrirla con un cubo debajo. El agua regresó al grifo y dejó una marca de cal en el plástico.",
+          "action": "Blue bucket beneath an open brass garden tap, terracotta tiled courtyard",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Blue bucket beneath an open brass garden tap, terracotta tiled courtyard, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Probé con el bebedero del perro. El nivel descendió hasta vaciarse, aunque la manguera no llegaba al recipiente. Cada vez que abría la llave, desaparecía agua del entorno.",
+          "action": "Empty ceramic dog bowl on a terracotta tiled courtyard",
+          "camera": "close-up",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Empty ceramic dog bowl on a terracotta tiled courtyard, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Mi padre dormía en una silla junto a la puerta. Cerré el grifo cuando advertí que el vaso que tenía en la mano se estaba quedando seco.",
+          "action": "Elderly man in beige shirt asleep holding an almost empty glass, terracotta tiled courtyard",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Elderly man in beige shirt asleep holding an almost empty glass, terracotta tiled courtyard, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Quise desenroscar la llave para impedir que volviera a abrirse. Al hacerlo, el vástago salió entero y la tubería comenzó a tragar aire con un silbido agudo.",
+          "action": "Hand unscrewing a brass garden tap from a white wall",
+          "camera": "medium",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Hand unscrewing a brass garden tap from a white wall, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Busqué desesperadamente el paso general. Cuando regresé al patio, mi padre seguía en la silla. Sus manos parecían de papel. Dentro de la tubería alguien estaba respirando.",
+          "action": "Dry wrinkled hands of an elderly man in beige shirt resting on a wooden chair",
+          "camera": "detail",
+          "references": [
+            "anchor2"
+          ],
+          "prompt": "Dry wrinkled hands of an elderly man in beige shirt resting on a wooden chair, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
+  },
+  {
+    "title": "El plano del desván",
+    "hook": "En el plano de mi casa había una habitación que medía lo mismo que mi cama.",
+    "narration": "En el plano de mi casa había una habitación que medía lo mismo que mi cama. Encontré el dibujo dentro de una carpeta guardada en el desván. Medí el dormitorio y comprobé que la habitación dibujada quedaba superpuesta a la cama. Una línea de lápiz señalaba una puerta junto a la pared del cabecero. Borré aquella línea con una goma. Abajo sonó un golpe seco. Al volver al dormitorio, encontré el marco de la puerta de entrada completamente liso, como si nunca hubiera existido. Dibujé la puerta otra vez y reapareció. Entendí que las modificaciones del plano alteraban la casa. Decidí guardar la carpeta y salir sin tocar nada más. Pero una corriente de aire tiró el papel al suelo. Al recogerlo vi que alguien había dibujado un segundo acceso, marcado con un lápiz diferente al mío. Desde entonces duermo en el sofá. Cada noche encuentro una línea nueva en el plano. Todas las puertas dibujadas terminan abriéndose hacia el interior de mi dormitorio.",
+    "caption": "El plano del desván. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Tiny room marked on a yellowed floor plan in a timber attic, cinematic realistic horror, vertical frame, no text",
+      "Tape measure stretched beside an oak bed in a small bedroom, cinematic realistic horror, vertical frame, no text",
+      "Blank plaster patch where a doorway stood beside an oak bed, cinematic realistic horror, vertical frame, no text",
+      "Pencil redrawing a doorway on a yellowed floor plan, cinematic realistic horror, vertical frame, no text",
+      "Yellowed floor plan blown across floorboards in a timber attic, cinematic realistic horror, vertical frame, no text",
+      "Several narrow dark doorways around an oak bed in an empty bedroom, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-25",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "yellowed floor plan",
+        "anchor1": "oak bed",
+        "anchor2": "timber attic"
+      },
+      "shots": [
+        {
+          "narration": "En el plano de mi casa había una habitación que medía lo mismo que mi cama. Encontré el dibujo dentro de una carpeta guardada en el desván.",
+          "action": "Tiny room marked on a yellowed floor plan in a timber attic",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Tiny room marked on a yellowed floor plan in a timber attic, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Medí el dormitorio y comprobé que la habitación dibujada quedaba superpuesta a la cama. Una línea de lápiz señalaba una puerta junto a la pared del cabecero.",
+          "action": "Tape measure stretched beside an oak bed in a small bedroom",
+          "camera": "medium",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Tape measure stretched beside an oak bed in a small bedroom, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Borré aquella línea con una goma. Abajo sonó un golpe seco. Al volver al dormitorio, encontré el marco de la puerta de entrada completamente liso, como si nunca hubiera existido.",
+          "action": "Blank plaster patch where a doorway stood beside an oak bed",
+          "camera": "close-up",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Blank plaster patch where a doorway stood beside an oak bed, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Dibujé la puerta otra vez y reapareció. Entendí que las modificaciones del plano alteraban la casa. Decidí guardar la carpeta y salir sin tocar nada más.",
+          "action": "Pencil redrawing a doorway on a yellowed floor plan",
+          "camera": "wide",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Pencil redrawing a doorway on a yellowed floor plan, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Pero una corriente de aire tiró el papel al suelo. Al recogerlo vi que alguien había dibujado un segundo acceso, marcado con un lápiz diferente al mío.",
+          "action": "Yellowed floor plan blown across floorboards in a timber attic",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Yellowed floor plan blown across floorboards in a timber attic, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Desde entonces duermo en el sofá. Cada noche encuentro una línea nueva en el plano. Todas las puertas dibujadas terminan abriéndose hacia el interior de mi dormitorio.",
+          "action": "Several narrow dark doorways around an oak bed in an empty bedroom",
+          "camera": "detail",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Several narrow dark doorways around an oak bed in an empty bedroom, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
+  },
+  {
+    "title": "El botón verde",
+    "hook": "La máquina de fichar imprimió una hora de salida que todavía no había llegado.",
+    "narration": "La máquina de fichar imprimió una hora de salida que todavía no había llegado. Era mi primer turno en una nave donde aún utilizaban tarjetas de cartón. Mi compañero se rio al ver mi tarjeta. Fichó y vio que su salida figuraba a las diez y trece. A esa hora desapareció del pasillo. Revisé las cámaras de seguridad. En el minuto exacto, la grabación mostraba su taquilla abierta y el uniforme vacío en el suelo. No había ninguna persona cerca. Comprendí que la máquina registraba la hora en que uno dejaría de existir allí. Busqué mi tarjeta y comprobé que disponía de veinte minutos para abandonar la nave. Corrí hacia el torno, pero mi tarjeta no lo abrió. Volví al vestuario para cortar la corriente de la máquina. Entonces vi que tenía una segunda ranura. Dentro había otra tarjeta con mi nombre. Esta vez indicaba una hora de entrada, las once en punto. El reloj marcó las once y escuché mi propia voz saludando desde el pasillo.",
+    "caption": "El botón verde. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Cardboard time card emerging from a grey mechanical time clock, cinematic realistic horror, vertical frame, no text",
+      "Worker in blue mechanic coveralls examining a time card beside metal lockers, cinematic realistic horror, vertical frame, no text",
+      "Empty blue mechanic coveralls lying beside open metal lockers, cinematic realistic horror, vertical frame, no text",
+      "Man in blue mechanic coveralls examining a printed card, cinematic realistic horror, vertical frame, no text",
+      "Closed industrial turnstile with red indicator, worker in blue mechanic coveralls, cinematic realistic horror, vertical frame, no text",
+      "Second time card protruding from a grey mechanical time clock beside metal lockers, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-26",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "grey mechanical time clock",
+        "anchor1": "blue mechanic coveralls",
+        "anchor2": "metal lockers"
+      },
+      "shots": [
+        {
+          "narration": "La máquina de fichar imprimió una hora de salida que todavía no había llegado. Era mi primer turno en una nave donde aún utilizaban tarjetas de cartón.",
+          "action": "Cardboard time card emerging from a grey mechanical time clock",
+          "camera": "detail",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Cardboard time card emerging from a grey mechanical time clock, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Mi compañero se rio al ver mi tarjeta. Fichó y vio que su salida figuraba a las diez y trece. A esa hora desapareció del pasillo.",
+          "action": "Worker in blue mechanic coveralls examining a time card beside metal lockers",
+          "camera": "medium",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Worker in blue mechanic coveralls examining a time card beside metal lockers, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Revisé las cámaras de seguridad. En el minuto exacto, la grabación mostraba su taquilla abierta y el uniforme vacío en el suelo. No había ninguna persona cerca.",
+          "action": "Empty blue mechanic coveralls lying beside open metal lockers",
+          "camera": "close-up",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Empty blue mechanic coveralls lying beside open metal lockers, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Comprendí que la máquina registraba la hora en que uno dejaría de existir allí. Busqué mi tarjeta y comprobé que disponía de veinte minutos para abandonar la nave.",
+          "action": "Man in blue mechanic coveralls examining a printed card",
+          "camera": "wide",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Man in blue mechanic coveralls examining a printed card, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Corrí hacia el torno, pero mi tarjeta no lo abrió. Volví al vestuario para cortar la corriente de la máquina. Entonces vi que tenía una segunda ranura.",
+          "action": "Closed industrial turnstile with red indicator, worker in blue mechanic coveralls",
+          "camera": "medium",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Closed industrial turnstile with red indicator, worker in blue mechanic coveralls, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Dentro había otra tarjeta con mi nombre. Esta vez indicaba una hora de entrada, las once en punto. El reloj marcó las once y escuché mi propia voz saludando desde el pasillo.",
+          "action": "Second time card protruding from a grey mechanical time clock beside metal lockers",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Second time card protruding from a grey mechanical time clock beside metal lockers, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Las huellas de sal",
+    "hook": "La sal que había derramado conservaba las huellas de alguien que aún no había llegado.",
+    "narration": "La sal que había derramado conservaba las huellas de alguien que aún no había llegado. Estaba solo en la cocina y acababa de abrir un paquete nuevo. Limpié el suelo con una escoba, pero las marcas volvían a dibujarse cada vez que echaba sal en el mismo lugar. Eran huellas de unos zapatos infantiles. Seguí el rastro hasta la puerta. Un minuto después llamó mi sobrino, que venía a comer conmigo. Llevaba los mismos zapatos que había visto dibujados en la sal. Comprendí que la sal mostraba pasos que todavía no habían ocurrido. Dibujé una línea frente a la puerta para comprobar si alguien más vendría aquella tarde. Aparecieron dos huellas enormes, orientadas hacia dentro. Cerré con llave. Las siguientes estaban detrás de mí, aunque no había oído abrirse la cerradura ni romperse nada. Tiré el paquete entero al suelo. Las marcas se multiplicaron alrededor de mis pies hasta cubrir la cocina. Entonces vi que algunas empezaban justo donde acababan las mías.",
+    "caption": "Las huellas de sal. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Child-sized shoeprints appearing in spilled salt on white kitchen tiles, cinematic realistic horror, vertical frame, no text",
+      "Broom pushing spilled salt into a thin line across white kitchen tiles, cinematic realistic horror, vertical frame, no text",
+      "Small shoes of a visitor visible beyond an apartment entrance, spilled salt, cinematic realistic horror, vertical frame, no text",
+      "Straight line of spilled salt in front of a locked apartment door, cinematic realistic horror, vertical frame, no text",
+      "Large footprints forming behind a man in a green knitted jumper, white kitchen tiles, cinematic realistic horror, vertical frame, no text",
+      "Interlocking shoeprints surrounding a man's feet on white kitchen tiles covered in spilled salt, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-27",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "white kitchen tiles",
+        "anchor1": "spilled salt",
+        "anchor2": "green knitted jumper"
+      },
+      "shots": [
+        {
+          "narration": "La sal que había derramado conservaba las huellas de alguien que aún no había llegado. Estaba solo en la cocina y acababa de abrir un paquete nuevo.",
+          "action": "Child-sized shoeprints appearing in spilled salt on white kitchen tiles",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Child-sized shoeprints appearing in spilled salt on white kitchen tiles, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Limpié el suelo con una escoba, pero las marcas volvían a dibujarse cada vez que echaba sal en el mismo lugar. Eran huellas de unos zapatos infantiles.",
+          "action": "Broom pushing spilled salt into a thin line across white kitchen tiles",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Broom pushing spilled salt into a thin line across white kitchen tiles, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Seguí el rastro hasta la puerta. Un minuto después llamó mi sobrino, que venía a comer conmigo. Llevaba los mismos zapatos que había visto dibujados en la sal.",
+          "action": "Small shoes of a visitor visible beyond an apartment entrance, spilled salt",
+          "camera": "close-up",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Small shoes of a visitor visible beyond an apartment entrance, spilled salt, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Comprendí que la sal mostraba pasos que todavía no habían ocurrido. Dibujé una línea frente a la puerta para comprobar si alguien más vendría aquella tarde.",
+          "action": "Straight line of spilled salt in front of a locked apartment door",
+          "camera": "wide",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Straight line of spilled salt in front of a locked apartment door, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Aparecieron dos huellas enormes, orientadas hacia dentro. Cerré con llave. Las siguientes estaban detrás de mí, aunque no había oído abrirse la cerradura ni romperse nada.",
+          "action": "Large footprints forming behind a man in a green knitted jumper, white kitchen tiles",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Large footprints forming behind a man in a green knitted jumper, white kitchen tiles, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Tiré el paquete entero al suelo. Las marcas se multiplicaron alrededor de mis pies hasta cubrir la cocina. Entonces vi que algunas empezaban justo donde acababan las mías.",
+          "action": "Interlocking shoeprints surrounding a man's feet on white kitchen tiles covered in spilled salt",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Interlocking shoeprints surrounding a man's feet on white kitchen tiles covered in spilled salt, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
   }
 ]
