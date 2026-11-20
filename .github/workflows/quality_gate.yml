@@ -9,6 +9,7 @@ on:
       - 'requirements*.txt'
       - '.github/actions/**'
       - 'stories.json'
+      - 'stories_morning.json'
       - 'audio_engine.py'
       - 'scripts/**'
       - 'tests/**'
