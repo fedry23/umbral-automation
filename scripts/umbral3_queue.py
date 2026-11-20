@@ -116,8 +116,16 @@ def main():
     if args.local_store:
         store = BudgetStore(LocalStore(args.local_store))
     else:
-        remote = DropboxStore.from_env()
-        store = BudgetStore(remote, lambda: quota(remote))
+        backend = os.getenv("UMBRAL_PRIVATE_STORE", "hf_bucket")
+        if backend == "hf_bucket":
+            from scripts.umbral3_hf_storage import HfBucketStore
+            remote = HfBucketStore.from_oidc()
+            store = BudgetStore(remote, remote.quota)
+        elif backend == "dropbox":
+            remote = DropboxStore.from_env()
+            store = BudgetStore(remote, lambda: quota(remote))
+        else:
+            raise ValueError("Unsupported private storage backend")
     def generate(story, folder):
         import render
         return render.generate_images(story, folder, model_revision=recipe["revision"])
