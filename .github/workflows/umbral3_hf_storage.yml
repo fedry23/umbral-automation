@@ -51,6 +51,11 @@ jobs:
     if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.render_private == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL private full render')))
     runs-on: ubuntu-latest
     timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        fixture: [0, 1, 2]
     permissions:
       contents: read
       id-token: write
@@ -75,4 +80,4 @@ jobs:
           python -m venv /tmp/umbral3-hf-storage
           /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
       - name: Render real private test Reel and verify remote full media readback
-        run: python -u -m scripts.umbral3_private_render --index 0 --private-evidence
+        run: python -u -m scripts.umbral3_private_render --index ${{ matrix.fixture }} --private-evidence
