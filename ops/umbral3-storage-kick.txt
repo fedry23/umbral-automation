@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-20: retry real private fixture after Path-shadowing hotfix and regression test
+2026-11-20 — full-media archive protocol v2, immutable readback, no render or Meta publish
