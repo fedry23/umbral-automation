@@ -4,6 +4,7 @@ on:
     branches: [integration/umbral-3]
     paths:
       - 'scripts/storyboard.py'
+      - 'scripts/umbral3_*.py'
       - 'tests/**'
       - 'render.py'
       - '.github/workflows/umbral3_storyboard.yml'

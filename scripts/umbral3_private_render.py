@@ -26,7 +26,7 @@ def load_fixture(index):
         raise ValueError('Invalid fixture duration contract')
     return story
 
-def run_fixture(index):
+def run_fixture(index, private_store=None):
     # Do not accept credentials, official output paths, or a production slot.
     if any(os.environ.get(k) for k in ('IG_ACCESS_TOKEN', 'IG_PUBLISH_ENABLED', 'UMBRAL_META_PUBLISH_ENABLED')):
         raise RuntimeError('Meta environment must be absent')
@@ -62,10 +62,21 @@ def run_fixture(index):
                    'image_qa': report,
                    'shot_durations': [round(s['end']-s['start'],2) for s in timeline],
                    'visual_review': 'not_performed'}
+        if private_store is not None:
+            from scripts.umbral3_evidence import persist_fixture
+            summary['private_evidence'] = persist_fixture(private_store, out, video, summary)
         print('UMBRAL3_PRIVATE_RESULT=' + json.dumps(summary, ensure_ascii=False), flush=True)
         return summary
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--index', type=int, required=True, choices=(0,1,2))
-    run_fixture(parser.parse_args().index)
+    parser.add_argument('--private-evidence', action='store_true')
+    args = parser.parse_args()
+    store = None
+    if args.private_evidence:
+        from scripts.umbral3_storage import DropboxStore
+        from scripts.umbral3_evidence import probe
+        store = DropboxStore.from_env()
+        probe(store)
+    run_fixture(args.index, store)
