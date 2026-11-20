@@ -61,12 +61,81 @@
       "Upward shot of a shoulder shaped bulge emerging from a white plaster ceiling above the doorway. Empty rectangular room, cool window daylight, thirty year old painter with short dark hair and grey work overalls looking upward, cinematic horror, vertical frame, no text."
     ],
     "publish_date": "2026-11-21",
-    "editorial_protocol": "fixed-v1"
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "empty room with bare wooden floor",
+        "anchor1": "white plaster wall",
+        "anchor2": "painter in grey overalls"
+      },
+      "shots": [
+        {
+          "narration": "La pintura de la pared se abombó con la forma de una mano. Soy pintor y aquella mañana estaba reformando una habitación vacía de una casa antigua. Pensé que había humedad.",
+          "action": "Hand-shaped bulge in wet paint, white plaster wall, empty room with bare wooden floor",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Hand-shaped bulge in wet paint, white plaster wall, empty room with bare wooden floor, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Rasqué la pintura con la espátula y el relieve desapareció. Entonces descubrí que la mano había dejado cinco marcas profundas en el yeso.",
+          "action": "Steel scraper uncovering five grooves in a white plaster wall, painter in grey overalls",
+          "camera": "close-up",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Steel scraper uncovering five grooves in a white plaster wall, painter in grey overalls, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Para descartar que alguien estuviera al otro lado, golpeé la pared con el mango. Sonó maciza.",
+          "action": "Painter in grey overalls tapping a white plaster wall with a scraper handle",
+          "camera": "medium",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Painter in grey overalls tapping a white plaster wall with a scraper handle, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Cubrí las marcas con una capa de pintura blanca.",
+          "action": "Paint roller covering five grooves on a white plaster wall",
+          "camera": "close-up",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Paint roller covering five grooves on a white plaster wall, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Antes de que secara, apareció el relieve de un antebrazo, unido a la misma mano. Retiré la pintura y encontré otro surco, mucho más profundo. Comprendí que cada capa nueva permitía que aquello avanzara un poco hacia la superficie. Cerré el bote y recogí mis herramientas.",
+          "action": "Elongated forearm-shaped relief in a white plaster wall, painter in grey overalls staring",
+          "camera": "detail",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Elongated forearm-shaped relief in a white plaster wall, painter in grey overalls staring, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Al llegar a la puerta recordé que, antes de empezar la habitación, había dado dos manos de pintura al techo. Levanté la vista. Sobre mi cabeza sobresalía un hombro.",
+          "action": "Upward view of shoulder-shaped bulge in white ceiling over doorway, empty room with bare wooden floor, painter in grey overalls",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Upward view of shoulder-shaped bulge in white ceiling over doorway, empty room with bare wooden floor, painter in grey overalls, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
   },
   {
     "title": "El ascensor de servicio",
-    "hook": "Cada vez que el ascensor perdía un piso, en mi acreditación aparecía un año menos.",
-    "narration": "Cada vez que el ascensor perdía un piso, en mi acreditación aparecía un año menos. Eran las seis y acababa de entrar a limpiar un edificio de oficinas. Encontré la cabina abierta en la cuarta planta. Bajé al tercero y vi que mi año de nacimiento había cambiado. Pensé que alguien había sustituido mi tarjeta. Pulsé el segundo para salir por las escaleras. El año retrocedió otra vez y la alianza de mi dedo desapareció. Ya no recordaba el nombre de mi mujer. La salida estaba tapiada. Pulsé el tercero y la alianza volvió, pero la puerta de la cabina se quedó detenida unos centímetros por debajo del rellano. Comprendí que el ascensor me borraba un año de vida por cada planta que descendía. Quise llamar a mantenimiento, pero el teléfono no tenía cobertura. Entonces se encendió el botón del sótano sin que nadie lo tocara. La cabina empezó a bajar y el pasamanos fue quedando por encima de mi cabeza.",
+    "hook": "Cada vez que el ascensor bajaba un piso, mi año de nacimiento avanzaba una década.",
+    "narration": "Cada vez que el ascensor bajaba un piso, mi año de nacimiento avanzaba una década. Eran las seis y acababa de entrar a limpiar un edificio de oficinas. Encontré la cabina abierta en la cuarta planta. Bajé al tercero y vi que mi año de nacimiento había cambiado. Pensé que alguien había sustituido mi tarjeta. Pulsé el segundo para salir por las escaleras. El año avanzó otra década y la alianza de mi dedo desapareció. Ya no recordaba el nombre de mi mujer. La salida estaba tapiada. Pulsé el tercero y la alianza volvió, pero la puerta de la cabina se quedó detenida unos centímetros por debajo del rellano. Comprendí que el ascensor me borraba diez años de vida por cada planta que descendía. Quise llamar a mantenimiento, pero el teléfono no tenía cobertura. Entonces se encendió el botón del sótano sin que nadie lo tocara. La cabina empezó a bajar y el pasamanos fue quedando por encima de mi cabeza.",
     "caption": "El ascensor de servicio. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
     "scenes": [
       "Close-up of a plastic ID badge held beside the floor display of a steel service elevator, cinematic realistic horror, vertical frame, no text",
@@ -87,7 +156,7 @@
       },
       "shots": [
         {
-          "narration": "Cada vez que el ascensor perdía un piso, en mi acreditación aparecía un año menos. Eran las seis y acababa de entrar a limpiar un edificio de oficinas.",
+          "narration": "Cada vez que el ascensor bajaba un piso, mi año de nacimiento avanzaba una década. Eran las seis y acababa de entrar a limpiar un edificio de oficinas.",
           "action": "Close-up of a plastic ID badge held beside the floor display of a steel service elevator",
           "camera": "detail",
           "references": [
@@ -106,7 +175,7 @@
           "prompt": "Open doors of a steel service elevator facing an empty office landing, cinematic realistic horror, vertical frame, no text"
         },
         {
-          "narration": "Pulsé el segundo para salir por las escaleras. El año retrocedió otra vez y la alianza de mi dedo desapareció. Ya no recordaba el nombre de mi mujer.",
+          "narration": "Pulsé el segundo para salir por las escaleras. El año avanzó otra década y la alianza de mi dedo desapareció. Ya no recordaba el nombre de mi mujer.",
           "action": "Bare ring finger and plastic ID badge beside elevator buttons, navy cleaning uniform",
           "camera": "close-up",
           "references": [
@@ -125,7 +194,7 @@
           "prompt": "Steel service elevator misaligned with the floor beneath a bricked-up doorway, cinematic realistic horror, vertical frame, no text"
         },
         {
-          "narration": "Comprendí que el ascensor me borraba un año de vida por cada planta que descendía. Quise llamar a mantenimiento, pero el teléfono no tenía cobertura.",
+          "narration": "Comprendí que el ascensor me borraba diez años de vida por cada planta que descendía. Quise llamar a mantenimiento, pero el teléfono no tenía cobertura.",
           "action": "Worker in navy cleaning uniform holds an unlit phone inside a steel service elevator",
           "camera": "medium",
           "references": [
