@@ -67,7 +67,6 @@ def run_fixture(index, private_store=None, storage_python=None):
             summary['private_evidence'] = persist_fixture(private_store, out, video, summary)
         elif storage_python is not None:
             # HF bucket SDK is deliberately isolated from pinned diffusers/hub.
-            from pathlib import Path
             python = Path(storage_python)
             if not python.is_file() or not python.name.startswith("python"):
                 raise ValueError("Invalid isolated private storage interpreter")
