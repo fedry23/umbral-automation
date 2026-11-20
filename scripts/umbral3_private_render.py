@@ -26,7 +26,7 @@ def load_fixture(index):
         raise ValueError('Invalid fixture duration contract')
     return story
 
-def run_fixture(index, private_store=None):
+def run_fixture(index, private_store=None, storage_python=None):
     # Do not accept credentials, official output paths, or a production slot.
     if any(os.environ.get(k) for k in ('IG_ACCESS_TOKEN', 'IG_PUBLISH_ENABLED', 'UMBRAL_META_PUBLISH_ENABLED')):
         raise RuntimeError('Meta environment must be absent')
@@ -65,6 +65,21 @@ def run_fixture(index, private_store=None):
         if private_store is not None:
             from scripts.umbral3_evidence import persist_fixture
             summary['private_evidence'] = persist_fixture(private_store, out, video, summary)
+        elif storage_python is not None:
+            # HF bucket SDK is deliberately isolated from pinned diffusers/hub.
+            from pathlib import Path
+            python = Path(storage_python)
+            if not python.is_file() or not python.name.startswith("python"):
+                raise ValueError("Invalid isolated private storage interpreter")
+            verified_summary = out / "verified_private_summary.json"
+            verified_summary.write_text(json.dumps(summary, sort_keys=True), encoding="utf-8")
+            subprocess.run([str(python), "-m", "scripts.umbral3_hf_persist_media",
+                            "--output", str(out), "--video", video.name,
+                            "--summary", str(verified_summary)], check=True,
+                           cwd=ROOT)
+            summary["private_evidence"] = {"readback_verified": True,
+                                            "storage": "hf_bucket",
+                                            "visual_review": "not_performed"}
         print('UMBRAL3_PRIVATE_RESULT=' + json.dumps(summary, ensure_ascii=False), flush=True)
         return summary
 
@@ -74,16 +89,17 @@ if __name__ == '__main__':
     parser.add_argument('--private-evidence', action='store_true')
     args = parser.parse_args()
     store = None
+    storage_python = None
     if args.private_evidence:
-        from scripts.umbral3_evidence import probe, quota
         if os.getenv("UMBRAL_PRIVATE_STORE", "hf_bucket") == "hf_bucket":
-            from scripts.umbral3_hf_storage import HfBucketStore
-            store = HfBucketStore.from_oidc()
-            quota(store)
+            storage_python = os.environ.get("UMBRAL_HF_STORAGE_PYTHON")
+            if not storage_python:
+                raise RuntimeError("Isolated private storage Python is required")
         elif os.getenv("UMBRAL_PRIVATE_STORE") == "dropbox":
             from scripts.umbral3_storage import DropboxStore
+            from scripts.umbral3_evidence import probe
             store = DropboxStore.from_env()
             probe(store)
         else:
             raise ValueError("Unsupported private storage backend")
-    run_fixture(args.index, store)
+    run_fixture(args.index, store, storage_python)
