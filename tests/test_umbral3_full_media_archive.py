@@ -6,12 +6,15 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 import zipfile
 
 from scripts.umbral3_evidence import (
     HEADROOM, persist_fixture, verify_media_bundle,
 )
+from scripts.umbral3_hf_inventory import audit
+from scripts.umbral3_hf_storage import PREFIX, BUCKET
 
 MEMBERS = [
     "cover.jpg", "scene_contact_sheet.jpg", "subtitles.ass",
@@ -95,3 +98,28 @@ class PrivateMediaArchiveTests(unittest.TestCase):
                 archive.writestr("../escape", "blocked")
             with self.assertRaisesRegex(ValueError, "Unsafe ZIP members"):
                 verify_media_bundle(buffer.getvalue())
+
+    def test_fresh_runner_inventory_does_not_approve_unreviewed_media(self):
+        _, raw = self.archive()
+        self.store.bucket, self.store.token = BUCKET, "hf_fixture_test"
+        self.store.api = SimpleNamespace(
+            list_bucket_tree=lambda bucket, recursive, token: [
+                SimpleNamespace(path=PREFIX + k, size=len(v))
+                for k, v in self.store.blobs.items()])
+        result = audit(self.store)
+        self.assertEqual(result["full_media_v2"], 1)
+        self.assertEqual(result["files_checked"], 1)
+        self.assertEqual(result["corrupt"], 0)
+        self.assertEqual(result["ready_reels"], 0)
+        self.assertEqual(result["visual_approved"], 0)
+
+    def test_private_inventory_fails_closed_on_corrupted_object(self):
+        receipt, raw = self.archive()
+        self.store.blobs[receipt["key"]] = raw[:-4] + b"evil"
+        self.store.bucket, self.store.token = BUCKET, "hf_fixture_test"
+        self.store.api = SimpleNamespace(
+            list_bucket_tree=lambda bucket, recursive, token: [
+                SimpleNamespace(path=PREFIX + k, size=len(v))
+                for k, v in self.store.blobs.items()])
+        with self.assertRaisesRegex(RuntimeError, "Corrupt private archive"):
+            audit(self.store)
