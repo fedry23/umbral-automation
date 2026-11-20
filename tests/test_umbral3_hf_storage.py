@@ -64,6 +64,25 @@ class HfStoreRegressionTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError,"headroom"):
             self.store.put_new(KEY,b"new data")
         self.assertFalse(self.api.objects)
+    def test_long_running_store_renews_oidc_before_remote_access(self):
+        from unittest.mock import patch
+        self.store._oidc_renew_at = 0
+        with patch("scripts.umbral3_hf_storage.time.monotonic", return_value=3600), \
+             patch("scripts.umbral3_hf_storage.exchange", return_value="hf_new_safe_token") as exchange:
+            self.assertIsNone(self.store.get(KEY))
+            exchange.assert_called_once_with(BUCKET)
+        self.assertEqual(self.store.token, "hf_new_safe_token")
+        self.assertEqual(self.store._oidc_renew_at, 5400)
+
+    def test_failed_oidc_refresh_aborts_before_writing(self):
+        from unittest.mock import patch
+        self.store._oidc_renew_at = 0
+        with patch("scripts.umbral3_hf_storage.time.monotonic", return_value=3600), \
+             patch("scripts.umbral3_hf_storage.exchange", side_effect=RuntimeError("OIDC unavailable")):
+            with self.assertRaisesRegex(RuntimeError, "OIDC unavailable"):
+                self.store.put_new(KEY, b"private")
+        self.assertFalse(self.api.objects)
+
     def test_quota_values_from_conservative_cap(self):
         self.assertEqual(self.store.quota(),
                          {"used":0,"allocated":CAP,"free":CAP})
