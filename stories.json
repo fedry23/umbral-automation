@@ -195,5 +195,505 @@
     ],
     "publish_date": "2026-11-21",
     "editorial_protocol": "fixed-v1"
+  },
+  {
+    "title": "El banco de la parada",
+    "hook": "El banco de la parada estaba mojado por debajo, aunque llevaba semanas sin llover.",
+    "narration": "El banco de la parada estaba mojado por debajo, aunque llevaba semanas sin llover. Esperaba el último autobús y no había nadie más en aquella carretera. Al sentarme escuché una gota caer sobre el asfalto. Miré debajo del banco y descubrí un charco que reflejaba la misma parada, cubierta de agua hasta el techo. Me levanté y el charco dejó de crecer. Volví a sentarme para recoger la mochila. Entonces el agua alcanzó mis zapatos y escuché un motor que pasaba sobre mi cabeza. Entendí que el banco hundía a quien se sentaba en una copia sumergida de la parada. Salté a la acera y vi que el agua se retiraba lentamente. A lo lejos apareció el autobús. Le hice señas, pero el conductor siguió de largo. En las ventanillas vi a varios pasajeros golpeando el cristal desde dentro. Me alejé por el arcén sin mirar atrás. Al pasar junto a otra parada reconocí el mismo banco. Debajo había un charco; en su reflejo seguía sentado yo.",
+    "caption": "El banco de la parada. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Water droplets underneath a green metal bench at an empty rural bus shelter, cinematic realistic horror, vertical frame, no text",
+      "Reflection of a flooded empty rural bus shelter under a green metal bench, water surface, cinematic realistic horror, vertical frame, no text",
+      "Shoes submerged in rising water over dark asphalt beside a green metal bench, cinematic realistic horror, vertical frame, no text",
+      "Wet footprints on dark asphalt leading away from an empty rural bus shelter, cinematic realistic horror, vertical frame, no text",
+      "Night bus passing an empty rural bus shelter with hands pressed against misted windows, cinematic realistic horror, vertical frame, no text",
+      "Reflection of a seated man in a puddle beneath a green metal bench, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-22",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "empty rural bus shelter",
+        "anchor1": "green metal bench",
+        "anchor2": "dark asphalt"
+      },
+      "shots": [
+        {
+          "narration": "El banco de la parada estaba mojado por debajo, aunque llevaba semanas sin llover. Esperaba el último autobús y no había nadie más en aquella carretera.",
+          "action": "Water droplets underneath a green metal bench at an empty rural bus shelter",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Water droplets underneath a green metal bench at an empty rural bus shelter, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Al sentarme escuché una gota caer sobre el asfalto. Miré debajo del banco y descubrí un charco que reflejaba la misma parada, cubierta de agua hasta el techo.",
+          "action": "Reflection of a flooded empty rural bus shelter under a green metal bench, water surface",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Reflection of a flooded empty rural bus shelter under a green metal bench, water surface, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Me levanté y el charco dejó de crecer. Volví a sentarme para recoger la mochila. Entonces el agua alcanzó mis zapatos y escuché un motor que pasaba sobre mi cabeza.",
+          "action": "Shoes submerged in rising water over dark asphalt beside a green metal bench",
+          "camera": "close-up",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Shoes submerged in rising water over dark asphalt beside a green metal bench, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Entendí que el banco hundía a quien se sentaba en una copia sumergida de la parada. Salté a la acera y vi que el agua se retiraba lentamente.",
+          "action": "Wet footprints on dark asphalt leading away from an empty rural bus shelter",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Wet footprints on dark asphalt leading away from an empty rural bus shelter, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "A lo lejos apareció el autobús. Le hice señas, pero el conductor siguió de largo. En las ventanillas vi a varios pasajeros golpeando el cristal desde dentro.",
+          "action": "Night bus passing an empty rural bus shelter with hands pressed against misted windows",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Night bus passing an empty rural bus shelter with hands pressed against misted windows, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Me alejé por el arcén sin mirar atrás. Al pasar junto a otra parada reconocí el mismo banco. Debajo había un charco; en su reflejo seguía sentado yo.",
+          "action": "Reflection of a seated man in a puddle beneath a green metal bench",
+          "camera": "detail",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Reflection of a seated man in a puddle beneath a green metal bench, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
+  },
+  {
+    "title": "El paquete sin remitente",
+    "hook": "La caja que habían dejado en el portal contenía el felpudo que tenía delante de mi puerta.",
+    "narration": "La caja que habían dejado en el portal contenía el felpudo que tenía delante de mi puerta. Lo comprobé subiendo dos pisos: efectivamente, el mío había desaparecido. Devolví el felpudo a su sitio y bajé con la caja vacía. Al abrirla encontré la lámpara del recibidor, todavía caliente. El enchufe de mi casa había quedado libre. Probé a introducir una cuchara y cerrar la tapa. Cuando la abrí, la cuchara seguía allí junto al espejo del baño. Comprendí que cada cierre traía otro objeto de mi vivienda. Puse la caja abierta en el descansillo, sujetando la tapa con una piedra. Me dispuse a llamar a la policía. Entonces escuché un pequeño golpe de cartón. La piedra había caído. Dentro encontré el bombín de casa. Subí y descubrí que mi puerta no tenía cerradura, solo una superficie lisa donde antes estaba el mecanismo. No he vuelto a cerrar la caja. Desde aquel día la tapa se mueve sola cuando duermo. Por la rendija veo una parte de mi pijama.",
+    "caption": "El paquete sin remitente. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Blue striped doormat folded inside a plain brown cardboard box in a beige apartment hallway, cinematic realistic horror, vertical frame, no text",
+      "Table lamp inside a plain brown cardboard box on a stair landing, cinematic realistic horror, vertical frame, no text",
+      "Bathroom mirror and a metal spoon inside a plain brown cardboard box, cinematic realistic horror, vertical frame, no text",
+      "Open plain brown cardboard box held apart by a small stone, beige apartment hallway, cinematic realistic horror, vertical frame, no text",
+      "Front door with a smooth blank patch instead of a lock, blue striped doormat, cinematic realistic horror, vertical frame, no text",
+      "Close view of blue pajama fabric visible through the lid of a plain brown cardboard box, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-23",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "plain brown cardboard box",
+        "anchor1": "beige apartment hallway",
+        "anchor2": "blue striped doormat"
+      },
+      "shots": [
+        {
+          "narration": "La caja que habían dejado en el portal contenía el felpudo que tenía delante de mi puerta. Lo comprobé subiendo dos pisos: efectivamente, el mío había desaparecido.",
+          "action": "Blue striped doormat folded inside a plain brown cardboard box in a beige apartment hallway",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Blue striped doormat folded inside a plain brown cardboard box in a beige apartment hallway, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Devolví el felpudo a su sitio y bajé con la caja vacía. Al abrirla encontré la lámpara del recibidor, todavía caliente. El enchufe de mi casa había quedado libre.",
+          "action": "Table lamp inside a plain brown cardboard box on a stair landing",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Table lamp inside a plain brown cardboard box on a stair landing, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Probé a introducir una cuchara y cerrar la tapa. Cuando la abrí, la cuchara seguía allí junto al espejo del baño. Comprendí que cada cierre traía otro objeto de mi vivienda.",
+          "action": "Bathroom mirror and a metal spoon inside a plain brown cardboard box",
+          "camera": "close-up",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Bathroom mirror and a metal spoon inside a plain brown cardboard box, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Puse la caja abierta en el descansillo, sujetando la tapa con una piedra. Me dispuse a llamar a la policía. Entonces escuché un pequeño golpe de cartón.",
+          "action": "Open plain brown cardboard box held apart by a small stone, beige apartment hallway",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Open plain brown cardboard box held apart by a small stone, beige apartment hallway, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "La piedra había caído. Dentro encontré el bombín de casa. Subí y descubrí que mi puerta no tenía cerradura, solo una superficie lisa donde antes estaba el mecanismo.",
+          "action": "Front door with a smooth blank patch instead of a lock, blue striped doormat",
+          "camera": "medium",
+          "references": [
+            "anchor2"
+          ],
+          "prompt": "Front door with a smooth blank patch instead of a lock, blue striped doormat, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "No he vuelto a cerrar la caja. Desde aquel día la tapa se mueve sola cuando duermo. Por la rendija veo una parte de mi pijama.",
+          "action": "Close view of blue pajama fabric visible through the lid of a plain brown cardboard box",
+          "camera": "detail",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Close view of blue pajama fabric visible through the lid of a plain brown cardboard box, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
+  },
+  {
+    "title": "La última página",
+    "hook": "Mi cuaderno de guardia tenía escrita una ronda que yo todavía no había realizado.",
+    "narration": "Mi cuaderno de guardia tenía escrita una ronda que yo todavía no había realizado. Trabajaba de vigilante en un museo cerrado por reformas y anotaba cada incidencia. La entrada describía una vitrina rota a las dos. Esperé delante de ella hasta esa hora. El cristal se partió sin que nadie estuviera cerca de la vitrina. Escribí debajo que la puerta de emergencia se abriría a las tres. A esa hora, la puerta se abrió sola. Comprendí que todo lo anotado terminaba ocurriendo en el museo. Arranqué las hojas restantes para impedir más incidentes. La tinta apareció en el reverso de la cubierta, anunciando que todas las salidas desaparecerían a las cuatro. Corrí hacia la puerta principal. El reloj del vestíbulo marcó las cuatro mientras bajaba la escalera. Delante de mí solo quedaba una pared con las marcas del marco. Desde dentro veo la calle a través del cristal. He escrito que alguien me encontrará mañana. Debajo, con otra letra, alguien ha añadido que solo encontrará el cuaderno.",
+    "caption": "La última página. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Open black guard notebook on a desk in a closed museum with grey stone walls, cinematic realistic horror, vertical frame, no text",
+      "Shattered glass display case in a closed museum with grey stone walls, cinematic realistic horror, vertical frame, no text",
+      "Empty emergency doorway standing open in a closed museum with grey stone walls, cinematic realistic horror, vertical frame, no text",
+      "Torn loose pages next to a black guard notebook, cinematic realistic horror, vertical frame, no text",
+      "Guard in dark security uniform facing a smooth wall where the exit stood, closed museum with grey stone walls, cinematic realistic horror, vertical frame, no text",
+      "Black guard notebook alone on a desk beside a window, closed museum with grey stone walls, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-24",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "closed museum with grey stone walls",
+        "anchor1": "black guard notebook",
+        "anchor2": "dark security uniform"
+      },
+      "shots": [
+        {
+          "narration": "Mi cuaderno de guardia tenía escrita una ronda que yo todavía no había realizado. Trabajaba de vigilante en un museo cerrado por reformas y anotaba cada incidencia.",
+          "action": "Open black guard notebook on a desk in a closed museum with grey stone walls",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Open black guard notebook on a desk in a closed museum with grey stone walls, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "La entrada describía una vitrina rota a las dos. Esperé delante de ella hasta esa hora. El cristal se partió sin que nadie estuviera cerca de la vitrina.",
+          "action": "Shattered glass display case in a closed museum with grey stone walls",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Shattered glass display case in a closed museum with grey stone walls, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Escribí debajo que la puerta de emergencia se abriría a las tres. A esa hora, la puerta se abrió sola. Comprendí que todo lo anotado terminaba ocurriendo en el museo.",
+          "action": "Empty emergency doorway standing open in a closed museum with grey stone walls",
+          "camera": "close-up",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Empty emergency doorway standing open in a closed museum with grey stone walls, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Arranqué las hojas restantes para impedir más incidentes. La tinta apareció en el reverso de la cubierta, anunciando que todas las salidas desaparecerían a las cuatro.",
+          "action": "Torn loose pages next to a black guard notebook",
+          "camera": "wide",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Torn loose pages next to a black guard notebook, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Corrí hacia la puerta principal. El reloj del vestíbulo marcó las cuatro mientras bajaba la escalera. Delante de mí solo quedaba una pared con las marcas del marco.",
+          "action": "Guard in dark security uniform facing a smooth wall where the exit stood, closed museum with grey stone walls",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Guard in dark security uniform facing a smooth wall where the exit stood, closed museum with grey stone walls, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Desde dentro veo la calle a través del cristal. He escrito que alguien me encontrará mañana. Debajo, con otra letra, alguien ha añadido que solo encontrará el cuaderno.",
+          "action": "Black guard notebook alone on a desk beside a window, closed museum with grey stone walls",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Black guard notebook alone on a desk beside a window, closed museum with grey stone walls, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
+  },
+  {
+    "title": "El taxi de la otra acera",
+    "hook": "El taxímetro empezó a sumar kilómetros antes de que el coche se moviera.",
+    "narration": "El taxímetro empezó a sumar kilómetros antes de que el coche se moviera. Había pedido un taxi para volver a casa, pero el conductor me indicó que pagara al final. Observé que cada número nuevo coincidía con una farola que se apagaba fuera. El coche seguía parado y el conductor mantenía ambas manos quietas sobre el volante. Intenté abrir la puerta. Por la ventana, la calle parecía alejarse como si el taxi permaneciera fijo mientras la ciudad se desplazaba. El taxímetro continuaba sumando kilómetros. Comprendí que aquel aparato no medía distancia recorrida, sino distancia borrada entre el coche y mi destino. Pedí al conductor que lo apagara antes de llegar a casa. El taxímetro llegó a cero de golpe. Reconocí el portal de mi edificio, justo al otro lado de la ventanilla. Abrí la puerta y salí sin pagar. Al cruzar la acera descubrí que el portal no daba al vestíbulo. Daba al asiento trasero del taxi. En el taxímetro había aparecido la palabra regreso.",
+    "caption": "El taxi de la otra acera. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Red digital taximeter lit inside an old black taxi interior parked under a streetlamp, cinematic realistic horror, vertical frame, no text",
+      "Driver in grey coat with hands resting on steering wheel, old black taxi interior, cinematic realistic horror, vertical frame, no text",
+      "View through a taxi window of receding empty streetlights, old black taxi interior, cinematic realistic horror, vertical frame, no text",
+      "Anxious passenger reaching toward a red digital taximeter, driver in grey coat, cinematic realistic horror, vertical frame, no text",
+      "Open rear taxi door beside a familiar apartment entrance, old black taxi interior, cinematic realistic horror, vertical frame, no text",
+      "Apartment doorway opening onto an old black taxi interior with a red digital taximeter, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-25",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "old black taxi interior",
+        "anchor1": "red digital taximeter",
+        "anchor2": "driver in grey coat"
+      },
+      "shots": [
+        {
+          "narration": "El taxímetro empezó a sumar kilómetros antes de que el coche se moviera. Había pedido un taxi para volver a casa, pero el conductor me indicó que pagara al final.",
+          "action": "Red digital taximeter lit inside an old black taxi interior parked under a streetlamp",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Red digital taximeter lit inside an old black taxi interior parked under a streetlamp, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Observé que cada número nuevo coincidía con una farola que se apagaba fuera. El coche seguía parado y el conductor mantenía ambas manos quietas sobre el volante.",
+          "action": "Driver in grey coat with hands resting on steering wheel, old black taxi interior",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Driver in grey coat with hands resting on steering wheel, old black taxi interior, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Intenté abrir la puerta. Por la ventana, la calle parecía alejarse como si el taxi permaneciera fijo mientras la ciudad se desplazaba. El taxímetro continuaba sumando kilómetros.",
+          "action": "View through a taxi window of receding empty streetlights, old black taxi interior",
+          "camera": "close-up",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "View through a taxi window of receding empty streetlights, old black taxi interior, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Comprendí que aquel aparato no medía distancia recorrida, sino distancia borrada entre el coche y mi destino. Pedí al conductor que lo apagara antes de llegar a casa.",
+          "action": "Anxious passenger reaching toward a red digital taximeter, driver in grey coat",
+          "camera": "wide",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Anxious passenger reaching toward a red digital taximeter, driver in grey coat, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "El taxímetro llegó a cero de golpe. Reconocí el portal de mi edificio, justo al otro lado de la ventanilla. Abrí la puerta y salí sin pagar.",
+          "action": "Open rear taxi door beside a familiar apartment entrance, old black taxi interior",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Open rear taxi door beside a familiar apartment entrance, old black taxi interior, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Al cruzar la acera descubrí que el portal no daba al vestíbulo. Daba al asiento trasero del taxi. En el taxímetro había aparecido la palabra regreso.",
+          "action": "Apartment doorway opening onto an old black taxi interior with a red digital taximeter",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Apartment doorway opening onto an old black taxi interior with a red digital taximeter, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
+  },
+  {
+    "title": "La radio del sótano",
+    "hook": "La radio del sótano empezó a avisar de los golpes que iba a recibir la puerta.",
+    "narration": "La radio del sótano empezó a avisar de los golpes que iba a recibir la puerta. Mi abuela la dejaba encendida para que nadie pensara que vivía sola. Una voz anunció tres golpes. Los escuché segundos después. Bajé y descubrí que la radio estaba desenchufada, con las pilas colocadas encima de una estantería. Giré el dial y la voz anunció dos golpes más. Ocurrieron al instante. Entendí que cada vez que cambiaba la frecuencia, alguien se acercaba un tramo. No toqué nada más y subí a buscar a mi abuela. Estaba despierta. Me preguntó por qué habían llamado desde el interior de su armario, junto a la cama. Regresé al sótano y giré el dial en sentido contrario. Los golpes retrocedieron hasta la puerta de la calle. Respiré aliviado, convencido de que podía alejar aquella presencia. Entonces el dial llegó al extremo y comenzó a girar solo. La voz anunció un único golpe. Esta vez lo escuché dentro de la caja torácica de mi abuela.",
+    "caption": "La radio del sótano. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Wooden vintage radio on a shelf in a damp brick basement, cinematic realistic horror, vertical frame, no text",
+      "Unplugged wooden vintage radio with removed batteries on a shelf, cinematic realistic horror, vertical frame, no text",
+      "Close-up of a hand turning the dial on a wooden vintage radio, cinematic realistic horror, vertical frame, no text",
+      "Elderly woman in cream nightgown sitting near a closed bedroom wardrobe, cinematic realistic horror, vertical frame, no text",
+      "Hand turning the dial backwards on a wooden vintage radio in a damp brick basement, cinematic realistic horror, vertical frame, no text",
+      "Elderly woman in cream nightgown holding a hand against her chest in a dim bedroom, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-26",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "wooden vintage radio",
+        "anchor1": "damp brick basement",
+        "anchor2": "elderly woman in cream nightgown"
+      },
+      "shots": [
+        {
+          "narration": "La radio del sótano empezó a avisar de los golpes que iba a recibir la puerta. Mi abuela la dejaba encendida para que nadie pensara que vivía sola.",
+          "action": "Wooden vintage radio on a shelf in a damp brick basement",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Wooden vintage radio on a shelf in a damp brick basement, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Una voz anunció tres golpes. Los escuché segundos después. Bajé y descubrí que la radio estaba desenchufada, con las pilas colocadas encima de una estantería.",
+          "action": "Unplugged wooden vintage radio with removed batteries on a shelf",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Unplugged wooden vintage radio with removed batteries on a shelf, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Giré el dial y la voz anunció dos golpes más. Ocurrieron al instante. Entendí que cada vez que cambiaba la frecuencia, alguien se acercaba un tramo.",
+          "action": "Close-up of a hand turning the dial on a wooden vintage radio",
+          "camera": "close-up",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Close-up of a hand turning the dial on a wooden vintage radio, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "No toqué nada más y subí a buscar a mi abuela. Estaba despierta. Me preguntó por qué habían llamado desde el interior de su armario, junto a la cama.",
+          "action": "Elderly woman in cream nightgown sitting near a closed bedroom wardrobe",
+          "camera": "wide",
+          "references": [
+            "anchor2"
+          ],
+          "prompt": "Elderly woman in cream nightgown sitting near a closed bedroom wardrobe, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Regresé al sótano y giré el dial en sentido contrario. Los golpes retrocedieron hasta la puerta de la calle. Respiré aliviado, convencido de que podía alejar aquella presencia.",
+          "action": "Hand turning the dial backwards on a wooden vintage radio in a damp brick basement",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Hand turning the dial backwards on a wooden vintage radio in a damp brick basement, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Entonces el dial llegó al extremo y comenzó a girar solo. La voz anunció un único golpe. Esta vez lo escuché dentro de la caja torácica de mi abuela.",
+          "action": "Elderly woman in cream nightgown holding a hand against her chest in a dim bedroom",
+          "camera": "detail",
+          "references": [
+            "anchor2"
+          ],
+          "prompt": "Elderly woman in cream nightgown holding a hand against her chest in a dim bedroom, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
+  },
+  {
+    "title": "El abrigo de la consigna",
+    "hook": "El abrigo que me entregaron en la consigna estaba tibio, como si alguien acabara de quitárselo.",
+    "narration": "El abrigo que me entregaron en la consigna estaba tibio, como si alguien acabara de quitárselo. Era idéntico al mío, incluso tenía la misma costura rota. Al ponérmelo encontré una entrada de cine para dos días después. En el otro bolsillo había un recibo de una tienda que nunca había visitado. Al día siguiente compré exactamente lo que figuraba en el recibo. Descubrí que el abrigo guardaba objetos que llevaría encima en el futuro, aunque todavía no existieran. Encontré una llave de hotel. Decidí no salir de casa durante una semana, para demostrar que podía evitar lo que anunciaba el abrigo. Dejé la llave sobre la mesa. Aquella noche apareció un papel doblado con una dirección. Era la de mi bloque. Debajo alguien había escrito el número de un piso que llevaba años vacío. Esta mañana encontré otra llave en el bolsillo. Llevaba una etiqueta con mi nombre y el número de aquel piso. Ahora alguien llama a mi puerta y me pide que le devuelva su abrigo.",
+    "caption": "El abrigo de la consigna. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Charcoal wool coat with torn seam hanging at a cloakroom counter, cinematic realistic horror, vertical frame, no text",
+      "Hand drawing a cinema ticket and receipt from a charcoal wool coat with torn seam, cinematic realistic horror, vertical frame, no text",
+      "Receipt and shopping bag beside a charcoal wool coat with torn seam, cinematic realistic horror, vertical frame, no text",
+      "Small brass key on a table next to a charcoal wool coat with torn seam, cinematic realistic horror, vertical frame, no text",
+      "Folded note held beside a small brass key at a dim apartment entrance, cinematic realistic horror, vertical frame, no text",
+      "Man holding a small brass key beside a closed door at a dim apartment entrance, charcoal wool coat with torn seam, cinematic realistic horror, vertical frame, no text"
+    ],
+    "publish_date": "2026-11-27",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "charcoal wool coat with torn seam",
+        "anchor1": "small brass key",
+        "anchor2": "dim apartment entrance"
+      },
+      "shots": [
+        {
+          "narration": "El abrigo que me entregaron en la consigna estaba tibio, como si alguien acabara de quitárselo. Era idéntico al mío, incluso tenía la misma costura rota.",
+          "action": "Charcoal wool coat with torn seam hanging at a cloakroom counter",
+          "camera": "detail",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Charcoal wool coat with torn seam hanging at a cloakroom counter, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Al ponérmelo encontré una entrada de cine para dos días después. En el otro bolsillo había un recibo de una tienda que nunca había visitado.",
+          "action": "Hand drawing a cinema ticket and receipt from a charcoal wool coat with torn seam",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Hand drawing a cinema ticket and receipt from a charcoal wool coat with torn seam, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Al día siguiente compré exactamente lo que figuraba en el recibo. Descubrí que el abrigo guardaba objetos que llevaría encima en el futuro, aunque todavía no existieran.",
+          "action": "Receipt and shopping bag beside a charcoal wool coat with torn seam",
+          "camera": "close-up",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Receipt and shopping bag beside a charcoal wool coat with torn seam, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Encontré una llave de hotel. Decidí no salir de casa durante una semana, para demostrar que podía evitar lo que anunciaba el abrigo. Dejé la llave sobre la mesa.",
+          "action": "Small brass key on a table next to a charcoal wool coat with torn seam",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Small brass key on a table next to a charcoal wool coat with torn seam, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Aquella noche apareció un papel doblado con una dirección. Era la de mi bloque. Debajo alguien había escrito el número de un piso que llevaba años vacío.",
+          "action": "Folded note held beside a small brass key at a dim apartment entrance",
+          "camera": "medium",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Folded note held beside a small brass key at a dim apartment entrance, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Esta mañana encontré otra llave en el bolsillo. Llevaba una etiqueta con mi nombre y el número de aquel piso. Ahora alguien llama a mi puerta y me pide que le devuelva su abrigo.",
+          "action": "Man holding a small brass key beside a closed door at a dim apartment entrance, charcoal wool coat with torn seam",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Man holding a small brass key beside a closed door at a dim apartment entrance, charcoal wool coat with torn seam, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
   }
 ]
