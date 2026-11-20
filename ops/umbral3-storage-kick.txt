@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-20: verify first real privately persisted Reel fixture, full-media integrity
+2026-11-20: retry real private fixture after Path-shadowing hotfix and regression test
