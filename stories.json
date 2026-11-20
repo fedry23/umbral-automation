@@ -194,7 +194,77 @@
       "Medium shot of a forty year old man with short brown hair and navy sweater sitting rigidly before a spinning vintage reel to reel tape recorder, dark wooden studio desk, grey acoustic panels, warm desk lamp, cinematic realistic horror, vertical frame, no text."
     ],
     "publish_date": "2026-11-21",
-    "editorial_protocol": "fixed-v1"
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "vintage reel-to-reel recorder",
+        "anchor1": "grey acoustic panels",
+        "anchor2": "navy wool sweater"
+      },
+      "shots": [
+        {
+          "narration": "La grabadora reprodujo mi voz, pero yo no había hablado. Trabajaba restaurando cintas en un pequeño estudio de sonido y aquella noche probaba una bobina sin etiqueta.",
+          "action": "Vintage reel-to-reel recorder spinning on wooden desk, grey acoustic panels",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Vintage reel-to-reel recorder spinning on wooden desk, grey acoustic panels, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Mi voz decía que tenía sed. Al escucharlo, noté que la boca se me secaba. Bebí agua y volví a reproducir la frase. La sed regresó inmediatamente.",
+          "action": "Man in navy wool sweater drinking a glass of water beside vintage reel-to-reel recorder",
+          "camera": "close-up",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Man in navy wool sweater drinking a glass of water beside vintage reel-to-reel recorder, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Rebobiné otro tramo. Esta vez mi voz decía que no podía mover la mano izquierda. En cuanto terminó la frase, se me quedó inmóvil sobre la mesa.",
+          "action": "Motionless left hand on wooden desk, navy wool sweater, vintage reel-to-reel recorder",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Motionless left hand on wooden desk, navy wool sweater, vintage reel-to-reel recorder, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Detuve la máquina con la derecha y recuperé el movimiento. Comprendí que la cinta imponía lo que describía mientras estuviera sonando.",
+          "action": "Right hand pressing stop button on vintage reel-to-reel recorder, navy wool sweater",
+          "camera": "close-up",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Right hand pressing stop button on vintage reel-to-reel recorder, navy wool sweater, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Decidí cortarla para impedir que alguien volviera a reproducirla. Al levantar la cuchilla, rocé accidentalmente el botón de reproducción.",
+          "action": "Steel cutting blade above magnetic tape, vintage reel-to-reel recorder, grey acoustic panels",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Steel cutting blade above magnetic tape, vintage reel-to-reel recorder, grey acoustic panels, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Mi voz pronunció una última frase: no puedo mover ningún músculo. La cuchilla cayó al suelo. Desde entonces permanezco sentado frente a la grabadora. La frase se repite porque la bobina tiene un bucle.",
+          "action": "Rigid seated man in navy wool sweater beside spinning vintage reel-to-reel recorder, blade on floor",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Rigid seated man in navy wool sweater beside spinning vintage reel-to-reel recorder, blade on floor, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
   },
   {
     "title": "El banco de la parada",
