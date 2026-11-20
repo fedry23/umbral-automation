@@ -30,9 +30,11 @@ jobs:
         with:
           python-version: '3.11'
       - name: Isolated storage SDK
-        run: python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+        run: python -m pip install --disable-pip-version-check huggingface_hub==1.19.0 Pillow==11.3.0
       - name: Verify private bucket and exact content read-back
         run: |
           set -euo pipefail
           export UMBRAL_HF_BUCKET="$(head -n 1 ops/umbral3-storage-kick.txt)"
           python -m scripts.umbral3_hf_probe
+      - name: Round-trip validated six-scene bundle with immutable metadata
+        run: python -m scripts.umbral3_hf_roundtrip
