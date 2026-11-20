@@ -76,3 +76,20 @@ class PrivateMediaArchiveTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"Missing or unsafe"):
             persist_fixture(self.store,self.root,self.video,self.summary)
         self.assertEqual(self.store.blobs,{})
+    def test_rejects_compressed_members_before_readback(self):
+        _, raw = self.archive()
+        edited = io.BytesIO()
+        with zipfile.ZipFile(io.BytesIO(raw)) as original:
+            with zipfile.ZipFile(edited, "w", compression=zipfile.ZIP_DEFLATED) as replacement:
+                for name in original.namelist():
+                    replacement.writestr(name, original.read(name))
+        with self.assertRaisesRegex(ValueError, "safe bounds"):
+            verify_media_bundle(edited.getvalue())
+
+    def test_rejects_zip_traversal(self):
+        with io.BytesIO() as buffer:
+            with zipfile.ZipFile(buffer, "w") as archive:
+                archive.writestr("manifest.json", "{}")
+                archive.writestr("../escape", "blocked")
+            with self.assertRaisesRegex(ValueError, "Unsafe ZIP members"):
+                verify_media_bundle(buffer.getvalue())
