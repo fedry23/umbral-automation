@@ -537,6 +537,8 @@ def render_story_media(story, out, date, filename, *, active_profile=None, reser
         from scripts.umbral3_prepare import visual_recipe
         from scripts.umbral3_storage import get_or_prepare
         recipe = visual_recipe()
+        if recipe['clip_revision']:
+            os.environ['UMBRAL_CLIP_REVISION'] = recipe['clip_revision']
         images, reserve_status = get_or_prepare(
             reserve_store, story, date.isoformat(), reserve_slot, recipe, out,
             lambda s, folder: generate_images(s, folder, model_revision=recipe['revision']))
