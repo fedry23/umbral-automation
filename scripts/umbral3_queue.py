@@ -2,6 +2,7 @@
 import datetime as dt
 import argparse
 import hashlib
+import os
 import json
 from pathlib import Path
 import tempfile
@@ -110,6 +111,8 @@ def main():
         return
     from scripts.umbral3_prepare import visual_recipe
     recipe = visual_recipe()
+    if recipe['clip_revision']:
+        os.environ['UMBRAL_CLIP_REVISION'] = recipe['clip_revision']
     if args.local_store:
         store = BudgetStore(LocalStore(args.local_store))
     else:

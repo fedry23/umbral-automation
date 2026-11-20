@@ -210,6 +210,19 @@ def generate_images(story, out, *, model_revision=None):
     from image_quality import assess_image
     from scripts.technical_learning import parameters_for
     tone = parameters_for(story["technical_profile"])["visual_tone"] if "technical_profile" in story else "original"
+    semantic = os.getenv('UMBRAL_SEMANTIC_RANKING', '0')
+    if semantic not in ('0', '1'):
+        raise ValueError('Invalid semantic ranking mode')
+    ranker = None
+    if semantic == '1':
+        if 'storyboard' not in story:
+            raise ValueError('Semantic experiment requires authored storyboard')
+        from scripts.umbral3_semantic import SceneRanker, MODEL
+        from huggingface_hub import model_info
+        revision = os.getenv('UMBRAL_CLIP_REVISION') or model_info(MODEL, timeout=30).sha
+        if not revision or len(revision) != 40:
+            raise RuntimeError('Cannot pin semantic model')
+        ranker = SceneRanker(visual_shots(story), revision)
     paths, report = [], []
     total_start = time.monotonic()
     max_attempts = int(os.getenv('UMBRAL_IMAGE_ATTEMPTS', '3'))
@@ -226,7 +239,7 @@ def generate_images(story, out, *, model_revision=None):
             if len(tokens) > pipe.tokenizer.model_max_length:
                 raise ValueError(f'Shot {i + 1}: prompt exceeds model token limit')
         best_image, best_score, best_reasons = None, float('-inf'), []
-        attempts = []
+        attempts, candidates = [], []
         for attempt in range(max_attempts):
             seed = int(story.get('image_seed_base', 7300)) + i + attempt * 1009
             image = pipe(prompt=prompt, num_inference_steps=steps, guidance_scale=guidance,
@@ -238,6 +251,18 @@ def generate_images(story, out, *, model_revision=None):
                     score, reasons = assess_image(image, prev)
             else:
                 score, reasons = assess_image(image)
+            if ranker is not None:
+                # Compare all earlier shots rather than only adjacent frames.
+                for previous in paths[:-1]:
+                    with Image.open(previous) as prev:
+                        _, prior_reasons = assess_image(image, prev)
+                    if 'near_duplicate' in prior_reasons and 'near_duplicate' not in reasons:
+                        reasons.append('near_duplicate')
+                target, margin = (None, None) if reasons else ranker.score(image, i)
+                attempts.append({'seed': seed, 'score': score, 'reasons': reasons,
+                                 'semantic_score': target, 'semantic_margin': margin})
+                candidates.append(image if not reasons else None)
+                continue
             attempts.append({'seed': seed, 'score': score, 'reasons': reasons})
             if not reasons:
                 best_image, best_score, best_reasons = image, score, reasons
@@ -246,6 +271,11 @@ def generate_images(story, out, *, model_revision=None):
                 best_image, best_score, best_reasons = image, score, reasons
             print(f'Imagen {i + 1}: intento {attempt + 1} rechazado '
                   f'({", ".join(reasons)}); regenerando', flush=True)
+        if ranker is not None:
+            from scripts.umbral3_semantic import choose_candidate
+            selected = choose_candidate(attempts)
+            best_image = candidates[selected]
+            best_score, best_reasons = attempts[selected]['score'], []
         if best_reasons:
             # Do not silently publish an objectively defective frame.
             raise RuntimeError(f'Imagen {i + 1} sin candidato válido tras '
@@ -253,7 +283,9 @@ def generate_images(story, out, *, model_revision=None):
         path = out / f'scene_{i:02}.png'
         best_image.save(path)
         report.append({'scene': i + 1, 'attempts': attempts,
-                       'accepted_score': best_score})
+                       'accepted_score': best_score,
+                       **({'selected_candidate': selected, 'semantic_revision': revision,
+                           'visual_approved': False} if ranker is not None else {})})
         print(f'Imagen: {i + 1}/{len(story["scenes"])} '
               f'({time.monotonic() - scene_start:.1f}s; '
               f'{len(attempts)} intento(s))', flush=True)

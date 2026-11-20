@@ -21,15 +21,26 @@ def visual_recipe():
     revision=model_info(model, timeout=30).sha
     if not revision or len(revision)!=40:
         raise RuntimeError('Cannot pin visual model revision')
-    return {'model':model,'revision':revision,'backend':backend,
+    semantic = os.getenv('UMBRAL_SEMANTIC_RANKING','0')
+    if semantic not in ('0','1'):
+        raise ValueError('Invalid semantic ranking mode')
+    clip_revision = None
+    if semantic == '1':
+        from scripts.umbral3_semantic import MODEL
+        clip_revision = os.getenv('UMBRAL_CLIP_REVISION') or model_info(MODEL, timeout=30).sha
+        if not clip_revision or len(clip_revision) != 40:
+            raise RuntimeError('Cannot pin semantic model revision')
+    return {'semantic_ranking':semantic,'clip_revision':clip_revision,'model':model,'revision':revision,'backend':backend,
             'profile':profile,'attempts':os.getenv('UMBRAL_IMAGE_ATTEMPTS','3'),
             'low_memory':os.getenv('UMBRAL_LOW_MEMORY','0'),
             'code':{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest()
                     for p in ('render.py','image_quality.py','scripts/storyboard.py',
-                              'scripts/technical_learning.py','requirements.txt','requirements-test.txt')}}
+                              'scripts/technical_learning.py','scripts/umbral3_semantic.py','requirements.txt','requirements-test.txt')}}
 
 def prepare(story,day,slot,store):
     recipe=visual_recipe()
+    if recipe['clip_revision']:
+        os.environ['UMBRAL_CLIP_REVISION'] = recipe['clip_revision']
     with tempfile.TemporaryDirectory(prefix='umbral3-prep-') as tmp:
         _,status=get_or_prepare(store,story,day,slot,recipe,Path(tmp),
             lambda s,folder:render.generate_images(s,folder,model_revision=recipe['revision']))
