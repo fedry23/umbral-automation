@@ -72,8 +72,7 @@ def probe(api, bucket, token):
         raise RuntimeError("Bucket size unavailable or cap exceeded")
     digest = hashlib.sha256(PROBE).hexdigest()
     key = "umbral3/probes/" + digest + ".bin"
-    matching = [x for x in api.list_bucket_tree(bucket, prefix="umbral3/probes",
-                                                recursive=True, token=token)
+    matching = [x for x in api.list_bucket_tree(bucket, recursive=True, token=token)
                 if x.path == key]
     if len(matching) > 1 or (matching and matching[0].size != len(PROBE)):
         raise RuntimeError("Existing probe metadata invalid")
