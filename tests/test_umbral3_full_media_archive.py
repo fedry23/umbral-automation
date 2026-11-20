@@ -2,6 +2,7 @@
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -58,6 +59,7 @@ class PrivateMediaArchiveTests(unittest.TestCase):
             self.assertEqual(set(manifest["assets"]), set(MEMBERS)|{"summary.json",self.video.name})
             self.assertFalse(manifest["publishable"])
             self.assertFalse(manifest["visual_approved"])
+        os.utime(self.root / 'voice.wav', (1230768000, 1893456000))
         receipt2, bundle2 = self.archive()
         self.assertEqual(receipt2,receipt)
         self.assertEqual(bundle2,bundle)
