@@ -206,6 +206,13 @@ def generate_images(story, out):
     from image_quality import assess_image
     from scripts.technical_learning import parameters_for
     tone = parameters_for(story["technical_profile"])["visual_tone"] if "technical_profile" in story else "original"
+    # Experimental offline-inference CLIP ranking; opt-in until benchmarked.
+    semantic = os.getenv('UMBRAL_SEMANTIC_RANKING', '0') == '1'
+    if semantic:
+        from transformers import CLIPModel, CLIPProcessor
+        clip_id = 'openai/clip-vit-base-patch32'
+        clip_model = CLIPModel.from_pretrained(clip_id).eval()
+        clip_processor = CLIPProcessor.from_pretrained(clip_id)
     paths, report = [], []
     total_start = time.monotonic()
     max_attempts = int(os.getenv('UMBRAL_IMAGE_ATTEMPTS', '3'))
@@ -227,11 +234,23 @@ def generate_images(story, out):
                     score, reasons = assess_image(image, prev)
             else:
                 score, reasons = assess_image(image)
-            attempts.append({'seed': seed, 'score': score, 'reasons': reasons})
-            if score > best_score:
+            semantic_score = None
+            if semantic and not reasons:
+                inputs = clip_processor(text=[scene], images=image,
+                                        return_tensors='pt', padding=True,
+                                        truncation=True)
+                with torch.inference_mode():
+                    semantic_score = float(clip_model(**inputs).logits_per_image.item())
+                score = semantic_score
+            attempts.append({'seed': seed, 'score': score, 'reasons': reasons,
+                             'semantic_score': semantic_score})
+            if (best_image is None or (not reasons and best_reasons) or
+                    (bool(reasons) == bool(best_reasons) and score > best_score)):
                 best_image, best_score, best_reasons = image, score, reasons
             if not reasons:
-                break
+                if not semantic:
+                    break
+                continue
             print(f'Imagen {i + 1}: intento {attempt + 1} rechazado '
                   f'({", ".join(reasons)}); regenerando', flush=True)
         if best_reasons:

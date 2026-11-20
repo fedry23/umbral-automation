@@ -1,0 +1,33 @@
+name: UMBRAL - Private visual benchmark
+on:
+  push:
+    branches: [integration/visual-semantic-v1]
+  pull_request:
+    branches: [main]
+    paths:
+      - visual_benchmark.py
+      - .github/workflows/visual_benchmark.yml
+permissions:
+  contents: read
+concurrency:
+  group: umbral-private-visual-benchmark
+  cancel-in-progress: true
+jobs:
+  compare:
+    if: github.event_name == 'push' || github.head_ref == 'integration/visual-semantic-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m py_compile render.py visual_benchmark.py
+      - run: python visual_benchmark.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: umbral-private-visual-comparison
+          path: visual-benchmark/
+          retention-days: 3
