@@ -12,6 +12,8 @@ from scripts.umbral3_storage import DropboxStore, LIMIT
 HEADROOM = 100_000_000
 
 def quota(store):
+    if hasattr(store, "quota"):
+        return store.quota()
     req = urllib.request.Request(
         "https://api.dropboxapi.com/2/users/get_space_usage",
         data=b"null", headers={"Authorization": "Bearer " + store.token,
