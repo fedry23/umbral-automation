@@ -75,8 +75,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
     store = None
     if args.private_evidence:
-        from scripts.umbral3_storage import DropboxStore
-        from scripts.umbral3_evidence import probe
-        store = DropboxStore.from_env()
-        probe(store)
+        from scripts.umbral3_evidence import probe, quota
+        if os.getenv("UMBRAL_PRIVATE_STORE", "hf_bucket") == "hf_bucket":
+            from scripts.umbral3_hf_storage import HfBucketStore
+            store = HfBucketStore.from_oidc()
+            quota(store)
+        elif os.getenv("UMBRAL_PRIVATE_STORE") == "dropbox":
+            from scripts.umbral3_storage import DropboxStore
+            store = DropboxStore.from_env()
+            probe(store)
+        else:
+            raise ValueError("Unsupported private storage backend")
     run_fixture(args.index, store)
