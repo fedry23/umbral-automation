@@ -2,6 +2,7 @@
 import hashlib
 import io
 import json
+import shutil
 import urllib.error
 import urllib.request
 import zipfile
@@ -71,6 +72,16 @@ def probe(store):
     receipt = persist(store, buffer.getvalue())
     return {"quota": before, "probe": receipt}
 
+def _write_stable_zip_member(archive, path):
+    """Stream a file into a deterministic, reproducible content-addressed ZIP."""
+    info = zipfile.ZipInfo.from_file(path, arcname=path.name)
+    info.date_time = (2020, 1, 1, 0, 0, 0)
+    info.external_attr = 0o100600 << 16
+    info.compress_type = zipfile.ZIP_STORED
+    with path.open("rb") as source, archive.open(info, "w") as destination:
+        shutil.copyfileobj(source, destination, length=1024*1024)
+
+
 def persist_fixture(store, folder, video, summary):
     """Archive complete private audiovisual evidence with a per-file integrity manifest.
 
@@ -108,7 +119,7 @@ def persist_fixture(store, folder, video, summary):
         archive.writestr("manifest.json", json.dumps(manifest, sort_keys=True))
         archive.writestr("summary.json", report)
         for path in paths:
-            archive.write(path, path.name)
+            _write_stable_zip_member(archive, path)
     data = buffer.getvalue()
     verify_media_bundle(data)
     return persist(store, data)
