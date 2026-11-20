@@ -6,6 +6,7 @@ One writer at a time is required at the workflow concurrency boundary.
 """
 from pathlib import Path
 import tempfile
+import time
 
 from scripts.umbral3_storage import KEY, LIMIT
 from scripts.umbral3_hf_probe import CAP, exchange
@@ -25,9 +26,24 @@ class HfBucketStore:
 
     @classmethod
     def from_oidc(cls):
-        return cls(BUCKET, exchange(BUCKET))
+        store = cls(BUCKET, exchange(BUCKET))
+        # The OIDC token is deliberately short lived. Long visual renders must
+        # not reuse the first token when storing their final evidence.
+        store._oidc_renew_at = time.monotonic() + 1800
+        return store
+
+    def _ensure_auth(self):
+        renew_at = getattr(self, "_oidc_renew_at", None)
+        if renew_at is not None and time.monotonic() >= renew_at:
+            # On exchange failure retain no success claim; caller aborts safely.
+            updated = exchange(self.bucket)
+            if not isinstance(updated, str) or not updated.startswith("hf_"):
+                raise RuntimeError("OIDC refresh returned invalid token")
+            self.token = updated
+            self._oidc_renew_at = time.monotonic() + 1800
 
     def verify_private(self):
+        self._ensure_auth()
         from huggingface_hub.errors import HfHubHTTPError
         try:
             info = self.api.bucket_info(self.bucket, token=self.token)
@@ -56,6 +72,7 @@ class HfBucketStore:
         return PREFIX + key
 
     def _find(self, key):
+        self._ensure_auth()
         name = self._remote(key)
         found = [obj for obj in self.api.list_bucket_tree(self.bucket, recursive=True, token=self.token)
                  if getattr(obj, "path", None) == name]
