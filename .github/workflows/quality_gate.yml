@@ -15,17 +15,20 @@ on:
       - '.github/workflows/quality_gate.yml'
       - '.github/workflows/reel.yml'
       - '.github/workflows/publish_daily.yml'
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: umbral-quality-gate
+  group: umbral-quality-gate-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   validar:
+    if: github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'integration/umbral-3')
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
