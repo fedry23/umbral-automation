@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-20: verify private full reserve ZIP upload + readback + reuse
+2026-11-20: verify first real privately persisted Reel fixture, full-media integrity
