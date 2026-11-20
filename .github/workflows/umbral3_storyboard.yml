@@ -13,6 +13,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: umbral3-storyboard-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   storyboard:
     if: github.ref == 'refs/heads/integration/umbral-3'
