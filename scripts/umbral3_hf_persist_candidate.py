@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 from scripts.umbral3_hf_storage import HfBucketStore
 from scripts.umbral3_evidence import persist_fixture
+from scripts.umbral3_hf_candidate_index import register
 
 FILENAME=re.compile(r"candidate-(20[0-9]{2}-[01][0-9]-[0-3][0-9])-(09|21)[.]mp4")
 
@@ -30,10 +31,13 @@ def persist(output,filename,summary_path):
     payload=store.get(receipt["key"])
     if receipt["bytes"]<100_000 or payload is None or hashlib.sha256(payload).hexdigest()!=receipt["sha256"]:
         raise RuntimeError("Private candidate readback mismatch")
+    pointer=register(store,data,receipt)
+    if pointer["bundle_sha256"]!=receipt["sha256"]:
+        raise RuntimeError("Candidate slot pointer not confirmed")
     print("UMBRAL3_PRIVATE_CANDIDATE_STORED="+json.dumps({
         "date":data["date"],"slot":data["slot"],"index":data["index"],
         "key":receipt["key"],"bytes":receipt["bytes"],
-        "sha256":receipt["sha256"],"private":True,
+        "sha256":receipt["sha256"],"private":True,"slot_indexed":True,
         "visual_review":"not_performed","ready_to_publish":False}),flush=True)
 
 if __name__=="__main__":
