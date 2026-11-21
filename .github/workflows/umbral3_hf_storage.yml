@@ -317,6 +317,26 @@ jobs:
         run: python -u -m scripts.umbral3_hf_candidate_audit --anchor 2026-11-21 --backend sdxl-lightning-2steps-ov-int8-horror-v3
 
 
+  v3-private-review-board:
+    needs: [candidate-inventory]
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.lightning_all == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL lightning private full')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install private review dependencies
+        run: python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Build private V3 contact sheet after all 14 archives pass
+        run: python -u -m scripts.umbral3_hf_contact_board --backend sdxl-lightning-2steps-ov-int8-horror-v3
+
   production-oidc-probe:
     # No Meta credentials, image model execution, publishing, artifact upload,
     # or production auto-enable. This is the SAME trusted-publisher filename.

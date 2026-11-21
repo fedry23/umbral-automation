@@ -41,6 +41,17 @@ class RefillScheduleTests(unittest.TestCase):
         self.assertIn("refs/heads/integration/umbral-3",
                       flow["jobs"]["lightning-batch"]["if"])
 
+    def test_v3_contact_board_requires_verified_full_private_batch(self):
+        flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
+                       Loader=yaml.BaseLoader)
+        board=flow["jobs"]["v3-private-review-board"]
+        self.assertEqual(board["needs"],["candidate-inventory"])
+        self.assertEqual(board["permissions"],{"contents":"read","id-token":"write"})
+        self.assertNotIn("IG_ACCESS_TOKEN",board.get("env",{}))
+        self.assertIn("--backend sdxl-lightning-2steps-ov-int8-horror-v3",
+                      board["steps"][-1]["run"])
+        self.assertIn("integration/umbral-3",board["if"])
+
     def test_private_v3_batch_reuses_archives_and_avoids_meta(self):
         flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
                        Loader=yaml.BaseLoader)
