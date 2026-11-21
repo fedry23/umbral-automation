@@ -1,7 +1,7 @@
 name: UMBRAL 3 - private storage connectivity
 on:
   push:
-    branches: [integration/umbral-3]
+    branches: [integration/umbral-3, main]
     paths: ['ops/umbral3-storage-kick.txt']
   # GitHub schedules run only on default main. Disabled until signed off by
   # visual QA, release CI and an additional main-scoped HF trusted publisher.
@@ -287,6 +287,32 @@ jobs:
       - name: Verify every candidate after separate GitHub runner restart
         run: python -u -m scripts.umbral3_hf_candidate_audit --anchor 2026-11-21
 
+
+  production-oidc-probe:
+    # No Meta credentials, image model execution, publishing, artifact upload,
+    # or production auto-enable. This is the SAME trusted-publisher filename.
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_BUCKET: 'Fedry23/umbral-private'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_PROGRESS_BARS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install private bucket client only
+        run: python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Verify main OIDC and SHA256 roundtrip without any Meta call
+        run: python -m scripts.umbral3_hf_probe
 
   daily-refill:
     if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED == 'true'
