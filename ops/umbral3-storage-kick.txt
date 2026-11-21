@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-# This file only triggers a private OIDC test after the account owner authorizes main.
+2026-11-21: probe main branch OIDC trusted-publisher authorization, one immutable 1MiB key, no Instagram access
