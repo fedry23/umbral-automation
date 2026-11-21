@@ -948,6 +948,45 @@ jobs:
         if: always()
         run: rm -rf -- "$RUNNER_TEMP/umbral3-d7-smoke"
 
+
+  automatic-art-private-pilot:
+    # Only the explicit owner-approved deployment commit, on MAIN, can write
+    # machine evidence for the already generated 28-Nov private candidates.
+    # No IG_ACCESS_TOKEN, GITHUB_TOKEN write, Pages or Meta permissions.
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL automatic visual QA private pilot')
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      OMP_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Install isolated OIDC private reader with image metrics
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0' 'numpy==1.26.4'
+      - name: CLIP-verify already stored future morning without Meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          export UMBRAL_CLIP_PYTHON="$(command -v python)"
+          /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa --mode certify --date 2026-11-28 --slot 09
+      - name: CLIP-verify already stored future evening without Meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          export UMBRAL_CLIP_PYTHON="$(command -v python)"
+          /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa --mode certify --date 2026-11-28 --slot 21
+
   daily-refill:
     if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED != 'false' && github.event.schedule == '42 20 * * *'
     runs-on: ubuntu-latest
