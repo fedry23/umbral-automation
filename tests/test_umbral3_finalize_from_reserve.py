@@ -38,6 +38,31 @@ class FinalizationTests(unittest.TestCase):
         (out/filename).write_bytes(b"x"*100001)
         (out/"story_used.json").write_text(json.dumps(story))
         return out/filename
+    def test_fresh_main_receipts_override_stale_integration_episode(self):
+        main=self.root/"official-main"
+        (main/"docs"/"published").mkdir(parents=True)
+        receipt={"date":"2026-11-21","episode_number":16,
+                 "verification":"published_media_read_back",
+                 "instagram_media_id":"18137894143763489",
+                 "permalink":"https://www.instagram.com/reel/Df_tRtoh_kN/"}
+        (main/"docs"/"published"/"2026-11-21_09.json").write_text(json.dumps(receipt))
+        def restored(story,out,date,filename,**kwargs):
+            self.assertEqual(story["episode_number"],17)
+            self.assertEqual(kwargs["prepared_images"],self.record)
+            (out/filename).write_bytes(b"x"*100001)
+            (out/"story_used.json").write_text(json.dumps(story))
+            return out/filename
+        with patch("render.render_story_media",side_effect=restored),patch(
+            "scripts.umbral3_finalize_from_reserve.subprocess.run"
+        ):
+            result=finalize("2027-03-28","09",self.media,root=self.root,
+                            private_test=True,official_receipts_root=main)
+        self.assertEqual(result["episode_number"],17)
+        self.assertFalse(result["ready_to_publish"])
+        with self.assertRaisesRegex(ValueError,"number moved"):
+            finalize("2027-03-28","09",self.media,root=self.root,
+                     private_test=True,official_receipts_root=main,number=11)
+
     def test_private_finalize_renumbers_without_regenerating_images(self):
         with patch("render.render_story_media",side_effect=self.fake),patch(
             "scripts.umbral3_finalize_from_reserve.subprocess.run"
