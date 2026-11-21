@@ -27,7 +27,7 @@ class CandidateSelectionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"missing"):
             load_slot(0,dt.date(2028,1,1),catalogs())
         data=catalogs()
-        data["09"].append(dict(data["09"][-1]))
+        data["09"].append(dict(next(s for s in data["09"] if s["publish_date"] == "2026-11-27")))
         with self.assertRaisesRegex(ValueError,"(Ambiguous|Duplicate)"):
             load_slot(12,dt.date(2026,11,21),data)
     def test_archive_filename_is_not_a_path_or_official_name(self):
