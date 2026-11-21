@@ -32,6 +32,15 @@ class RefillScheduleTests(unittest.TestCase):
         self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'", job["if"])
         self.assertNotIn("IG_ACCESS_TOKEN", job.get("env", {}))
 
+    def test_private_full_batch_is_reachable_by_kick_file(self):
+        flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
+                       Loader=yaml.BaseLoader)
+        self.assertIn("ops/umbral3-lightning-kick.txt",flow["on"]["push"]["paths"])
+        self.assertIn("UMBRAL lightning private full",
+                      flow["jobs"]["lightning-batch"]["if"])
+        self.assertIn("refs/heads/integration/umbral-3",
+                      flow["jobs"]["lightning-batch"]["if"])
+
     def test_private_v3_batch_reuses_archives_and_avoids_meta(self):
         flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
                        Loader=yaml.BaseLoader)
