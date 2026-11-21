@@ -107,3 +107,25 @@ def verify(record, story, day, slot, recipe, folder):
     if not isinstance(record, dict) or record != manifest(story, day, slot, recipe, folder):
         raise ValueError("Reserve manifest mismatch")
     return True
+
+def validated_prepared_images(record, story, day, slot, folder):
+    """Reuse six privately extracted images without any model inference.
+
+    A valid ZIP alone does not authorize a publication: the record is bound to
+    a *specific* civil day, slot, editorial story and per-scene SHA-256.
+    Official number and audio learning profile do not affect the scene pixels.
+    """
+    if not isinstance(record, dict) or set(record)!={"version","kind","date","slot",
+                                                     "story_sha256","assets",
+                                                     "visual_approved"}:
+        raise ValueError("Invalid private scene-handoff manifest")
+    editorial={k:v for k,v in story.items() if k!="technical_profile"}
+    if (record["version"]!=1 or record["kind"]!="umbral3-scene-handoff"
+            or record["date"]!=day or record["slot"]!=slot
+            or record["story_sha256"]!=story_key(editorial)
+            or type(record["visual_approved"]) is not bool):
+        raise ValueError("Scene-handoff belongs to another story, day or slot")
+    count=len(story["scenes"])
+    if count!=6 or _assets(folder,count)!=record["assets"]:
+        raise ValueError("Private scene-handoff integrity mismatch")
+    return [Path(folder)/f"scene_{i:02}.png" for i in range(count)]
