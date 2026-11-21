@@ -85,6 +85,12 @@ jobs:
       - name: Extract exact V3 scene hashes for owner approval registry (no image disclosure)
         if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL reviewed v3 fingerprint')
         run: python -u -m scripts.umbral3_hf_review_fingerprint
+      - name: Read-only authentic D+7 refill preflight for both 28 Nov slots
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL D7 private preflight')
+        run: |
+          python -u -m scripts.umbral3_refill_gate --today 2026-11-21 --slot 09
+          python -u -m scripts.umbral3_refill_gate --today 2026-11-21 --slot 21
+          python -u -m scripts.umbral3_release_policy --future
       - name: Round-trip validated six-scene bundle with immutable metadata
         run: python -m scripts.umbral3_hf_roundtrip
       - name: Prove full v2 audiovisual archive contract using synthetic private files
