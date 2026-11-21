@@ -9,3 +9,4 @@ Owner-only encrypted V3.1 preview transport, no raw image export (2026-11-21)
 2026-11-21: private end-to-end V3.1 2026-11-22 09 test, SHA-verified owner signoff, late-numbered MP4, no Meta and no public media.
 2026-11-21: repeat approved private release smoke with real official staging validator, intro/outro, voice, cover and caption; no Meta.
 2026-11-21: read-only D+7 Nov 28 09/21 actual HF pointer audit; visual approval report; zero Meta.
+2026-11-21: third owner-approved private end-to-end smoke rerun after exact caption LF fix; do not publish.
