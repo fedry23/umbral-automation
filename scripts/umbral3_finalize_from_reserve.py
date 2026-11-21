@@ -30,7 +30,7 @@ def select(day,slot,root):
         raise ValueError("Missing or ambiguous civil-slot editorial story")
     return exact[0]
 
-def finalize(day,slot,media_dir,number=None,root=ROOT,private_test=False):
+def finalize(day,slot,media_dir,number=None,root=ROOT,private_test=False,official_receipts_root=None):
     media_dir=Path(media_dir)
     if not media_dir.is_dir() or media_dir.is_symlink():
         raise ValueError("Invalid restored private media directory")
@@ -38,10 +38,16 @@ def finalize(day,slot,media_dir,number=None,root=ROOT,private_test=False):
     handoff=json.loads((media_dir/"visuals_manifest.json").read_text(encoding="utf-8"))
     # Fail before TTS/FFmpeg if a different story, slot, or corrupt scene was supplied.
     validated_prepared_images(handoff,story,day,slot,media_dir)
-    receipt=root/"docs"/"published"/(receipt_key(day,slot)+".json")
+    # Editorial input may be an integration branch with STALE official receipts.
+    # Use the separately checked-out, freshest release branch as the sole source
+    # of official episode allocation. Do not infer numbers from candidate media.
+    receipts_root=Path(official_receipts_root) if official_receipts_root is not None else Path(root)
+    if not receipts_root.is_dir() or not (receipts_root/"docs"/"published").is_dir():
+        raise RuntimeError("Authoritative official receipts checkout unavailable")
+    receipt=receipts_root/"docs"/"published"/(receipt_key(day,slot)+".json")
     if receipt.is_file():
         raise RuntimeError("This official slot already has a publication receipt")
-    official=planned_episode(day,slot,root=root)
+    official=planned_episode(day,slot,root=receipts_root)
     if number is not None and (type(number) is not int or number!=official):
         raise ValueError("Official episode number moved; do not reuse stale media")
     if not private_test:
@@ -82,7 +88,10 @@ if __name__=="__main__":
     p.add_argument("--slot",choices=["09","21"],required=True)
     p.add_argument("--media-dir",type=Path,required=True)
     p.add_argument("--private-test",action="store_true")
+    p.add_argument("--official-receipts-root",type=Path,
+                   help="Fresh authoritative main checkout, never integration receipts")
     args=p.parse_args()
     result=finalize(args.date,args.slot,args.media_dir,
-                    private_test=args.private_test)
+                    private_test=args.private_test,
+                    official_receipts_root=args.official_receipts_root)
     print("UMBRAL3_FINALIZATION="+json.dumps(result,sort_keys=True),flush=True)
