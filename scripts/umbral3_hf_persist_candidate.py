@@ -7,7 +7,7 @@ import re
 from scripts.umbral3_hf_storage import HfBucketStore
 from scripts.umbral3_evidence import persist_fixture
 
-FILENAME=re.compile(r"candidate-(20[0-9]{2}-[01][0-9]-[0-3][0-9])-(09|21)\\.mp4")
+FILENAME=re.compile(r"candidate-(20[0-9]{2}-[01][0-9]-[0-3][0-9])-(09|21)[.]mp4")
 
 def persist(output,filename,summary_path):
     root=Path(output).resolve(strict=True)
