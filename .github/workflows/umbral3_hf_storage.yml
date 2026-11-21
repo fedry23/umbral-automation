@@ -75,6 +75,9 @@ jobs:
           set -euo pipefail
           export UMBRAL_HF_BUCKET="$(head -n 1 ops/umbral3-storage-kick.txt)"
           python -m scripts.umbral3_hf_probe
+      - name: Fingerprint exact owner-reviewed mixed V3/V3.1 board and 84 scene bytes
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL owner review evidence')
+        run: python -u -m scripts.umbral3_owner_approval_evidence
       - name: Extract exact V3 scene hashes for owner approval registry (no image disclosure)
         if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL reviewed v3 fingerprint')
         run: python -u -m scripts.umbral3_hf_review_fingerprint
