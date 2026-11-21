@@ -82,7 +82,7 @@ class AutomaticQATests(unittest.TestCase):
              "human_review":False,"machine_approved":True,
              "ready_to_publish":False,"bundle_sha256":"a"*64}
         with patch("scripts.umbral3_machine_qa.find",return_value=pointer),\
-             patch("scripts.umbral3_machine_qa._get",return_value=json.dumps(row).encode()):
+             patch("scripts.umbral3_machine_qa._get",side_effect=lambda *_: json.dumps(row).encode()):
             self.assertFalse(check_certificate(store,"2026-11-28","09",ROOT)["human_review"])
             row["human_review"]=True
             with self.assertRaisesRegex(RuntimeError,"tampered"):
