@@ -16,9 +16,11 @@ class OwnerReviewedV3Tests(unittest.TestCase):
         self.assertEqual(len(obj["scene_sha256"]),6)
         assets={n:{"sha256":sha,"bytes":100} for n,sha in obj["scene_sha256"].items()}
         self.assertTrue(require_visual_approval(ROOT,obj["date"],obj["slot"],obj["story_sha256"],assets))
-        with self.assertRaisesRegex(RuntimeError,"missing"):
+        # Other slots now have their own approvals: wrong story must fail closed.
+        with self.assertRaisesRegex(RuntimeError,"does not match"):
             require_visual_approval(ROOT,obj["date"],"09",obj["story_sha256"],assets)
-        with self.assertRaisesRegex(RuntimeError,"missing"):
+        # Other slots now have their own approvals: wrong story must fail closed.
+        with self.assertRaisesRegex(RuntimeError,"does not match"):
             require_visual_approval(ROOT,"2026-11-23","21",obj["story_sha256"],assets)
     def test_modified_scene_or_narration_cannot_reuse_approval(self):
         obj=json.loads(APPROVAL.read_text(encoding="utf-8"))
