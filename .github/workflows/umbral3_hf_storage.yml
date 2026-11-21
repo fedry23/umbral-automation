@@ -942,7 +942,7 @@ jobs:
           /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
       - name: Verify existing private candidate or select exactly one missing D+7 slot
         id: gate
-        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --slot ${{ matrix.slot }}
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --recover-backlog --slot ${{ matrix.slot }}
       - name: Reuse pinned Lightning weights when a candidate is missing
         if: steps.gate.outputs.generate == 'true'
         uses: actions/cache@v4
@@ -965,9 +965,9 @@ jobs:
       - name: Assemble and privately persist one complete candidate, never publish
         if: steps.gate.outputs.generate == 'true'
         run: python -u -m scripts.umbral3_reserve_render --single --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --prepared-dir "$RUNNER_TEMP/umbral3-refill"
-      - name: Verify full video index and restored hashes in separate subprocess
+      - name: Verify the EXACT refilled date's private index and hashes
         if: steps.gate.outputs.generate == 'true'
-        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --slot ${{ matrix.slot }}
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --index "${{ steps.gate.outputs.index }}" --anchor "${{ steps.gate.outputs.anchor }}"
 
   late-finalization-smoke:
     needs: verify
