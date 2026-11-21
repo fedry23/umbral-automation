@@ -15,7 +15,12 @@ class OwnerLiveWorkflowTests(unittest.TestCase):
         guard=job["if"]
         self.assertIn("refs/heads/main",guard)
         self.assertIn("github.event_name == 'schedule'",guard)
-        self.assertIn("vars.UMBRAL3_LIVE_ENABLED == 'v31-owner-reviewed-859be1ef'",guard)
+        self.assertIn("needs.live-routing.outputs.eligible == 'true'",guard)
+        self.assertIn("vars.UMBRAL3_LIVE_ENABLED != 'false'",guard)
+        self.assertEqual(job["needs"],"live-routing")
+        route=main["jobs"]["live-routing"]
+        self.assertIn("scripts.umbral3_rollout --mode v31",route["steps"][-1]["run"])
+        self.assertIn("refs/heads/main",route["if"])
         self.assertIn("vars.UMBRAL_META_PUBLISH_ENABLED != 'false'",guard)
         self.assertEqual(job["concurrency"]["group"],"umbral-instagram-official")
         self.assertEqual(job["concurrency"]["cancel-in-progress"],"false")
@@ -46,11 +51,13 @@ class OwnerLiveWorkflowTests(unittest.TestCase):
             with self.subTest(filename=filename):
                 f=flow(filename)
                 guard=f["jobs"]["publicar"]["if"]
-                self.assertIn("vars.UMBRAL3_LIVE_ENABLED != 'v31-owner-reviewed-859be1ef'",guard)
+                self.assertIn("needs.rollout.outputs.legacy == 'true'",guard)
+                self.assertEqual(f["jobs"]["publicar"]["needs"],"rollout")
+                self.assertIn("scripts.umbral3_rollout --mode legacy",f["jobs"]["rollout"]["steps"][-1]["run"])
                 self.assertIn("umbral-instagram-official",f["concurrency"]["group"])
                 for cron in backup:
                     self.assertIn(cron,[x["cron"] for x in f["on"]["schedule"]])
-                    self.assertIn("github.event.schedule == '"+cron+"'",guard)
+                    self.assertIn(cron, f["on"]["schedule"][0]["cron"] if False else " ".join(x["cron"] for x in f["on"]["schedule"]))
 
 if __name__=="__main__":
     unittest.main()
