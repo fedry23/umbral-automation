@@ -29,6 +29,10 @@ on:
         description: 'Render 14 private candidate Reels; NONE approved for publication'
         type: boolean
         default: false
+      audit_candidates:
+        description: 'Read-only audit of all 14 SHA-verified private candidate Reels'
+        type: boolean
+        default: false
       audit_private:
         description: 'Audit existing private archive inventory without generating media'
         type: boolean
@@ -72,6 +76,9 @@ jobs:
       - name: Verify persisted private archives after workflow restart
         if: (github.event_name == 'workflow_dispatch' && inputs.audit_private == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL private inventory'))
         run: python -m scripts.umbral3_hf_inventory
+      - name: Reconcile all 14 full private candidate ZIPs without publication
+        if: (github.event_name == 'workflow_dispatch' && inputs.audit_candidates == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL candidate audit'))
+        run: python -u -m scripts.umbral3_hf_candidate_audit --anchor 2026-11-21
 
   render-fixture:
     needs: verify
