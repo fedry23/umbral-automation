@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-21: read-only candidate inventory after completed run 44862349621; no render, no Meta publication, no visual approval
+2026-11-21: restore actual 2026-11-22 09 six-scene candidate and privately verify late numbering, no Meta
