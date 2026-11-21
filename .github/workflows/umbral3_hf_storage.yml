@@ -50,7 +50,9 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: umbral3-private-bucket
+  # Long private CPU refills must never queue or block an official 09/21 Reel.
+  # The official job still shares umbral-instagram-official with both legacy publishers.
+  group: ${{ github.event_name == 'schedule' && github.event.schedule != '42 20 * * *' && 'umbral3-official-schedule' || 'umbral3-private-bucket' }}
   cancel-in-progress: false
 jobs:
   verify:
@@ -777,6 +779,70 @@ jobs:
       - name: Report fail-closed fallback eligibility without forcing another Meta POST
         if: failure()
         run: echo '::error::V3.1 official pipeline failed. Legacy backup slot will reconcile Meta and try safely under the shared lock.'
+
+  integration-nextweek-refill-smoke:
+    # One explicitly requested REAL private D+7 rehearsal; never runs on main.
+    # The exact push subject is a one-off safety gate for 28-Nov 09.
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && github.event.head_commit.message == 'UMBRAL D+7 private refill 2026-11-28 09'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v3
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Isolated OIDC bucket client; no Meta token
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Check exact 28-Nov morning story, index and immutable content
+        id: gate
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --today 2026-11-21 --slot 09
+      - name: Reuse pinned Lightning model if private candidate is missing
+        if: steps.gate.outputs.generate == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        if: steps.gate.outputs.generate == 'true'
+        with:
+          models: 'true'
+      - name: Install pinned private CPU renderer
+        if: steps.gate.outputs.generate == 'true'
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Generate SIX unapproved 28-Nov images without publishing
+        if: steps.gate.outputs.generate == 'true'
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --output "$RUNNER_TEMP/umbral3-d7-smoke"
+      - name: Persist ONE immutable private candidate with placeholder number
+        if: steps.gate.outputs.generate == 'true'
+        run: python -u -m scripts.umbral3_reserve_render --single --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --prepared-dir "$RUNNER_TEMP/umbral3-d7-smoke"
+      - name: Independently read back and verify SHA256 and complete media
+        run: |
+          /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --today 2026-11-21 --slot 09 |
+            tee /tmp/umbral3-d7-verification.log
+          grep -q '"stored_full_candidate": true' /tmp/umbral3-d7-verification.log
+          grep -q '"ready_to_publish": false' /tmp/umbral3-d7-verification.log
+      - name: Remove private transient media
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-d7-smoke"
 
   daily-refill:
     if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED == 'true' && github.event.schedule == '42 20 * * *'
