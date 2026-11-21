@@ -47,6 +47,7 @@ jobs:
         id: route
         env:
           UMBRAL3_ROLLOUT_OVERRIDE: ${{ vars.UMBRAL3_LIVE_ENABLED }}
+          UMBRAL3_AUTO_QA_ENABLED: ${{ vars.UMBRAL3_AUTO_QA_ENABLED }}
         run: |
           python -m scripts.umbral3_rollout --mode legacy --slot 09 --event '${{ github.event_name }}' --schedule '${{ github.event.schedule }}'
 
