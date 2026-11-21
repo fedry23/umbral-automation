@@ -61,6 +61,21 @@ def check(store, day, slot, all_stories=None):
     result["stored_full_candidate"]=True
     return result
 
+def assert_generation_budget(store):
+    """Reject costly CPU generation BEFORE downloading models when HF space is low.
+
+    A complete ZIP can legally reach LIMIT; reserve extra preview/index space
+    and keep the existing 100 MB emergency headroom. No deletes/overwrites.
+    """
+    from scripts.umbral3_evidence import quota, HEADROOM
+    from scripts.umbral3_storage import LIMIT
+    expected_free = LIMIT + HEADROOM + 20_000_000
+    available = quota(store)["free"]
+    if available < expected_free:
+        raise RuntimeError("Private D+7 storage below safe generation budget")
+    return {"capacity_verified": True, "minimum_required_bytes": expected_free}
+
+
 def batch_target(anchor, index):
     """Map an existing fourteen-slot date/index to check()'s D+7 input.
 
@@ -94,7 +109,10 @@ def main():
         today=(dt.date.fromisoformat(args.today) if args.today else
                dt.datetime.now(MADRID).date())
         slot=args.slot
-    result=check(HfBucketStore.from_oidc(),today,slot)
+    store=HfBucketStore.from_oidc()
+    result=check(store,today,slot)
+    if result["generate"]:
+        result.update(assert_generation_budget(store))
     print("UMBRAL3_REFILL="+json.dumps(result,sort_keys=True),flush=True)
     out=os.environ.get("GITHUB_OUTPUT")
     if out:
