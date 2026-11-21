@@ -75,3 +75,23 @@ class RefillTests(unittest.TestCase):
     def test_missing_nextweek_story_fails_not_falls_back(self):
         with self.assertRaisesRegex(ValueError,"missing authored story"):
             check(Mock(),dt.date(2034,2,5),"09")
+
+    def test_capacity_preflight_rejects_low_space_before_expensive_generation(self):
+        from scripts.umbral3_refill_gate import assert_generation_budget
+        from scripts.umbral3_evidence import HEADROOM
+        from scripts.umbral3_storage import LIMIT
+
+        class PrivateQuota:
+            def __init__(self, free):
+                self.free = free
+            def quota(self):
+                return {"used": 5_000_000_000-self.free,
+                        "allocated": 5_000_000_000, "free": self.free}
+
+        threshold = LIMIT + HEADROOM + 20_000_000
+        with self.assertRaisesRegex(RuntimeError, "below safe generation budget"):
+            assert_generation_budget(PrivateQuota(threshold-1))
+        result = assert_generation_budget(PrivateQuota(threshold))
+        self.assertTrue(result["capacity_verified"])
+        self.assertEqual(result["minimum_required_bytes"], threshold)
+
