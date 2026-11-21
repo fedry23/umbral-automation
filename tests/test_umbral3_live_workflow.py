@@ -27,7 +27,7 @@ class OwnerLiveWorkflowTests(unittest.TestCase):
     def test_trusted_oidc_restore_is_separate_from_meta_secret_steps(self):
         job=flow("umbral3_hf_storage.yml")["jobs"]["live-owner-approved-release"]
         steps=job["steps"]
-        restore=next(x for x in steps if x["name"].startswith("Restore exact owner"))
+        restore=next(x for x in steps if x.get("name","").startswith("Restore exact owner"))
         self.assertNotIn("IG_ACCESS_TOKEN",restore.get("env",{}))
         self.assertIn("scripts.umbral3_live_stage",restore["run"])
         for term in ("scripts/reconcile_publications.py",
