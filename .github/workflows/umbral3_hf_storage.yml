@@ -623,11 +623,39 @@ jobs:
       - name: Verify main OIDC and SHA256 roundtrip without any Meta call
         run: python -m scripts.umbral3_hf_probe
 
+  live-routing:
+    # Read the owner-authorized, dated rollout on main. No Meta/HF token.
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      eligible: ${{ steps.route.outputs.eligible }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Check exact owner-reviewed civil slot before using any CPU/GPU models
+        id: route
+        shell: bash
+        env:
+          UMBRAL3_ROLLOUT_OVERRIDE: ${{ vars.UMBRAL3_LIVE_ENABLED }}
+        run: |
+          set -euo pipefail
+          case "${{ github.event.schedule }}" in
+            '17 5 * * *'|'17 6 * * *') slot=09 ;;
+            '17 17 * * *'|'17 18 * * *') slot=21 ;;
+            *) echo '::error::Unknown V3.1 schedule'; exit 1 ;;
+          esac
+          python -m scripts.umbral3_rollout --mode v31 --slot "$slot"
   live-owner-approved-release:
+    needs: live-routing
+    # Active only for exact reviewed dates/scene hashes in the owner-authorized rollout.
     # OFF by default. Main OIDC uses THIS trusted-publisher workflow filename.
     # The older official workflows keep the same Meta lock and provide late
     # fallback at their distinct backup cron slots when this route is enabled.
-    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_LIVE_ENABLED == 'v31-owner-reviewed-859be1ef' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && needs.live-routing.outputs.eligible == 'true' && vars.UMBRAL3_LIVE_ENABLED != 'false' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')
     runs-on: ubuntu-latest
     timeout-minutes: 240
     concurrency:
@@ -909,7 +937,7 @@ jobs:
         run: rm -rf -- "$RUNNER_TEMP/umbral3-d7-smoke"
 
   daily-refill:
-    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED == 'true' && github.event.schedule == '42 20 * * *'
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED != 'false' && github.event.schedule == '42 20 * * *'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     strategy:
@@ -936,6 +964,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Confirm Git-tracked owner authorization for private D+7 refill
+        env:
+          UMBRAL3_RESERVE_OVERRIDE: ${{ vars.UMBRAL3_RESERVE_ENABLED }}
+        run: python -m scripts.umbral3_rollout --mode refill
       - name: Authenticate the authorized main publisher; no Meta tokens
         run: |
           python -m venv /tmp/umbral3-hf-storage
