@@ -7,6 +7,7 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import tempfile
@@ -29,7 +30,16 @@ def render_images(index, anchor, output):
     if output.exists() and any(output.iterdir()):
         raise ValueError("Private Lightning output must start empty")
     output.mkdir(parents=True,exist_ok=True,mode=0o700)
-    prompts=visual_shots(story)
+    direction = os.environ.get("UMBRAL_HORROR_DIRECTION", "original")
+    if direction == "horror-v2":
+        from scripts.umbral3_horror_direction import directed_prompts
+        # Delay until the pinned SDXL tokenizer is available; never truncate
+        # the scene action or its horror anomaly without noticing.
+        prompts = None
+    elif direction == "original":
+        prompts = visual_shots(story)
+    else:
+        raise ValueError("Unrecognized private horror direction")
     if len(prompts)!=6 or len(set(prompts))!=6:
         raise ValueError("Six distinct storyboard prompts required")
     started=time.monotonic()
@@ -45,6 +55,10 @@ def render_images(index, anchor, output):
         directory=snapshot_download(MODEL,revision=PIN,max_workers=2)
         pipe=OVStableDiffusionXLPipeline.from_pretrained(
             directory,device="CPU",ov_config={"CACHE_DIR":str(Path(tmp)/"cache")})
+        if direction == "horror-v2":
+            prompts = directed_prompts(story, pipe.tokenizer)
+        if len(prompts)!=6 or len(set(prompts))!=6:
+            raise ValueError("Six unique visual story beats required")
         report=[]
         images=[]
         for i,prompt in enumerate(prompts):
@@ -54,7 +68,7 @@ def render_images(index, anchor, output):
             best=None
             attempts=[]
             for attempt in range(2):
-                seed=730000 + index*1000 + i*17 + attempt*123
+                seed=(830000 if direction=="horror-v2" else 730000) + index*1000 + i*17 + attempt*123
                 started_shot=time.monotonic()
                 image=pipe(prompt=prompt,width=W,height=H,
                            num_inference_steps=2,guidance_scale=1.0,
@@ -85,7 +99,8 @@ def render_images(index, anchor, output):
         (output/"visuals_manifest.json").write_text(json.dumps(manifest,sort_keys=True),encoding="utf-8")
         (output/"image_quality_report.json").write_text(json.dumps(report,sort_keys=True),encoding="utf-8")
         (output/"model_used.json").write_text(json.dumps({
-            "backend":"sdxl-lightning-2steps-ov-int8","model":MODEL,
+            "backend":("sdxl-lightning-2steps-ov-int8-horror-v2" if direction=="horror-v2" else "sdxl-lightning-2steps-ov-int8"),"model":MODEL,
+            "direction_version":direction,
             "revision":PIN,"steps":2,
             "seconds":round(time.monotonic()-started,2),
             "visual_review":"not_performed"
