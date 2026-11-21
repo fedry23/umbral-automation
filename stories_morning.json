@@ -580,8 +580,7 @@
       "version": 1,
       "continuity": {
         "anchor0": "yellow floor warning tape",
-        "anchor1": "cracked grey corridor tile",
-        "anchor2": "navy blue janitor uniform"
+        "anchor1": "cracked grey corridor tile"
       },
       "shots": [
         {
