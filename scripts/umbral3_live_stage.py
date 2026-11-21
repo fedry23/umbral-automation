@@ -15,7 +15,6 @@ from zoneinfo import ZoneInfo
 
 from scripts.episode_state import inventory,receipt_key
 from scripts.umbral3_release_policy import approved_slot
-from scripts.umbral3_reserve import validated_prepared_images
 from scripts.technical_learning import load_profile
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -67,13 +66,13 @@ def stage(day,slot,root=ROOT,storage_python=None,run=subprocess.run,now=None):
             raise RuntimeError("Stale audiovisual experiment in private video")
         importer.validate_cover(folder/"cover.jpg")
         importer.validate_mp4(folder/video)
-        if (not caption.startswith(f"Historia {decision['episode_number']}: {story['title']}\\n")
+        if (not caption.startswith(f"Historia {decision['episode_number']}: {story['title']}\n")
                 or not (folder/"subtitles.ass").read_text(encoding="utf-8").count("Dialogue:")):
             raise RuntimeError("Late-numbered audio/caption/subtitles invalid")
         timings=json.loads((folder/"branding_timing.json").read_text(encoding="utf-8"))
         if not 0<timings["intro_end"]<timings["outro_start"]<timings["duration"]:
             raise RuntimeError("Final branding timings corrupt")
-        target.mkdir(parents=True,exist_ok=False)
+        target.mkdir(parents=True,exist_ok=True)
         for name in (*REQUIRED,video):
             p=folder/name
             if not p.is_file() or p.is_symlink():
