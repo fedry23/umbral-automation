@@ -1,0 +1,63 @@
+name: UMBRAL 3 - Automatic Art QA CI (never publish)
+on:
+  push:
+    branches: [feature/umbral3-automatic-visual-qa]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/umbral3_machine_qa.py'
+      - 'scripts/umbral3_machine_clip_runner.py'
+      - 'scripts/umbral3_rollout.py'
+      - 'scripts/umbral3_live_stage.py'
+      - 'scripts/umbral3_finalize_from_reserve.py'
+      - 'scripts/umbral3_approved_restore.py'
+      - 'tests/**'
+      - '.github/workflows/umbral3_*.yml'
+      - '.github/workflows/publish_morning.yml'
+      - '.github/workflows/publish_daily.yml'
+      - 'docs/umbral3-automatic-qa.json'
+permissions:
+  contents: read
+concurrency:
+  group: umbral3-machine-qa-ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test-no-meta:
+    if: github.repository == 'fedry23/umbral-automation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements-test.txt
+      - name: Install isolated test-only dependencies (no public models)
+        run: python -m pip install --disable-pip-version-check -r requirements-test.txt
+      - name: Ensure FFmpeg and ffprobe for full media regressions
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends ffmpeg
+          fi
+      - name: Compile machine gate and verify Python contracts
+        run: |
+          python -m compileall -q scripts/umbral3_machine_qa.py scripts/umbral3_machine_clip_runner.py scripts/umbral3_rollout.py scripts/umbral3_live_stage.py scripts/umbral3_approved_restore.py scripts/umbral3_finalize_from_reserve.py
+          python -m unittest discover -s tests -v
+      - name: Assert no Meta publication permissions in machine pilot
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          flow=yaml.load(Path('.github/workflows/umbral3_hf_storage.yml').read_text(),Loader=yaml.BaseLoader)
+          pilot=flow['jobs']['automatic-art-private-pilot']
+          assert pilot['permissions']=={'contents':'read','id-token':'write'}
+          assert 'IG_ACCESS_TOKEN' not in str(pilot)
+          assert 'graph.facebook.com' not in str(pilot)
+          assert pilot['if'].count("refs/heads/main")==1
+          print('UMBRAL3_MACHINE_QA_CI=private_only')
+          PY

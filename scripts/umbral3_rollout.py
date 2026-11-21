@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MADRID = ZoneInfo("Europe/Madrid")
 BOARD = "859be1ef1001f5be6476c87db5c90a47f866a30b19d91a39597bbea748e14b2e"
 SOURCE = "docs/umbral3-owner-visual-signoff-2026-11-21.json"
+AUTO_CONFIG = "docs/umbral3-automatic-qa.json"
 CONFIG = "docs/umbral3-production-rollout.json"
 BACKUPS = {
     "09": ("0 7 * * *", "0 8 * * *"),
@@ -49,6 +50,50 @@ def read_config(root=ROOT):
     return row
 
 
+def read_auto_policy(root=ROOT, override=None):
+    """Distinct signed-off user consent for machine QA; never human review."""
+    path=Path(root)/AUTO_CONFIG
+    if not path.is_file() or path.is_symlink() or not 0<path.stat().st_size<=4096:
+        raise RuntimeError("Missing separate machine-QA policy")
+    data=json.loads(path.read_text(encoding="utf-8"))
+    keys={"version","kind","enabled","authorized_by","authorized_at",
+          "start_date","backend","model","revision","quality_policy",
+          "fallback","requires_private_sha_certificate","human_review",
+          "emergency_stop","notes"}
+    from scripts.umbral3_machine_qa import BACKEND,MODEL,REVISION,POLICY
+    if (not isinstance(data,dict) or set(data)!=keys
+            or data["version"]!=1
+            or data["kind"]!="umbral3-consented-machine-visual-qa"
+            or type(data["enabled"]) is not bool
+            or data["authorized_by"]!="fedry23"
+            or data["authorized_at"]!="2026-11-22"
+            or data["start_date"]!="2026-11-28"
+            or data["backend"]!=BACKEND
+            or data["model"]!=MODEL or data["revision"]!=REVISION
+            or data["quality_policy"]!=POLICY
+            or data["fallback"]!="legacy-backup"
+            or data["requires_private_sha_certificate"] is not True
+            or data["human_review"] is not False
+            or data["emergency_stop"]!="UMBRAL3_AUTO_QA_ENABLED=false"
+            or not isinstance(data["notes"],str) or len(data["notes"])<35):
+        raise RuntimeError("Untrusted automatic QA authorization")
+    override=os.getenv("UMBRAL3_AUTO_QA_ENABLED","") if override is None else override
+    return data["enabled"] and override!="false"
+
+
+def machine_eligible(day,slot,root=ROOT,checker=None,override=None):
+    try:
+        if not read_auto_policy(root,override) or day<"2026-11-28":
+            return False
+        if checker is not None:
+            return checker(day,slot) is True
+        from scripts.umbral3_hf_storage import HfBucketStore
+        from scripts.umbral3_machine_qa import check_certificate
+        return check_certificate(HfBucketStore.from_oidc(),day,slot,root)["machine_approved"] is True
+    except (RuntimeError,ValueError,TypeError,KeyError,LookupError,OSError,ImportError,AttributeError):
+        return False
+
+
 def eligible(day, slot, root=ROOT, now=None, override=None):
     """Only truly owner-reviewed image bytes may join the official V3.1 route."""
     if slot not in BACKUPS or dt.date.fromisoformat(day).isoformat() != day:
@@ -66,19 +111,33 @@ def eligible(day, slot, root=ROOT, now=None, override=None):
     except (RuntimeError, ValueError, TypeError, KeyError, OSError):
         # Missing/corrupt Git release gate cannot suppress the legacy route.
         return False
-    if not row["enabled"] or not row["first_date"] <= day <= row["last_date"]:
+    if not row["enabled"]:
         return False
-    try:
-        approved_slot(day, slot, root, now)
-    except (ValueError, RuntimeError, OSError, TypeError, KeyError):
-        return False
-    return True
+    if row["first_date"] <= day <= row["last_date"]:
+        try:
+            approved_slot(day, slot, root, now)
+        except (ValueError, RuntimeError, OSError, TypeError, KeyError):
+            return False
+        return True
+    # Entirely separate automatic consent and private CLIP/SHA certificate.
+    # No machine evaluation ever becomes a fake owner visual signoff.
+    return machine_eligible(day,slot,root)
 
 
 def route_legacy(day, slot, event, schedule, root=ROOT, now=None, override=None):
-    # The dated late schedules are genuine fallback, even while V3.1 is active.
+    # Always allow early legacy backup, even while new publisher is active.
     if event == "schedule" and schedule in BACKUPS[slot]:
         return True
+    # For future machine-QA dates the new publisher alone queries private HF.
+    # Legacy's distinct workflow lacks authorized HF OIDC identity, so it
+    # yields PRIMARY scheduled slots and takes the dated backup on any failure.
+    # Never suppress manually triggered legacy rescue / emergency rollback.
+    if event == "schedule" and day >= "2026-11-28" and override != "false":
+        try:
+            if read_config(root)["enabled"] and read_auto_policy(root):
+                return False
+        except (RuntimeError, ValueError, TypeError, KeyError, OSError):
+            pass
     return not eligible(day, slot, root, now, override)
 
 

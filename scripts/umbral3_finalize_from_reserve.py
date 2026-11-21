@@ -30,7 +30,7 @@ def select(day,slot,root):
         raise ValueError("Missing or ambiguous civil-slot editorial story")
     return exact[0]
 
-def finalize(day,slot,media_dir,number=None,root=ROOT,private_test=False,official_receipts_root=None):
+def finalize(day,slot,media_dir,number=None,root=ROOT,private_test=False,official_receipts_root=None,machine_evidence=None):
     media_dir=Path(media_dir)
     if not media_dir.is_dir() or media_dir.is_symlink():
         raise ValueError("Invalid restored private media directory")
@@ -58,7 +58,32 @@ def finalize(day,slot,media_dir,number=None,root=ROOT,private_test=False,officia
         # bound to the precise six PNG hashes, story and publishing slot.
         from scripts.umbral3_visual_approval import require_visual_approval
         from scripts.umbral3_reserve import story_key
-        require_visual_approval(root,day,slot,story_key(story),handoff["assets"])
+        if machine_evidence is None:
+            require_visual_approval(root,day,slot,story_key(story),handoff["assets"])
+            review_kind="owner"
+        else:
+            # Evidence arrives only from the isolated, OIDC-authenticated
+            # private restore executable. Refuse mismatched local bytes.
+            from scripts.umbral3_machine_qa import BACKEND, POLICY, PIN, SCENES, MODEL, REVISION
+            from scripts.umbral3_rollout import read_auto_policy
+            proof=machine_evidence
+            expected={k:handoff["assets"][k]["sha256"] for k in SCENES}
+            if (read_auto_policy(root) is not True or day<"2026-11-28"
+                    or not isinstance(proof,dict)
+                    or proof.get("kind")!="umbral3-automatic-machine-qa"
+                    or proof.get("policy")!=POLICY
+                    or proof.get("date")!=day or proof.get("slot")!=slot
+                    or proof.get("story_sha256")!=story_key(story)
+                    or proof.get("backend")!=BACKEND
+                    or proof.get("model_revision")!=PIN
+                    or proof.get("clip_model")!=MODEL
+                    or proof.get("clip_revision")!=REVISION
+                    or proof.get("human_review") is not False
+                    or proof.get("machine_approved") is not True
+                    or proof.get("ready_to_publish") is not False
+                    or proof.get("scene_sha256")!=expected):
+                raise RuntimeError("Machine certificate does not match restored actual scenes")
+            review_kind="machine"
         handoff={**handoff,"visual_approved":True}
     elif handoff.get("visual_approved") is not False:
         raise RuntimeError("Private tests may only use unapproved candidates")
@@ -78,7 +103,10 @@ def finalize(day,slot,media_dir,number=None,root=ROOT,private_test=False,officia
         raise RuntimeError("Late numbering not embedded in final story")
     return {"date":day,"slot":slot,"episode_number":official,
             "private_test":bool(private_test),
-            "visual_approved":handoff["visual_approved"],
+            "art_authorized":bool(not private_test and handoff["visual_approved"]),
+            "owner_reviewed":not private_test and review_kind=="owner",
+            "machine_approved":not private_test and review_kind=="machine",
+            "visual_approved":handoff["visual_approved"] if not private_test else False,
             "ready_to_publish":bool(not private_test and handoff["visual_approved"]),
             "video_bytes":output.stat().st_size}
 

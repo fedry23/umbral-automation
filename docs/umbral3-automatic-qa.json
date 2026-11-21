@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "kind": "umbral3-consented-machine-visual-qa",
+  "enabled": true,
+  "authorized_by": "fedry23",
+  "authorized_at": "2026-11-22",
+  "start_date": "2026-11-28",
+  "backend": "sdxl-lightning-2steps-ov-int8-horror-v3",
+  "model": "openai/clip-vit-base-patch32",
+  "revision": "d15b5f29721ca72dac15f8526b284be910de18be",
+  "quality_policy": "umbral3-machine-qa-v1",
+  "fallback": "legacy-backup",
+  "requires_private_sha_certificate": true,
+  "human_review": false,
+  "emergency_stop": "UMBRAL3_AUTO_QA_ENABLED=false",
+  "notes": "Owner authorized autonomous technical visual QA for future scenes; not human-reviewed. Fail closed on missing or unsuccessful semantic QA, with isolated legacy publisher backups."
+}

@@ -26,11 +26,28 @@ class RolloutTests(unittest.TestCase):
                 self.assertFalse(eligible(day,slot,ROOT,self.now("2026-11-21"),override=""))
                 self.assertFalse(eligible(day,slot,ROOT,self.now(day),override="false"))
 
-    def test_no_unreviewed_future_or_historical_route(self):
-        for day in ("2026-11-21", "2026-11-28", "2026-11-29"):
+    def test_future_requires_actual_private_machine_evidence_not_just_owner_consent(self):
+        from scripts.umbral3_rollout import read_auto_policy, machine_eligible
+        self.assertTrue(read_auto_policy(ROOT,override=""))
+        self.assertFalse(read_auto_policy(ROOT,override="false"))
+        day="2026-11-28"
+        with patch("scripts.umbral3_rollout.machine_eligible",return_value=False):
+            self.assertFalse(eligible(day,"09",ROOT,self.now(day),override=""))
+        with patch("scripts.umbral3_rollout.machine_eligible",return_value=True):
+            self.assertTrue(eligible(day,"09",ROOT,self.now(day),override=""))
+        self.assertFalse(machine_eligible(day,"09",ROOT,checker=lambda *_:False,override=""))
+        self.assertTrue(machine_eligible(day,"09",ROOT,checker=lambda *_:True,override=""))
+        self.assertFalse(machine_eligible(day,"09",ROOT,checker=lambda *_:True,override="false"))
+
+    def test_future_routing_yields_primary_but_legacy_backups_remain_independent(self):
+        for day in ("2026-11-28", "2026-11-29"):
             with self.subTest(day=day):
-                self.assertFalse(eligible(day,"09",ROOT,self.now(day),override=""))
-                self.assertTrue(route_legacy(day,"09","schedule","17 5 * * *",ROOT,self.now(day),override=""))
+                self.assertFalse(route_legacy(day,"09","schedule","17 5 * * *",ROOT,self.now(day),override=""))
+                self.assertTrue(route_legacy(day,"09","schedule","0 7 * * *",ROOT,self.now(day),override=""))
+                self.assertTrue(route_legacy(day,"09","schedule","17 5 * * *",ROOT,self.now(day),override="false"))
+                with patch.dict("os.environ",{"UMBRAL3_AUTO_QA_ENABLED":"false"}):
+                    self.assertTrue(route_legacy(day,"09","schedule","17 5 * * *",ROOT,self.now(day),override=""))
+        self.assertTrue(route_legacy("2026-11-21","09","schedule","17 5 * * *",ROOT,self.now("2026-11-21"),override=""))
 
     def test_legacy_skips_approved_primary_but_keeps_both_backups(self):
         for slot, primary, backup in (
