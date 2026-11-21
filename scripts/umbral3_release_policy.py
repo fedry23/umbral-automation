@@ -56,9 +56,39 @@ def approved_slot(day,slot,root=ROOT,now=None):
     if not isinstance(entries,list) or len(entries)!=14:
         raise RuntimeError("Incomplete signed-off visual registry")
     matches=[x for x in entries if x.get("date")==day and x.get("slot")==slot]
-    if len(matches)!=1:
-        raise RuntimeError("No exact owner-approved artwork for civil slot")
-    item=matches[0]
+    if len(matches)>1:
+        raise RuntimeError("Conflicting original owner approvals")
+    if matches:
+        item=matches[0]  # Frozen 84-image review: never change or extend it.
+    else:
+        # Separate append-only signoffs for future scenes. A valid archived ZIP,
+        # visual score or the 2026-11-21 board is NEVER a future owner's review.
+        future=root/"docs"/"umbral3-future-signoffs"/(key+".json")
+        if not future.is_file():
+            raise RuntimeError("No exact owner-approved artwork for civil slot")
+        if future.is_symlink() or not 0<future.stat().st_size<=9_000:
+            raise RuntimeError("Invalid future owner approval record")
+        item=json.loads(future.read_text(encoding="utf-8"))
+        required={"version","kind","owner","date","slot","title",
+                  "reviewed_at","reviewed_board_sha256","backend","story_sha256",
+                  "private_candidate_bundle_sha256","scene_sha256","record"}
+        if (not isinstance(item,dict) or set(item)!=required
+                or item["version"]!=1
+                or item["kind"]!="umbral3-explicit-owner-future-signoff"
+                or item["owner"]!="fedry23"
+                or item["date"]!=day or item["slot"]!=slot
+                or item["title"]!=story["title"]
+                or not isinstance(item["reviewed_board_sha256"],str)
+                or not SHA.fullmatch(item["reviewed_board_sha256"])):
+            raise RuntimeError("Untrusted future owner review metadata")
+        approved_file=root/"docs"/"visual_approvals"/(key+".json")
+        if not approved_file.is_file() or approved_file.is_symlink():
+            raise RuntimeError("Missing independent future visual approval")
+        visual=json.loads(approved_file.read_text(encoding="utf-8"))
+        if (visual.get("reviewed_at")!=item["reviewed_at"]
+                or item["reviewed_board_sha256"] not in visual.get("notes","")
+                or item["private_candidate_bundle_sha256"] not in visual.get("notes","")):
+            raise RuntimeError("Future owner review evidence is not bound to approved bytes")
     bundle=item.get("private_candidate_bundle_sha256")
     backend=item.get("backend")
     record_name="docs/visual_approvals/"+key+".json"
