@@ -1,4 +1,4 @@
-"""UMBRAL branding: dark intro/outro only, unchanged middle narration."""
+"""UMBRAL branding: natural intro/outro, low-pitched central narration."""
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
@@ -19,7 +19,7 @@ class BrandingTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             render.episode_intro({'title': 'No numbered'})
 
-    def test_only_open_and_close_have_lower_pitch(self):
+    def test_only_middle_story_has_lower_pitch(self):
         # Independent of the network/TTS: a 180 Hz synthetic voiced sample.
         def fake_narrate(text, out, split_phrases, pipeline=None):
             t = np.arange(audio_engine.RATE) / audio_engine.RATE
@@ -37,20 +37,21 @@ class BrandingTests(unittest.TestCase):
             self.assertAlmostEqual(duration, len(audio) / sr, places=4)
             self.assertEqual([c[2] for c in cues],
                              ['Intro', 'Relato original', 'Outro'])
-            # Story starts after the lowered intro and 0.50 s pause.
-            start_story = round((cues[1][0] - 0.05) * sr)
-            original = (0.2 * np.sin(2 * np.pi * 180 * np.arange(sr) / sr))
-            self.assertLess(float(np.max(np.abs(audio[start_story:start_story+sr] - original))), 0.0002)
+            # Intro/outro retain original 180-Hz timbre; only the story
+            # receives the old lowered branding treatment.
             def strongest_frequency(segment):
                 spec = np.abs(np.fft.rfft(segment))
                 return np.fft.rfftfreq(len(segment), 1/sr)[np.argmax(spec)]
             intro_freq = strongest_frequency(audio[:sr])
-            story_freq = strongest_frequency(audio[start_story:start_story+sr])
-            outro_start = int(cues[2][0] / 1.0 * sr) - int(0.05 * sr)
+            story_start = round((cues[1][0] - 0.05) * sr)
+            story_freq = strongest_frequency(audio[story_start:story_start+sr])
+            outro_start = round((cues[2][0] - 0.05) * sr)
             outro_freq = strongest_frequency(audio[outro_start:outro_start+sr])
-            self.assertAlmostEqual(story_freq, 180, delta=3)
-            self.assertLess(intro_freq, story_freq * 0.90)
-            self.assertLess(outro_freq, story_freq * 0.90)
+            self.assertAlmostEqual(intro_freq, 180, delta=3)
+            self.assertAlmostEqual(outro_freq, 180, delta=3)
+            self.assertLess(story_freq, intro_freq * 0.90)
+            self.assertLess(story_freq, outro_freq * 0.90)
+            self.assertAlmostEqual(story_freq, 150, delta=4)
 
 
 if __name__ == '__main__':
