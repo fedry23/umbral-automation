@@ -84,7 +84,8 @@ def future_coverage(root=ROOT,now=None):
         raise ValueError("Timezone-aware release planning required")
     report={"as_of":now.astimezone(MADRID).isoformat(),
             "expected_future_slots":14,"approved":0,
-            "unapproved_or_missing":[],"production_ready":False}
+            "unapproved_or_missing":[],"all_future_art_approved":False,
+            "production_ready":False}
     for target in slots(now,7):
         day,slot=target["date"],target["slot"]
         try:
@@ -94,7 +95,9 @@ def future_coverage(root=ROOT,now=None):
                    "reason":str(exc).split(":")[0][:110]})
         else:
             report["approved"]+=1
-    report["production_ready"]=(report["approved"]==14)
+    report["all_future_art_approved"]=(report["approved"]==14)
+    # Image sign-off alone never authorizes final MP4 or Meta publication.
+    report["production_ready"]=False
     return report
 
 
