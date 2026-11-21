@@ -1,0 +1,55 @@
+"""Release-critical regressions: heavy D+7 queue must not block official Meta slot."""
+from pathlib import Path
+import unittest
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class D7IsolationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.workflow = yaml.load(
+            (ROOT / ".github/workflows/umbral3_hf_storage.yml").read_text(encoding="utf-8"),
+            Loader=yaml.BaseLoader,
+        )
+
+    def test_private_reserve_and_official_publication_use_distinct_workflow_locks(self):
+        group = self.workflow["concurrency"]["group"]
+        self.assertIn("github.event.schedule", group)
+        self.assertIn("42 20 * * *", group)
+        self.assertIn("umbral3-private-bucket", group)
+        self.assertIn("umbral3-official-schedule", group)
+        self.assertNotEqual("umbral3-private-bucket", "umbral3-official-schedule")
+        live = self.workflow["jobs"]["live-owner-approved-release"]
+        self.assertEqual(live["concurrency"]["group"], "umbral-instagram-official")
+        for workflow in ("publish_morning.yml", "publish_daily.yml"):
+            fallback = yaml.load(
+                (ROOT / ".github/workflows" / workflow).read_text(encoding="utf-8"),
+                Loader=yaml.BaseLoader,
+            )
+            self.assertEqual(fallback["concurrency"]["group"], "umbral-instagram-official")
+
+    def test_one_off_actual_refill_is_private_and_never_uses_meta_credentials(self):
+        job = self.workflow["jobs"]["integration-nextweek-refill-smoke"]
+        self.assertEqual(job["needs"], "verify")
+        self.assertIn("refs/heads/integration/umbral-3", job["if"])
+        self.assertIn("github.event_name == 'push'", job["if"])
+        self.assertEqual(job["permissions"], {"contents": "read", "id-token": "write"})
+        self.assertEqual(job["env"]["UMBRAL_HORROR_DIRECTION"], "horror-v3")
+        self.assertNotIn("IG_ACCESS_TOKEN", job.get("env", {}))
+        script = "\n".join(s.get("run", "") for s in job["steps"])
+        self.assertIn("--today 2026-11-21 --slot 09", script)
+        self.assertIn("--single", script)
+        self.assertIn("stored_full_candidate", script)
+        self.assertIn("ready_to_publish", script)
+        self.assertNotIn("publish_daily.py", script)
+        self.assertNotIn("IG_ACCESS_TOKEN", script)
+        self.assertNotIn("graph.facebook.com", script)
+        self.assertNotIn("docs/published", script)
+
+    def test_main_refill_stays_off_until_explicit_release(self):
+        refill = self.workflow["jobs"]["daily-refill"]
+        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'", refill["if"])
+        self.assertIn("refs/heads/main", refill["if"])
+        self.assertIn("42 20 * * *", refill["if"])
