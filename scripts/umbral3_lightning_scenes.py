@@ -42,7 +42,7 @@ def render_images(index, anchor, output):
             raise RuntimeError("Pinned model size unverified")
         if sum(sizes)+2_000_000_000>shutil.disk_usage(tmp).free:
             raise RuntimeError("Not enough disk for model and workspace")
-        directory=snapshot_download(MODEL,revision=PIN,local_dir=Path(tmp)/"model",max_workers=2)
+        directory=snapshot_download(MODEL,revision=PIN,max_workers=2)
         pipe=OVStableDiffusionXLPipeline.from_pretrained(
             directory,device="CPU",ov_config={"CACHE_DIR":str(Path(tmp)/"cache")})
         report=[]
