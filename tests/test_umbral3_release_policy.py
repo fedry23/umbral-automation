@@ -25,7 +25,7 @@ class ReleasePolicyTests(unittest.TestCase):
                 self.assertFalse(row["ready_to_publish"])
                 self.assertEqual(len(row["bundle_sha256"]),64)
     def test_refuses_11_21_already_posted_even_if_owner_approved(self):
-        with self.assertRaisesRegex(RuntimeError,"Historical"):
+        with self.assertRaisesRegex(RuntimeError,"publication receipt"):
             approved_slot("2026-11-21","21",ROOT,NOW)
     def test_refuses_future_slot_without_review(self):
         with self.assertRaisesRegex(RuntimeError,"No exact owner-approved"):
