@@ -47,8 +47,13 @@ def finalize(day,slot,media_dir,number=None,root=ROOT,private_test=False):
     if not private_test:
         if dt.datetime.now(TZ).date().isoformat()!=day:
             raise RuntimeError("Live finalization only allowed on its own civil day")
-        if handoff.get("visual_approved") is not True:
-            raise RuntimeError("Visual approval still missing; official finalization blocked")
+        # The local handoff flag is untrusted (it comes from restored media).
+        # Review is an explicit owner registry entry on the release checkout,
+        # bound to the precise six PNG hashes, story and publishing slot.
+        from scripts.umbral3_visual_approval import require_visual_approval
+        from scripts.umbral3_reserve import story_key
+        require_visual_approval(root,day,slot,story_key(story),handoff["assets"])
+        handoff={**handoff,"visual_approved":True}
     elif handoff.get("visual_approved") is not False:
         raise RuntimeError("Private tests may only use unapproved candidates")
     from render import render_story_media
