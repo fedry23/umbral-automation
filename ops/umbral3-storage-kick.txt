@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-21: probe main branch OIDC trusted-publisher authorization, one immutable 1MiB key, no Instagram access
+2026-11-21 15:25 Europe/Madrid: owner added main Trusted Publisher, repeat OIDC private roundtrip only; no Meta publishing.
