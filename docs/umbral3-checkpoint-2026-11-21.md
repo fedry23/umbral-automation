@@ -51,3 +51,16 @@ No fusionar PR #18 ni activar media experimental en producción hasta revisar vi
 7. Observar siete días completos de publicaciones 09/21 antes de declarar finalización.
 
 **Estado de liberación: PR #18 abierta. Reserva verificadamente lista para publicar = 0/14. No autorizar producción por error.**
+
+
+## Addendum validado — 21/11/2026, primera prueba Lightning completada
+
+- Run [44862349621](https://github.com/fedry23/umbral-automation/actions/runs/44862349621), job `lightning-smoke` 136718806155, terminó **SUCCESS**. Produjo seis imágenes de la historia civil 2026-11-21 / 09 con tiempos individuales ~8-10 s y las ensambló como Reel completo privado.
+- Se subió a `Fedry23/umbral-private` el ZIP 15,702,139 bytes, SHA-256 `249f776afc2d7e3c1dc8cff7b4a57df0ba9fb82a5a64573c8c77f3ebd2f419c4`; reporte `UMBRAL3_PRIVATE_CANDIDATE_STORED` confirma `slot_indexed:true`, `private_previews_verified:true`, `ready_to_publish:false`, `visual_review:not_performed`. Los previews individuales de vídeo, portada y hoja de contacto se almacenan **solo en el bucket privado**. Ninguna publicación Meta.
+- Este éxito desbloqueó los otros trece trabajos `lightning-batch (1..13)` de la MISMA ejecución, max-parallel 2; estaban queued/in_progress en la última comprobación. **No afirmar 14/14 sin ver sus conclusiones y leer inventario nuevo.**
+- scripts/umbral3_hf_candidate_audit.py y el workflow OIDC incorporan auditoría de los 14 Reels sin publicación ni modelos, activable con commit en `ops/umbral3-storage-kick.txt` cuyo mensaje **empiece exactamente `UMBRAL candidate audit`** cuando la matriz esté terminada. Si los ficheros faltan, mostrar faltantes sin inventar aprobación artística. Esa auditoría requiere workflow en commit posterior al disparo de 44862349621, por lo que no forma parte de su snapshot.
+- Nueva reposición móvil D+7: `scripts/umbral3_refill_gate.py` comprueba historia exacta, revisión de modelo pinned, hashes y si ya existe; `.github/workflows/umbral3_hf_storage.yml` contiene job `daily-refill` con dos slots y cron 17:07 UTC, pero **solo se ejecutará en main cuando** `vars.UMBRAL3_RESERVE_ENABLED=='true'` y el propietario autorice OIDC estrictamente para main. Es inactivo por defecto y no publica Meta.
+- El Centro de control UMBRAL ahora prepara editorialmente D+7 por ambas franjas después de validar mañana, sin cambiar su cron ni sus funciones de respaldo. La automatización existente `UMBRAL 3 · Desarrollo y validación` se actualizó para revisar los runs nuevos y el checkpoint, conservando 11:00 Europe/Madrid. No se crearon tareas adicionales.
+- Se añadió caché de pesos SDXL Lightning para futuras ejecuciones en el workspace de Github (`HF_HOME`). El primer commit de caché 68053de... produjo workflow YAML inválido por usar `runner.temp` en jobs.env; se corrigió con `github.workspace` en 127cfee..., y tests de integración posteriores pasaron. No reutilizar la versión rota.
+- Tests posteriores de desarrollo: **165/165** exitosos en el job de regresión 136721281869 de run 44863279371, sin publicar. No atribuir 165/165 a commits posteriores hasta que sus propias ejecuciones terminen.
+- Sin inspección visual de los fotogramas del modelo, ningún Reel nuevo está aprobado. Prohibido fusionar PR #18 a main o activar la variable de producción.
