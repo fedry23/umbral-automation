@@ -442,6 +442,79 @@ jobs:
       - name: Publish SHA-verified 84-frame mixed V3/V3.1 board to private bucket ONLY
         run: python -u -m scripts.umbral3_hf_contact_board --backend sdxl-lightning-2steps-ov-int8-horror-v3 --priority-mix
 
+
+  private-encrypted-owner-preview:
+    # One-off owner preview: the ONLY uploaded bytes are RSA/AES authenticated ciphertext.
+    # This does NOT reveal raw private HF media in public GitHub Actions artifacts or logs.
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL owner encrypted image review')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_PROGRESS_BARS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned private readback and encryption dependencies
+        run: python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'cryptography==46.0.3' 'Pillow==11.3.0'
+      - name: Read exact owner board and encrypt before it touches any artifact
+        env:
+          PREVIEW_PUBLIC_KEY_DER_B64: 'MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA6eJnjWXWjToW8YMtHRQ9ZV8sXxX42dBguM4WbaduPq+ZCChzoeAjNlxzfs/IfEfNd/y58O4ZIVjVO9RbnU672qRugne9B1jyJ2d3bWdKpFZiBLCkZk+zyeNlW+3XrXV9r8jOgThQcuKItJl80KIjvbb50ns+cvwzQbUaJ4GRwU0ioVB+/ITukDaXMvyDr9ZLnvKkZHtk4Ke4CdEIUU16uGPGaAuLElrXb3IRUUCgLB+3tFRMHi3Q9SE6RPQP4TjyrDRive1Fq2Nx5vZxJMgPdZUgqeNPVXtYX7+hhyGG7NjRabzTPrih27yUMbt+H/7Y1x4qnjYT8B3m8FH1rTLLvVQxwP0Ut05cc5eJWF1X7AlN6XdojZKqLcAtbebjXg7FVM5hJTnEEIlJhFD3wCNePdQIypYjS5KuJYgEumMpoQahBN1Pmu07zz+WJF1oVruB/fcGESZF7xoIetPGr20oOWc4XbhSV/aXoCDdc/qYbvd2yV3CYvjUPlKMUhjlRh/PAgMBAAE='
+        run: |
+          python - <<'PY'
+          import base64, hashlib, os
+          from pathlib import Path
+          from PIL import Image
+          from cryptography.hazmat.primitives import hashes, serialization
+          from cryptography.hazmat.primitives.asymmetric import padding
+          from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+          from scripts.umbral3_hf_storage import HfBucketStore
+
+          name = 'umbral3/private-review/_boards/umbral-2026-11-21-v3-v31-priority-mix-14-scenes-859be1ef1001f5be6476c87db5c90a47f866a30b19d91a39597bbea748e14b2e.jpg'
+          expected_sha = '859be1ef1001f5be6476c87db5c90a47f866a30b19d91a39597bbea748e14b2e'
+          store = HfBucketStore.from_oidc()
+          entries = [x for x in store.api.list_bucket_tree(store.bucket, recursive=True, token=store.token)
+                     if getattr(x, 'path', None) == name]
+          if len(entries) != 1 or entries[0].size != 1902350:
+              raise RuntimeError('Exact private review image is missing or ambiguous')
+          from tempfile import TemporaryDirectory
+          with TemporaryDirectory() as folder:
+              path=Path(folder)/'private.jpg'
+              store.api.download_bucket_files(store.bucket, files=[(name,path)], token=store.token)
+              raw=path.read_bytes()
+              if len(raw)!=1902350 or hashlib.sha256(raw).hexdigest()!=expected_sha:
+                  raise RuntimeError('Private image SHA256/length mismatch')
+              with Image.open(path) as im:
+                  if im.format!='JPEG' or im.size!=(2664,3032):
+                      raise RuntimeError('Unexpected private board image')
+              public=serialization.load_der_public_key(base64.b64decode(os.environ['PREVIEW_PUBLIC_KEY_DER_B64']))
+              key,nonce=os.urandom(32),os.urandom(12)
+              wrapped=public.encrypt(key,padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),
+                                                     algorithm=hashes.SHA256(),label=None))
+              if len(wrapped)!=384:
+                  raise RuntimeError('Invalid RSA key size')
+              encrypted=AESGCM(key).encrypt(nonce,raw,b'UMBRAL V3.1 owner visual review')
+              output=Path(os.environ['RUNNER_TEMP'])/'umbral-owner-review.enc'
+              output.write_bytes(b'UV31'+wrapped+nonce+encrypted)
+              print('OWNER_REVIEW_ENCRYPTED: bytes='+str(output.stat().st_size)
+                    +' image_sha256='+expected_sha+' raw_media_not_exposed=true')
+          PY
+      - name: Temporary encrypted-only owner delivery
+        uses: actions/upload-artifact@v4
+        with:
+          name: umbral-owner-review-encrypted
+          path: ${{ runner.temp }}/umbral-owner-review.enc
+          retention-days: 1
+          if-no-files-found: error
+
   production-oidc-probe:
     # No Meta credentials, image model execution, publishing, artifact upload,
     # or production auto-enable. This is the SAME trusted-publisher filename.
