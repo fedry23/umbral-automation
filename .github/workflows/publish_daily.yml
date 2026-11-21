@@ -31,10 +31,30 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  rollout:
+    # Fail closed to the legacy publisher if V3.1 art is unreviewed/expired.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      legacy: ${{ steps.route.outputs.legacy }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Select safe official producer for this civil slot
+        id: route
+        env:
+          UMBRAL3_ROLLOUT_OVERRIDE: ${{ vars.UMBRAL3_LIVE_ENABLED }}
+        run: |
+          python -m scripts.umbral3_rollout --mode legacy --slot 21 --event '${{ github.event_name }}' --schedule '${{ github.event.schedule }}'
+
   publicar:
+    needs: rollout
     # Publicación programada autorizada. La tarea antigua de ChatGPT está desactivada.
     # Bloqueo manual de emergencia: UMBRAL_META_PUBLISH_ENABLED=false en Variables.
-    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_call' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push') && github.event.workflow_run.head_repository.full_name == github.repository)) && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && (vars.UMBRAL3_LIVE_ENABLED != 'v31-owner-reviewed-859be1ef' || (github.event_name == 'schedule' && (github.event.schedule == '0 19 * * *' || github.event.schedule == '0 20 * * *'))) }}
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_call' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push') && github.event.workflow_run.head_repository.full_name == github.repository)) && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && needs.rollout.outputs.legacy == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 240
     env:
