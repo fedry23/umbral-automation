@@ -40,10 +40,72 @@ class OptimizationsTests(unittest.TestCase):
             out=Path(tmp)
             (out/'prepared.json').write_text(json.dumps({'date':'2026-11-17','status':'prepared','container':'abc'}))
             events=[]
-            with patch.object(publisher,'OUT',out), patch.object(publisher,'intent_path',return_value=out/'absent.json'), patch.object(publisher,'already_published',return_value=None), patch.object(publisher,'now_local',return_value=dt.datetime(2026,11,17,20,30,tzinfo=publisher.TZ)), patch.object(publisher,'persist_intent',side_effect=lambda *a:events.append('persist')), patch.object(publisher,'wait_until_target',side_effect=lambda *a:events.append('wait')), patch.object(publisher,'api',side_effect=lambda *a:(events.append('post') or {'id':'123'})) as api, patch.object(publisher,'record_verified',side_effect=lambda *a:events.append('verify')):
+            with patch.object(publisher,'OUT',out), patch.object(publisher,'intent_path',return_value=out/'absent.json'), patch.object(publisher,'already_published',side_effect=lambda *a:(events.append('meta-read') or None)) as reader, patch.object(publisher,'now_local',return_value=dt.datetime(2026,11,17,20,30,tzinfo=publisher.TZ)), patch.object(publisher,'persist_intent',side_effect=lambda *a:events.append('persist')), patch.object(publisher,'wait_until_target',side_effect=lambda *a:events.append('wait')), patch.object(publisher,'api',side_effect=lambda *a:(events.append('post') or {'id':'123'})) as api, patch.object(publisher,'record_verified',side_effect=lambda *a:events.append('verify')):
                 publisher.publish('2026-11-17')
-                self.assertEqual(events,['persist','wait','post','verify'])
+                self.assertEqual(events,['meta-read','persist','wait','meta-read','post','verify'])
+                self.assertEqual(reader.call_count,2)
                 api.assert_called_once_with('POST',f'{publisher.ACCOUNT}/media_publish',{'creation_id':'abc'})
+
+    def test_last_second_meta_duplicate_skips_irreversible_post(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp)
+            (out/'prepared.json').write_text(json.dumps({
+                'date':'2026-11-17','status':'prepared','container':'abc'}))
+            event=[]
+            now=dt.datetime(2026,11,17,21,0,tzinfo=publisher.TZ)
+            existing={'id':'already-in-meta','media_product_type':'REELS'}
+            with patch.object(publisher,'OUT',out), patch.object(
+                publisher,'intent_path',return_value=out/'absent.json'), patch.object(
+                publisher,'already_published',side_effect=[None,existing]) as read, patch.object(
+                publisher,'now_local',return_value=now), patch.object(
+                publisher,'persist_intent',side_effect=lambda *a:event.append('persist')), patch.object(
+                publisher,'api') as api, patch.object(
+                publisher,'record_verified') as receipt:
+                publisher.publish('2026-11-17')
+                read.assert_has_calls([unittest.mock.call('2026-11-17')]*2)
+                self.assertEqual(event,['persist'])
+                api.assert_not_called()
+                receipt.assert_called_once()
+                self.assertEqual(receipt.call_args.args[1],'already-in-meta')
+
+    def test_failed_final_meta_read_never_posts_or_claims_receipt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp)
+            (out/'prepared.json').write_text(json.dumps({
+                'date':'2026-11-17','status':'prepared','container':'abc'}))
+            now=dt.datetime(2026,11,17,21,0,tzinfo=publisher.TZ)
+            with patch.object(publisher,'OUT',out), patch.object(
+                publisher,'intent_path',return_value=out/'absent.json'), patch.object(
+                publisher,'already_published',side_effect=[None,RuntimeError('Meta listing incomplete')]), patch.object(
+                publisher,'now_local',return_value=now), patch.object(
+                publisher,'persist_intent') as persisted, patch.object(
+                publisher,'api') as api, patch.object(
+                publisher,'record_verified') as receipt:
+                with self.assertRaisesRegex(RuntimeError,'Meta listing incomplete'):
+                    publisher.publish('2026-11-17')
+                persisted.assert_called_once()
+                api.assert_not_called()
+                receipt.assert_not_called()
+
+    def test_expired_date_after_final_read_never_posts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp)
+            (out/'prepared.json').write_text(json.dumps({
+                'date':'2026-11-17','status':'prepared','container':'abc'}))
+            now=dt.datetime(2026,11,17,23,59,tzinfo=publisher.TZ)
+            tomorrow=dt.datetime(2026,11,18,0,0,tzinfo=publisher.TZ)
+            with patch.object(publisher,'OUT',out), patch.object(
+                publisher,'intent_path',return_value=out/'absent.json'), patch.object(
+                publisher,'already_published',side_effect=[None,None]), patch.object(
+                publisher,'now_local',side_effect=[now,now,tomorrow]), patch.object(
+                publisher,'persist_intent') as persist, patch.object(
+                publisher,'api') as api, patch.object(
+                publisher,'record_verified') as receipt:
+                with self.assertRaisesRegex(RuntimeError,'Expired date during final'):
+                    publisher.publish('2026-11-17')
+                persist.assert_called_once()
+                api.assert_not_called()
+                receipt.assert_not_called()
 
     def test_failed_durable_write_never_publishes(self):
         with tempfile.TemporaryDirectory() as tmp:
