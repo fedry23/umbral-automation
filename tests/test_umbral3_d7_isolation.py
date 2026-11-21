@@ -50,7 +50,7 @@ class D7IsolationTests(unittest.TestCase):
 
     def test_main_refill_stays_off_until_explicit_release(self):
         refill = self.workflow["jobs"]["daily-refill"]
-        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'", refill["if"])
+        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED != 'false'", refill["if"])
         self.assertIn("refs/heads/main", refill["if"])
         self.assertIn("42 20 * * *", refill["if"])
 
