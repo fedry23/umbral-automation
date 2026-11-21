@@ -3,6 +3,10 @@ on:
   push:
     branches: [integration/umbral-3]
     paths: ['ops/umbral3-storage-kick.txt']
+  # GitHub schedules run only on default main. Disabled until signed off by
+  # visual QA, release CI and an additional main-scoped HF trusted publisher.
+  schedule:
+    - cron: '07 17 * * *'
   workflow_dispatch:
     inputs:
       render_private:
@@ -272,3 +276,63 @@ jobs:
         run: python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
       - name: Verify every candidate after separate GitHub runner restart
         run: python -u -m scripts.umbral3_hf_candidate_audit --anchor 2026-11-21
+
+
+  daily-refill:
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        slot: ['09', '21']
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate the authorized main publisher; no Meta tokens
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Verify existing private candidate or select exactly one missing D+7 slot
+        id: gate
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --slot ${{ matrix.slot }}
+      - name: Reuse pinned Lightning weights when a candidate is missing
+        if: steps.gate.outputs.generate == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        if: steps.gate.outputs.generate == 'true'
+        with:
+          models: 'true'
+      - name: Install pinned 2-step SDXL Lightning CPU environment
+        if: steps.gate.outputs.generate == 'true'
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Create six unapproved, hashed, dated cinematic storyboard shots
+        if: steps.gate.outputs.generate == 'true'
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --output "$RUNNER_TEMP/umbral3-refill"
+      - name: Assemble and privately persist one complete candidate, never publish
+        if: steps.gate.outputs.generate == 'true'
+        run: python -u -m scripts.umbral3_reserve_render --single --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --prepared-dir "$RUNNER_TEMP/umbral3-refill"
+      - name: Verify full video index and restored hashes in separate subprocess
+        if: steps.gate.outputs.generate == 'true'
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --slot ${{ matrix.slot }}
