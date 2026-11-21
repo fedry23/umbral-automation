@@ -1,0 +1,2 @@
+Fedry23/umbral-private
+2026-11-21: read-only candidate inventory after completed run 44862349621; no render, no Meta publication, no visual approval

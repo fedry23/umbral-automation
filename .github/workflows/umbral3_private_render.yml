@@ -1,0 +1,36 @@
+name: UMBRAL 3 - isolated full renders
+on:
+  push:
+    branches: [integration/umbral-3]
+    paths:
+      - '.github/workflows/umbral3_private_render.yml'
+      - 'ops/umbral3-private-render-kick.txt'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: umbral3-private-render
+  cancel-in-progress: false
+jobs:
+  private-render:
+    if: github.ref == 'refs/heads/integration/umbral-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        fixture: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Render fixture without publication credentials or media upload
+        env:
+          UMBRAL_IMAGE_BACKEND: turbo
+          UMBRAL_IMAGE_PROFILE: quality
+          UMBRAL_IMAGE_ATTEMPTS: '3'
+        run: python -u -m scripts.umbral3_private_render --index ${{ matrix.fixture }}

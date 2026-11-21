@@ -149,6 +149,9 @@ CURATED_VISUAL_SHOTS = {
 
 
 def visual_shots(story):
+    if 'storyboard' in story:
+        from scripts.storyboard import validate_storyboard
+        return [shot['prompt'] for shot in validate_storyboard(story)]
     curated = CURATED_VISUAL_SHOTS.get(story.get('title'))
     if curated is not None:
         if len(curated) != len(story['scenes']):
@@ -168,7 +171,7 @@ def apply_visual_tone(image, tone):
     lut = [min(255, round(x * factor)) for factor in (0.98, 1.0, 1.035) for x in range(256)]
     return image.point(lut)
 
-def generate_images(story, out):
+def generate_images(story, out, *, model_revision=None):
     from PIL import Image
     import torch
     from diffusers import AutoPipelineForText2Image
@@ -183,7 +186,8 @@ def generate_images(story, out):
     if backend not in models:
         raise ValueError('Modelo de imagen desconocido')
     pipe = AutoPipelineForText2Image.from_pretrained(
-        models[backend], torch_dtype=torch.float32)
+        models[backend], torch_dtype=torch.float32,
+        **({'revision': model_revision} if model_revision is not None else {}))
     # On CPU, attention slicing serializes work and often makes inference slower.
     # Leave it off unless explicitly requested for a memory-constrained runner.
     if os.getenv('UMBRAL_LOW_MEMORY', '0') == '1':
@@ -206,6 +210,19 @@ def generate_images(story, out):
     from image_quality import assess_image
     from scripts.technical_learning import parameters_for
     tone = parameters_for(story["technical_profile"])["visual_tone"] if "technical_profile" in story else "original"
+    semantic = os.getenv('UMBRAL_SEMANTIC_RANKING', '0')
+    if semantic not in ('0', '1'):
+        raise ValueError('Invalid semantic ranking mode')
+    ranker = None
+    if semantic == '1':
+        if 'storyboard' not in story:
+            raise ValueError('Semantic experiment requires authored storyboard')
+        from scripts.umbral3_semantic import SceneRanker, MODEL
+        from huggingface_hub import model_info
+        revision = os.getenv('UMBRAL_CLIP_REVISION') or model_info(MODEL, timeout=30).sha
+        if not revision or len(revision) != 40:
+            raise RuntimeError('Cannot pin semantic model')
+        ranker = SceneRanker(visual_shots(story), revision)
     paths, report = [], []
     total_start = time.monotonic()
     max_attempts = int(os.getenv('UMBRAL_IMAGE_ATTEMPTS', '3'))
@@ -214,8 +231,15 @@ def generate_images(story, out):
     for i, scene in enumerate(visual_shots(story)):
         scene_start = time.monotonic()
         prompt = scene_image_prompt(scene)
+        if 'storyboard' in story:
+            # Authored prompts already contain camera, action and continuity.
+            # Fail instead of silently dropping information at CLIP's limit.
+            prompt = scene
+            tokens = pipe.tokenizer(prompt, truncation=False).input_ids
+            if len(tokens) > pipe.tokenizer.model_max_length:
+                raise ValueError(f'Shot {i + 1}: prompt exceeds model token limit')
         best_image, best_score, best_reasons = None, float('-inf'), []
-        attempts = []
+        attempts, candidates = [], []
         for attempt in range(max_attempts):
             seed = int(story.get('image_seed_base', 7300)) + i + attempt * 1009
             image = pipe(prompt=prompt, num_inference_steps=steps, guidance_scale=guidance,
@@ -227,13 +251,40 @@ def generate_images(story, out):
                     score, reasons = assess_image(image, prev)
             else:
                 score, reasons = assess_image(image)
+            if ranker is not None:
+                # Compare all earlier shots rather than only adjacent frames.
+                for previous in paths[:-1]:
+                    with Image.open(previous) as prev:
+                        _, prior_reasons = assess_image(image, prev)
+                    if 'near_duplicate' in prior_reasons and 'near_duplicate' not in reasons:
+                        reasons.append('near_duplicate')
+                target, margin = (None, None) if reasons else ranker.score(image, i)
+                attempts.append({'seed': seed, 'score': score, 'reasons': reasons,
+                                 'semantic_score': target, 'semantic_margin': margin})
+                candidates.append(image if not reasons else None)
+                continue
             attempts.append({'seed': seed, 'score': score, 'reasons': reasons})
+            if not reasons:
+                best_image, best_score, best_reasons = image, score, reasons
+                break
             if score > best_score:
                 best_image, best_score, best_reasons = image, score, reasons
-            if not reasons:
-                break
             print(f'Imagen {i + 1}: intento {attempt + 1} rechazado '
                   f'({", ".join(reasons)}); regenerando', flush=True)
+        if ranker is not None:
+            from scripts.umbral3_semantic import choose_candidate
+            try:
+                selected = choose_candidate(attempts)
+            except (RuntimeError, ValueError):
+                report.append({'scene': i + 1, 'attempts': attempts,
+                               'accepted_score': None, 'selected_candidate': None,
+                               'semantic_revision': revision, 'visual_approved': False,
+                               'failure': 'no_acceptable_semantic_candidate'})
+                (out / 'image_quality_report.json').write_text(
+                    json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+                raise
+            best_image = candidates[selected]
+            best_score, best_reasons = attempts[selected]['score'], []
         if best_reasons:
             # Do not silently publish an objectively defective frame.
             raise RuntimeError(f'Imagen {i + 1} sin candidato válido tras '
@@ -241,7 +292,9 @@ def generate_images(story, out):
         path = out / f'scene_{i:02}.png'
         best_image.save(path)
         report.append({'scene': i + 1, 'attempts': attempts,
-                       'accepted_score': best_score})
+                       'accepted_score': best_score,
+                       **({'selected_candidate': selected, 'semantic_revision': revision,
+                           'visual_approved': False} if ranker is not None else {})})
         print(f'Imagen: {i + 1}/{len(story["scenes"])} '
               f'({time.monotonic() - scene_start:.1f}s; '
               f'{len(attempts)} intento(s))', flush=True)
@@ -279,7 +332,7 @@ def scene_boundaries_from_cues(cues, branding, count):
     return boundaries + [end]
 
 
-def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=1.0, zoom_step=0.000055):
+def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=1.0, zoom_step=0.000055, storyboard=None):
     if type(zoom_step) is not float or zoom_step not in (0.000055, 0.00012):
         raise ValueError('Perfil de cámara no autorizado')
     if type(music_gain) not in (int, float) or music_gain not in (1.0, 0.85):
@@ -303,6 +356,11 @@ def encode(out, images, duration, outfile, branding=None, cues=None, music_gain=
         bounds = (scene_boundaries_from_cues(cues, branding, len(images))
                   if cues else [intro_end + (outro_start - intro_end) * i / len(images)
                                 for i in range(len(images) + 1)])
+        if storyboard is not None:
+            from scripts.storyboard import shot_boundaries
+            bounds = shot_boundaries(storyboard, cues, branding)
+            if len(bounds) != len(images) + 1:
+                raise ValueError('Storyboard/image count mismatch')
         timeline = ([(intro, intro_end)]
                     + [(img, bounds[i + 1] - bounds[i]) for i, img in enumerate(images)]
                     + [(outro, duration - outro_start)])
@@ -449,18 +507,64 @@ def render():
         from scripts.technical_learning import load_profile
         active_profile = load_profile(date.isoformat(), '09' if morning else '21', BASE)
         story['technical_profile'] = active_profile
+    return render_story_media(story, OUT, date,
+                              f'umbral_{date:%Y%m%d}{"_09" if morning else ""}.mp4',
+                              active_profile=active_profile)
+
+
+def render_story_media(story, out, date, filename, *, active_profile=None, reserve_store=None, reserve_slot=None, prepared_images=None):
+    """Render media only; never publish or select a production episode."""
+    if not isinstance(filename, str) or Path(filename).name != filename or not filename.endswith('.mp4'):
+        raise ValueError('Invalid output filename')
     if 'episode_number' not in story:
         raise ValueError('La historia seleccionada no tiene número de episodio fijo')
-    OUT.mkdir(exist_ok=True)
+    storyboard = None
+    if 'storyboard' in story:
+        from scripts.storyboard import validate_storyboard
+        storyboard = validate_storyboard(story)
+    out.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
-    cues, duration = generate_branded_voice(story, OUT)
+    cues, duration = generate_branded_voice(story, out)
     from music_engine import generate_ambient_score
-    generate_ambient_score(duration, cues, OUT, seed=7300 + date.toordinal() % 10000)
+    generate_ambient_score(duration, cues, out, seed=7300 + date.toordinal() % 10000)
     voiced = time.monotonic()
     from scripts.technical_learning import parameters_for, DEFAULT_PARAMETERS
     params = parameters_for(active_profile) if active_profile is not None else DEFAULT_PARAMETERS
-    write_subtitles(cues, OUT / 'subtitles.ass', outline=params['subtitle_outline'])
-    images = generate_images(story, OUT)
+    write_subtitles(cues, out / 'subtitles.ass', outline=params['subtitle_outline'])
+    if storyboard is not None:
+        from scripts.storyboard import shot_boundaries
+        branding = json.loads((out / 'branding_timing.json').read_text(encoding='utf-8'))
+        bounds = shot_boundaries(storyboard, cues, branding)
+        (out / 'shot_timeline.json').write_text(json.dumps([
+            {'shot': i + 1, 'start': bounds[i], 'end': bounds[i + 1],
+             'narration': shot['narration']}
+            for i, shot in enumerate(storyboard)
+        ], ensure_ascii=False, indent=2), encoding='utf-8')
+    if prepared_images is not None:
+        if reserve_store is not None or reserve_slot not in ('09', '21'):
+            raise ValueError("Prepared scenes need an exclusive trusted civil slot")
+        from scripts.umbral3_reserve import validated_prepared_images
+        images = validated_prepared_images(prepared_images, story, date.isoformat(),
+                                           reserve_slot, out)
+        (out / 'reserve_status.json').write_text(json.dumps({
+            'status': 'private_candidate_scenes_reused',
+            'story_sha256': prepared_images['story_sha256'],
+            'visual_approved': prepared_images['visual_approved'],
+        }), encoding='utf-8')
+    elif reserve_store is None:
+        images = generate_images(story, out)
+    else:
+        from scripts.umbral3_prepare import visual_recipe
+        from scripts.umbral3_storage import get_or_prepare
+        recipe = visual_recipe()
+        if recipe['clip_revision']:
+            os.environ['UMBRAL_CLIP_REVISION'] = recipe['clip_revision']
+        images, reserve_status = get_or_prepare(
+            reserve_store, story, date.isoformat(), reserve_slot, recipe, out,
+            lambda s, folder: generate_images(s, folder, model_revision=recipe['revision']))
+        (out / 'reserve_status.json').write_text(json.dumps({
+            'status': reserve_status, 'visual_approved': False
+        }), encoding='utf-8')
     # Lightweight visual QA: a single contact sheet makes it easy to inspect
     # all six generated scenes without downloading large intermediate PNGs.
     from PIL import Image, ImageOps, ImageDraw
@@ -472,33 +576,35 @@ def render():
         x = gap + (idx % 3) * (thumb_w + gap)
         y = gap + (idx // 3) * (thumb_h + gap)
         sheet.paste(tile, (x, y))
-    sheet.save(OUT / 'scene_contact_sheet.jpg', quality=85, optimize=True)
+    sheet.save(out / 'scene_contact_sheet.jpg', quality=85, optimize=True)
     # Cover is a distinct downloadable JPEG. Brand cards are original
     # graphics; they NEVER reuse any generated story scene.
     from scripts.thumbnail import make_thumbnail
     from scripts.brand_cards import make_brand_cards
-    make_thumbnail(story, images, OUT / 'cover.jpg')
-    make_brand_cards(story, OUT)
-    (OUT / 'brand_story.json').write_text(json.dumps(story, ensure_ascii=False))
-    timing = json.loads((OUT / 'branding_timing.json').read_text(encoding='utf-8'))
+    make_thumbnail(story, images, out / 'cover.jpg')
+    make_brand_cards(story, out)
+    (out / 'brand_story.json').write_text(json.dumps(story, ensure_ascii=False))
+    timing = json.loads((out / 'branding_timing.json').read_text(encoding='utf-8'))
     illustrated = time.monotonic()
-    outfile = OUT / f'umbral_{date:%Y%m%d}{"_09" if morning else ""}.mp4'
+    outfile = out / filename
+    shot_options = {'storyboard': storyboard} if storyboard is not None else {}
     if active_profile is None:
-        encode(OUT, images, duration, outfile, branding=timing, cues=cues)
+        encode(out, images, duration, outfile, branding=timing, cues=cues, **shot_options)
     else:
-        encode(OUT, images, duration, outfile, branding=timing, cues=cues,
-               music_gain=params['music_gain'], zoom_step=params['zoom_step'])
+        encode(out, images, duration, outfile, branding=timing, cues=cues,
+               music_gain=params['music_gain'], zoom_step=params['zoom_step'], **shot_options)
     timings = {'voice_seconds': voiced - started, 'images_seconds': illustrated - voiced,
                'encoding_seconds': time.monotonic() - illustrated,
                'total_seconds': time.monotonic() - started}
-    (OUT / 'timings.json').write_text(json.dumps(timings, indent=2))
+    (out / 'timings.json').write_text(json.dumps(timings, indent=2))
     print(json.dumps(timings), flush=True)
-    (OUT / 'story_used.json').write_text(json.dumps({'date': str(date), **story}, ensure_ascii=False, indent=2))
-    (OUT / 'caption.txt').write_text(
+    (out / 'story_used.json').write_text(json.dumps({'date': str(date), **story}, ensure_ascii=False, indent=2))
+    (out / 'caption.txt').write_text(
         f"Historia {story['episode_number']}: {story['title']}\n"
         + story['caption'] + '\n#UmbralTerror #RelatosDeTerror\n',
         encoding='utf-8')
     print(f'Vídeo verificado: {outfile} ({duration:.2f}s)')
+    return outfile
 
 
 if __name__ == '__main__':

@@ -1,0 +1,48 @@
+name: UMBRAL 3 - isolated storyboard gate
+on:
+  push:
+    branches: [integration/umbral-3]
+    paths:
+      - 'scripts/storyboard.py'
+      - 'scripts/umbral3_*.py'
+      - 'tests/**'
+      - 'render.py'
+      - 'stories*.json'
+      - 'docs/published/*.json'
+      - '.github/workflows/umbral3_storyboard.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: umbral3-storyboard-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  storyboard:
+    if: github.ref == 'refs/heads/integration/umbral-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m py_compile render.py scripts/storyboard.py tests/test_storyboard.py
+      - run: python -m unittest discover -s tests -p test_storyboard.py -v
+  regression:
+    needs: storyboard
+    if: github.ref == 'refs/heads/integration/umbral-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      UMBRAL_DYNAMIC_EPISODES: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'false'
+      - run: python -m unittest discover -s tests -v
+      - run: python -c 'from scripts.episode_state import next_episode; print("Next official episode:", next_episode())'

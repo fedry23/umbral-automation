@@ -1,0 +1,55 @@
+name: UMBRAL 3 - private evidence and Dropbox gate
+on:
+  push:
+    branches: [integration/umbral-3]
+    paths: ['.github/workflows/umbral3_evidence.yml', 'ops/umbral3-evidence-kick.txt']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: umbral3-evidence
+  cancel-in-progress: false
+jobs:
+  storage:
+    if: github.ref == 'refs/heads/integration/umbral-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify dedicated OAuth, quota and immutable readback
+        env:
+          UMBRAL_DROPBOX_APP_KEY: ${{ secrets.UMBRAL_DROPBOX_APP_KEY }}
+          UMBRAL_DROPBOX_APP_SECRET: ${{ secrets.UMBRAL_DROPBOX_APP_SECRET }}
+          UMBRAL_DROPBOX_REFRESH_TOKEN: ${{ secrets.UMBRAL_DROPBOX_REFRESH_TOKEN }}
+        run: python -m scripts.umbral3_evidence
+  render:
+    needs: storage
+    if: github.ref == 'refs/heads/integration/umbral-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        fixture: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Render and retain privately, without Meta credentials
+        env:
+          UMBRAL_DROPBOX_APP_KEY: ${{ secrets.UMBRAL_DROPBOX_APP_KEY }}
+          UMBRAL_DROPBOX_APP_SECRET: ${{ secrets.UMBRAL_DROPBOX_APP_SECRET }}
+          UMBRAL_DROPBOX_REFRESH_TOKEN: ${{ secrets.UMBRAL_DROPBOX_REFRESH_TOKEN }}
+          UMBRAL_IMAGE_BACKEND: turbo
+          UMBRAL_IMAGE_PROFILE: quality
+          UMBRAL_IMAGE_ATTEMPTS: '3'
+        run: python -u -m scripts.umbral3_private_render --index ${{ matrix.fixture }} --private-evidence

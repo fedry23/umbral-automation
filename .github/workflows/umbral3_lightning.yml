@@ -1,0 +1,35 @@
+name: UMBRAL 3 - SDXL Lightning CPU feasibility
+on:
+  push:
+    branches: [integration/umbral-3]
+    paths: ['ops/umbral3-lightning-kick.txt']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: umbral3-lightning-cpu-test
+  cancel-in-progress: false
+jobs:
+  test:
+    if: github.ref == 'refs/heads/integration/umbral-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install compatible isolated CPU dependencies
+        run: |
+          python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          python -m pip check
+          free -h
+          df -h
+      - name: Benchmark two shots; no uploads, no Meta or bucket authentication
+        env:
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          HF_HUB_DISABLE_XET: '1'
+          OMP_NUM_THREADS: '4'
+        run: /usr/bin/time -v python -u -m scripts.umbral3_lightning_benchmark
