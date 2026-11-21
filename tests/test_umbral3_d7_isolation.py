@@ -54,6 +54,24 @@ class D7IsolationTests(unittest.TestCase):
         self.assertIn("refs/heads/main", refill["if"])
         self.assertIn("42 20 * * *", refill["if"])
 
+
+    def test_two_different_d7_private_jobs_cover_both_civil_slots(self):
+        jobs = self.workflow["jobs"]
+        first = jobs["integration-nextweek-refill-smoke"]
+        second = jobs["integration-nextweek-refill-evening-smoke"]
+        self.assertIn("2026-11-28 09", first["if"])
+        self.assertIn("2026-11-28 21", second["if"])
+        for slot, job in (("09", first), ("21", second)):
+            self.assertEqual(job["permissions"], {"contents": "read", "id-token": "write"})
+            script = "\n".join(s.get("run", "") for s in job["steps"])
+            self.assertIn("--slot " + slot, script)
+            self.assertIn("--single", script)
+            self.assertIn("stored_full_candidate", script)
+            self.assertIn("ready_to_publish", script)
+            self.assertNotIn("IG_ACCESS_TOKEN", script)
+            self.assertNotIn("publish_daily.py", script)
+        self.assertNotEqual(first["if"], second["if"])
+
     def test_nextweek_pair_exists_without_fabricating_owner_signoff(self):
         import datetime as dt
         import json
