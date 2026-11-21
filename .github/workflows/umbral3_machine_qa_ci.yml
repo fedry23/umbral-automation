@@ -32,7 +32,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup-render
         with:
-          models: 'true'
+          models: 'false'
       - name: Compile machine gate and verify Python contracts
         run: |
           python -m compileall -q scripts/umbral3_machine_qa.py scripts/umbral3_machine_clip_runner.py scripts/umbral3_rollout.py scripts/umbral3_live_stage.py scripts/umbral3_approved_restore.py scripts/umbral3_finalize_from_reserve.py
