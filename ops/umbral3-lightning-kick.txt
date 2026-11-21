@@ -1,0 +1,1 @@
+2026-11-21: first independent 2-step SDXL Lightning CPU benchmark, no uploads
