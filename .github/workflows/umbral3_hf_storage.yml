@@ -9,6 +9,14 @@ on:
         description: 'Explicitly render a full private trial Reel'
         type: boolean
         default: false
+      preview_one:
+        description: 'Render one dated, private six-shot candidate only'
+        type: boolean
+        default: false
+      preview_all:
+        description: 'Render 14 private candidate Reels; NONE approved for publication'
+        type: boolean
+        default: false
       audit_private:
         description: 'Audit existing private archive inventory without generating media'
         type: boolean
@@ -88,3 +96,66 @@ jobs:
           /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
       - name: Render real private test Reel and verify remote full media readback
         run: python -u -m scripts.umbral3_private_render --index ${{ matrix.fixture }} --private-evidence
+
+  candidate-smoke:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.preview_one == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL reserve candidate smoke')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_IMAGE_BACKEND: turbo
+      UMBRAL_IMAGE_PROFILE: quality
+      UMBRAL_IMAGE_ATTEMPTS: '3'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Isolate OIDC storage SDK from image-generation dependency pins
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Render complete but unapproved 21-Nov editorial candidate
+        run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index 0
+
+  candidate-batch:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.preview_all == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL reserve candidates full')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_IMAGE_BACKEND: turbo
+      UMBRAL_IMAGE_PROFILE: quality
+      UMBRAL_IMAGE_ATTEMPTS: '3'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Isolate OIDC storage SDK from image-generation dependency pins
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Archive complete but unapproved editorial candidate in private bucket
+        run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index ${{ matrix.index }}
