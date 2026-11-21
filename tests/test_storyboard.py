@@ -35,6 +35,19 @@ class StoryboardTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_storyboard(s)
 
+    def test_all_authored_storyboards_pass_contract(self):
+        """Catch inconsistent continuity anchors before any private render."""
+        import json
+        from pathlib import Path
+        root = Path(__file__).resolve().parents[1]
+        for name in ('stories.json', 'stories_morning.json'):
+            stories = json.loads((root / name).read_text(encoding='utf-8'))
+            for story in stories:
+                if 'storyboard' not in story:
+                    continue
+                with self.subTest(source=name, title=story.get('title')):
+                    validate_storyboard(story)
+
     def test_exact_spoken_cues(self):
         shots=validate_storyboard(fixture())
         cues=[(0,1,'Intro'),(2,3,'La puerta estaba cerrada.'),(3.3,4,'Oí tres golpes.'),
