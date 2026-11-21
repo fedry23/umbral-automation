@@ -440,3 +440,49 @@ jobs:
       - name: Erase test media from ephemeral runner
         if: always()
         run: rm -rf -- "$RUNNER_TEMP/umbral3-numbered"
+
+  horror-direction-smoke:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL horror private smoke')
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v2
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Verify all fourteen curated horror storyboards without Meta
+        run: python -m unittest tests.test_umbral3_horror_direction
+      - name: Isolate private storage SDK
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Install pinned Lightning model in isolated runtime
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Generate six darker story-specific scenes (no official approval)
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor 2026-11-21 --index 3 --output "$RUNNER_TEMP/umbral3-horror"
+      - name: Seal new horror version privately without overwriting first 14 originals
+        run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index 3 --prepared-dir "$RUNNER_TEMP/umbral3-horror" --single
+      - name: Delete ephemeral media after private hash readback
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-horror"
