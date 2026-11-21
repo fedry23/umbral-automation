@@ -278,17 +278,29 @@ def publish(day):
             wait_until_target(day)
         if now_local().date().isoformat() != day:
             raise RuntimeError("Expired date before POST; do not publish")
-        # Shared workflow concurrency plus the durable intent protects this POST.
-        # Perform ONE publish request. If the network drops, inspect media before retrying.
-        try:
-            result = api("POST", f"{ACCOUNT}/media_publish",
-                         {"creation_id": data["container"]})
-            media_id = result["id"]
-        except Exception:
-            found = already_published(day)
-            if not found:
-                raise RuntimeError("Publicación ambigua: revisar Instagram; NO reintentar automáticamente") from None
-            media_id = found["id"]
+        # The first inventory read happened BEFORE persisting the durable intent
+        # (potentially minutes before the actual publication time). Reconcile
+        # once again immediately before the irreversible Meta write, while the
+        # shared workflow lock and durable intent are still held.
+        # Incomplete/ambiguous Meta reads must fail closed, never cause a POST.
+        published_at_release = already_published(day)
+        if now_local().date().isoformat() != day:
+            raise RuntimeError("Expired date during final Meta reconciliation; do not publish")
+        if published_at_release:
+            print("Reel detectado en la comprobación final; no se publica otra vez")
+            media_id = published_at_release["id"]
+        else:
+            # Perform ONE publish request. If the network drops, inspect media
+            # before retrying; never automatically repeat an uncertain POST.
+            try:
+                result = api("POST", f"{ACCOUNT}/media_publish",
+                             {"creation_id": data["container"]})
+                media_id = result["id"]
+            except Exception:
+                found = already_published(day)
+                if not found:
+                    raise RuntimeError("Publicación ambigua: revisar Instagram; NO reintentar automáticamente") from None
+                media_id = found["id"]
     record_verified(day, media_id, data)
 
 
