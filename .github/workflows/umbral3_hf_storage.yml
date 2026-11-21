@@ -6,7 +6,9 @@ on:
   # GitHub schedules run only on default main. Disabled until signed off by
   # visual QA, release CI and an additional main-scoped HF trusted publisher.
   schedule:
-    - cron: '07 17 * * *'
+    # 21:42 CET / 22:42 CEST: after editorial preparation at 18:20,
+    # after the 21:00 official publication and 21:20 independent backup.
+    - cron: '42 20 * * *'
   workflow_dispatch:
     inputs:
       render_private:
