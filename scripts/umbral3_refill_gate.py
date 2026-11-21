@@ -61,6 +61,30 @@ def check(store, day, slot, all_stories=None):
     result["stored_full_candidate"]=True
     return result
 
+
+def recover_backlog(store, today, slot, all_stories=None):
+    """Recover the OLDEST missing slot in the next seven civil Madrid dates.
+
+    An interrupted D+7 run must not leave a permanent hole: tomorrow's refill
+    checks that old missing date before spending CPU on the new D+7 tail.
+    Every existing index is independently read back and SHA/ZIP verified by
+    check(); corrupt/stale media fails closed rather than being overwritten.
+    One new candidate maximum per official slot per scheduled run.
+    """
+    if isinstance(today,dt.datetime) or type(today) is not dt.date or slot not in ("09","21"):
+        raise ValueError("Backlog requires a civil date and a supported slot")
+    last=None
+    for offset in range(1,8):
+        target=today+dt.timedelta(days=offset)
+        decision=check(store,target-dt.timedelta(days=7),slot,all_stories)
+        if decision.get("generate") is True:
+            return {**decision,"recovered_backlog":offset<7,
+                    "checked_future_dates":offset,"all_slots_complete":False}
+        last=decision
+    return {**last,"generate":False,"recovered_backlog":False,
+            "checked_future_dates":7,"all_slots_complete":True}
+
+
 def assert_generation_budget(store):
     """Reject costly CPU generation BEFORE downloading models when HF space is low.
 
@@ -98,7 +122,11 @@ def main():
                       help="Explicit immutable private fourteen-slot batch index")
     parser.add_argument("--today")
     parser.add_argument("--anchor")
+    parser.add_argument("--recover-backlog",action="store_true",
+                        help="Refill the earliest missing one of seven future Madrid dates")
     args=parser.parse_args()
+    if args.recover_backlog and args.index is not None:
+        parser.error("--recover-backlog is only for scheduled civil-slot refills")
     if args.index is not None:
         if args.today is not None or args.anchor is None:
             parser.error("--index requires --anchor and rejects --today")
@@ -110,7 +138,8 @@ def main():
                dt.datetime.now(MADRID).date())
         slot=args.slot
     store=HfBucketStore.from_oidc()
-    result=check(store,today,slot)
+    result=(recover_backlog(store,today,slot) if args.recover_backlog
+            else check(store,today,slot))
     if result["generate"]:
         result.update(assert_generation_budget(store))
     print("UMBRAL3_REFILL="+json.dumps(result,sort_keys=True),flush=True)
