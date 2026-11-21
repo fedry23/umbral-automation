@@ -108,7 +108,7 @@ def _clip_logits(images,story):
                        env={k:v for k,v in os.environ.items()
                             if k not in ("IG_ACCESS_TOKEN","HF_TOKEN","HF_ACCESS_TOKEN",
                                          "GH_TOKEN","GITHUB_TOKEN",
-                                         "ACTIONS_ID_TOKEN_REQUEST_TOKEN")})
+                                         "ACTIONS_ID_TOKEN_REQUEST_TOKEN","HF_HOME")})
         result=json.loads((folder/"clip_scores.json").read_text(encoding="utf-8"))
         if len(result)!=6:
             raise RuntimeError("CLIP failed to assess every scene")
