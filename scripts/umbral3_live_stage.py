@@ -34,7 +34,18 @@ def stage(day,slot,root=ROOT,storage_python=None,run=subprocess.run,now=None):
     _last,receipts=inventory(root)
     if receipt_key(day,slot) in receipts:
         raise RuntimeError("Already published; never stage a duplicate official slot")
-    approved_slot(day,slot,root,now)
+    try:
+        approved_slot(day,slot,root,now)
+        artistic_mode="owner"
+    except RuntimeError as error:
+        # Never fall through from a duplicate, stale editorial story or
+        # integrity mismatch. Only absent FUTURE owner signoff is eligible.
+        if str(error)!="No exact owner-approved artwork for civil slot":
+            raise
+        from scripts.umbral3_rollout import read_auto_policy
+        if day<"2026-11-28" or read_auto_policy(root) is not True:
+            raise
+        artistic_mode="machine"
     if not isinstance(storage_python,str) or not storage_python.startswith("/tmp/umbral3-hf-storage/"):
         raise RuntimeError("Expected isolated OIDC bucket reader, never a reusable long-lived token")
     target=root/"staged"
@@ -46,14 +57,23 @@ def stage(day,slot,root=ROOT,storage_python=None,run=subprocess.run,now=None):
     with tempfile.TemporaryDirectory(prefix="umbral3-owner-live-") as tmp:
         folder=Path(tmp)
         run([storage_python,"-m","scripts.umbral3_approved_restore",
-             "--date",day,"--slot",slot,"--output",str(folder)],
+             "--date",day,"--slot",slot,"--output",str(folder),
+             "--mode",artistic_mode],
             cwd=root,check=True,timeout=180)
-        # An approved private image has NOT yet been published, so we still
-        # bind the actual episode number to authoritative current receipts.
+        proof=None
+        if artistic_mode=="machine":
+            file=folder/"machine_quality_certificate.json"
+            if not file.is_file() or file.is_symlink() or file.stat().st_size>9000:
+                raise RuntimeError("Private OIDC machine QA handoff absent")
+            proof=json.loads(file.read_text(encoding="utf-8"))
+        # Number the media only after exact remote approval and final receipts.
         decision=finalize(day,slot,folder,root=root,
-                          official_receipts_root=root,private_test=False)
+                          official_receipts_root=root,private_test=False,
+                          machine_evidence=proof)
         if (decision.get("ready_to_publish") is not True
-                or decision.get("visual_approved") is not True):
+                or decision.get("art_authorized") is not True
+                or decision.get("owner_reviewed") is not (artistic_mode=="owner")
+                or decision.get("machine_approved") is not (artistic_mode=="machine")):
             raise RuntimeError("Live finalization did not authorize validated artwork")
         suffix="_09" if slot=="09" else ""
         video=f"umbral_{day.replace('-','')}{suffix}.mp4"
@@ -79,7 +99,11 @@ def stage(day,slot,root=ROOT,storage_python=None,run=subprocess.run,now=None):
                 raise RuntimeError("Required final media missing: "+name)
             shutil.copy2(p,target/name)
     return {"date":day,"slot":slot,"episode_number":decision["episode_number"],
-            "video":str(target/video),"image_source":"owner-approved-private",
+            "video":str(target/video),
+            "image_source":("owner-approved-private" if artistic_mode=="owner"
+                            else "machine-qa-private"),
+            "owner_reviewed":artistic_mode=="owner",
+            "machine_approved":artistic_mode=="machine",
             "ready_for_meta_preflight":True,
             "published":False}
 
