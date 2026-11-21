@@ -1,4 +1,4 @@
-"""Prove V3.1 live publisher is inert unless explicitly activated on main."""
+"""Prove V3.1 routing is dated, owner-authorized, and fail-safe for main."""
 from pathlib import Path
 import unittest
 import yaml
@@ -57,7 +57,7 @@ class OwnerLiveWorkflowTests(unittest.TestCase):
                 self.assertIn("umbral-instagram-official",f["concurrency"]["group"])
                 for cron in backup:
                     self.assertIn(cron,[x["cron"] for x in f["on"]["schedule"]])
-                    self.assertIn(cron, f["on"]["schedule"][0]["cron"] if False else " ".join(x["cron"] for x in f["on"]["schedule"]))
+                    self.assertNotIn("IG_ACCESS_TOKEN", f["jobs"]["rollout"]["steps"][-1].get("env", {}))
 
 if __name__=="__main__":
     unittest.main()
