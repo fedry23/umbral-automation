@@ -343,3 +343,62 @@ jobs:
       - name: Verify full video index and restored hashes in separate subprocess
         if: steps.gate.outputs.generate == 'true'
         run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --slot ${{ matrix.slot }}
+
+  late-finalization-smoke:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL late-number smoke')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      UMBRAL_IMAGE_BACKEND: turbo
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'false'
+      - name: Prepare OIDC read-only media restoration
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0 Pillow==11.3.0
+      - name: Verify complete private candidate and restore exactly six original scenes
+        run: |
+          set -euo pipefail
+          test -z "${IG_ACCESS_TOKEN:-}"
+          STORY_SHA="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts.umbral3_reserve import story_key
+          stories=json.loads(Path('stories_morning.json').read_text())
+          rows=[s for s in stories if s.get('publish_date')=='2026-11-22']
+          assert len(rows)==1
+          print(story_key(rows[0]))
+          PY
+          )"
+          /tmp/umbral3-hf-storage/bin/python -m scripts.umbral3_hf_restore_candidate --date 2026-11-22 --slot 09 --backend sdxl-lightning-2steps-ov-int8 --story-sha "$STORY_SHA" --output "$RUNNER_TEMP/umbral3-numbered"
+          echo "UMBRAL3_RESTORED_SHOTS=6"
+      - name: Recreate late-numbered final media without diffusion or publication
+        run: |
+          python -u -m scripts.umbral3_finalize_from_reserve --date 2026-11-22 --slot 09 --media-dir "$RUNNER_TEMP/umbral3-numbered" --private-test
+      - name: Confirm no private output is uploaded as a public artifact
+        run: |
+          test -f "$RUNNER_TEMP/umbral3-numbered/umbral_20261122_09.mp4"
+          test -f "$RUNNER_TEMP/umbral3-numbered/cover.jpg"
+          python - <<'PY'
+          from pathlib import Path
+          import os,hashlib
+          folder=Path(os.environ["RUNNER_TEMP"])/"umbral3-numbered"
+          frames=[folder/f"scene_{n:02}.png" for n in range(6)]
+          assert all(p.is_file() for p in frames)
+          assert len({hashlib.sha256(p.read_bytes()).hexdigest() for p in frames})==6
+          print("UMBRAL3_LATE_NUMBER_PASS: 6 original images, new official-numbered preview; nothing published")
+          PY
+      - name: Erase test media from ephemeral runner
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-numbered"
