@@ -39,6 +39,9 @@ def render_images(index, anchor, output):
     elif direction == "horror-v3":
         from scripts.umbral3_horror_v3 import directed_prompts_v3
         prompts = None
+    elif direction == "horror-v3-1":
+        from scripts.umbral3_horror_v31 import directed_prompts_v31
+        prompts = None
     elif direction == "original":
         prompts = visual_shots(story)
     else:
@@ -62,6 +65,8 @@ def render_images(index, anchor, output):
             prompts = directed_prompts(story, pipe.tokenizer)
         elif direction == "horror-v3":
             prompts = directed_prompts_v3(story, pipe.tokenizer)
+        elif direction == "horror-v3-1":
+            prompts = directed_prompts_v31(story, pipe.tokenizer)
         if len(prompts)!=6 or len(set(prompts))!=6:
             raise ValueError("Six unique visual story beats required")
         report=[]
@@ -73,7 +78,7 @@ def render_images(index, anchor, output):
             best=None
             attempts=[]
             for attempt in range(2):
-                seed=({"original": 730000, "horror-v2": 830000, "horror-v3": 930000}[direction]) + index*1000 + i*17 + attempt*123
+                seed=({"original": 730000, "horror-v2": 830000, "horror-v3": 930000, "horror-v3-1": 1030000}[direction]) + index*1000 + i*17 + attempt*123
                 started_shot=time.monotonic()
                 image=pipe(prompt=prompt,width=W,height=H,
                            num_inference_steps=2,guidance_scale=1.0,
