@@ -44,7 +44,7 @@ class HorrorDirectionTests(unittest.TestCase):
         examples={
             "El banco de la parada":("submerged underwater","trapped passengers","STILL SITTING"),
             "Las huellas de sal":("SALT crystals","behind the broom","WHITE SALT footprints"),
-            "El último doblaje":("shadow stays motionless","hand is rigid","spinning endlessly"),
+            "El último doblaje":("shadow stays motionless","hand is rigid","spin endlessly"),
             "El ascensor de servicio":("decades younger","ring itself has vanished","child-height"),
         }
         for title,phrases in examples.items():
