@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-21: rerun horror v3 bus stop candidate with verified empty-bench unit assertion, zero Meta access
+2026-11-21: exact scene fingerprint read for owner-reviewed horror-v3 22 Nov 21; no media exposure; no publication
