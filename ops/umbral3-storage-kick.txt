@@ -1,3 +1,4 @@
 Fedry23/umbral-private
 2026-11-21: exact scene fingerprint read for owner-reviewed horror-v3 22 Nov 21; no media exposure; no publication
 2026-11-21: read-only integrity audit of fourteen archived candidate ZIPs after branch sync; no approval or Meta publish
+2026-11-21: trigger FULL fourteen-slot horror-v3 private batch after 197 validated tests, skip immutable existing v3, no Instagram posting or approval
