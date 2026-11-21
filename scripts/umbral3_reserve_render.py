@@ -130,11 +130,14 @@ def main():
     p.add_argument("--index",type=int,required=True)
     p.add_argument("--anchor",required=True)
     p.add_argument("--prepared-dir",type=Path)
+    p.add_argument("--single",action="store_true",help="Validate only one D+7 refill slot")
     args=p.parse_args()
     date=dt.date.fromisoformat(args.anchor)
-    # Validate the entire 14-slot editorial supply BEFORE model downloads.
+    # An initial batch requires all 14 stories; an incremental refill must only
+    # require its two new D+7 slots, not another seven future days of scripts.
     items=catalogs()
-    for i in range(14):
+    selected=(args.index,) if args.single else range(14)
+    for i in selected:
         load_slot(i,date,items)
     python=os.environ.get("UMBRAL_HF_STORAGE_PYTHON","")
     prepare(args.index,date,python,args.prepared_dir)
