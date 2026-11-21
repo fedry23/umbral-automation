@@ -22,13 +22,14 @@ class OIDCIdentityIntegrationTests(unittest.TestCase):
         self.assertNotIn("graph.facebook.com",combined)
         self.assertNotIn("upload-artifact",combined)
         self.assertIn("umbral3_hf_probe",combined)
-    def test_refill_still_disabled_by_default_and_has_no_meta_permissions(self):
+    def test_refill_requires_owner_control_and_has_no_meta_permissions(self):
         w=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
                     Loader=yaml.BaseLoader)
         refill=w["jobs"]["daily-refill"]
         self.assertIn("refs/heads/main",refill["if"])
-        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'",refill["if"])
+        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED != 'false'",refill["if"])
         self.assertEqual(refill["permissions"],{"contents":"read","id-token":"write"})
+        self.assertIn("scripts.umbral3_rollout --mode refill",str(refill["steps"]))
         self.assertNotIn("IG_ACCESS_TOKEN",str(refill))
         self.assertNotIn("graph.facebook.com",str(refill))
     def test_existing_development_trusted_publisher_claims_preserved(self):
