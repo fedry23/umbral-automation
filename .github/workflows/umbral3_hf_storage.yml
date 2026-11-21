@@ -182,14 +182,14 @@ jobs:
       HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
       HF_HUB_DISABLE_XET: '1'
       OMP_NUM_THREADS: '4'
-      HF_HOME: ${{ runner.temp }}/umbral3-lightning-model-cache
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
       - uses: actions/cache@v4
         with:
-          path: ${{ runner.temp }}/umbral3-lightning-model-cache/hub
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
           key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
       - uses: ./.github/actions/setup-render
         with:
@@ -222,7 +222,7 @@ jobs:
       HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
       HF_HUB_DISABLE_XET: '1'
       OMP_NUM_THREADS: '4'
-      HF_HOME: ${{ runner.temp }}/umbral3-lightning-model-cache
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -234,7 +234,7 @@ jobs:
           persist-credentials: false
       - uses: actions/cache@v4
         with:
-          path: ${{ runner.temp }}/umbral3-lightning-model-cache/hub
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
           key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
       - uses: ./.github/actions/setup-render
         with:
