@@ -35,9 +35,20 @@ class V3Tests(unittest.TestCase):
             self.assertIn("no text",p)
         self.assertIn("BENCH is EMPTY",prompts[5])
         self.assertIn("MAN SITTING",prompts[5])
-    def test_unrelated_story_is_not_styled_or_approved(self):
-        with self.assertRaisesRegex(ValueError,"limited"):
-            directed_prompts_v3({**self.story,"title":"another story"},Tokenizer())
+    def test_new_authored_story_uses_v3_film_language_without_approval(self):
+        for name,file in (("La cinta amarilla","stories_morning.json"),("El cristal empañado","stories.json")):
+            stories=json.loads((ROOT/file).read_text(encoding="utf-8"))
+            story=next(s for s in stories if s.get("title")==name)
+            prompts=directed_prompts_v3(story,Tokenizer())
+            self.assertEqual(len(prompts),6)
+            self.assertEqual(len(set(prompts)),6)
+            self.assertIn(story["storyboard"]["shots"][5]["action"],prompts[-1])
+            self.assertTrue(all("horror" in p and "No text" in p for p in prompts))
+            self.assertNotIn("visual_approved",story)
+
+    def test_uncurated_storyboard_is_refused(self):
+        with self.assertRaises((ValueError,KeyError)):
+            directed_prompts_v3({"title":"No storyboard","scenes":["x"]*6},Tokenizer())
         self.assertNotIn("visual_approved",self.story)
     def test_tight_tokenizer_fails_without_truncating_anomaly(self):
         tok=Tokenizer()
