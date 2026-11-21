@@ -9,6 +9,8 @@ import datetime as dt
 import hashlib
 import io
 import json
+import os
+import subprocess
 from pathlib import Path
 import re
 import tempfile
@@ -90,18 +92,27 @@ def _prompts(story):
 
 
 def _clip_logits(images,story):
-    import torch
-    from transformers import CLIPModel, CLIPProcessor
-    processor=CLIPProcessor.from_pretrained(MODEL,revision=REVISION)
-    model=CLIPModel.from_pretrained(MODEL,revision=REVISION,use_safetensors=True)
-    model.eval()
-    inputs=processor(images=images,text=_prompts(story),return_tensors="pt",
-                     padding=True,truncation=True)
-    with torch.inference_mode():
-        result=model(**inputs).logits_per_image.float().cpu().tolist()
-    if len(result)!=6:
-        raise RuntimeError("CLIP failed to assess every scene")
-    return result
+    """Run public CLIP in rendering Python, never share OIDC private HF token."""
+    python=os.environ.get("UMBRAL_CLIP_PYTHON","")
+    if not python.startswith("/") or not Path(python).is_file():
+        raise RuntimeError("No isolated public CLIP vision runtime configured")
+    with tempfile.TemporaryDirectory(prefix="umbral3-clip-scenes-") as tmp:
+        folder=Path(tmp)
+        for i,img in enumerate(images):
+            img.save(folder/f"scene_{i:02}.png")
+        (folder/"prompts.json").write_text(
+            json.dumps(_prompts(story),ensure_ascii=False),encoding="utf-8")
+        subprocess.run([python,"-m","scripts.umbral3_machine_clip_runner",
+                        "--folder",str(folder)],cwd=ROOT,
+                       check=True,timeout=600,
+                       env={k:v for k,v in os.environ.items()
+                            if k not in ("IG_ACCESS_TOKEN","HF_TOKEN","HF_ACCESS_TOKEN",
+                                         "GH_TOKEN","GITHUB_TOKEN",
+                                         "ACTIONS_ID_TOKEN_REQUEST_TOKEN")})
+        result=json.loads((folder/"clip_scores.json").read_text(encoding="utf-8"))
+        if len(result)!=6:
+            raise RuntimeError("CLIP failed to assess every scene")
+        return result
 
 
 def evaluate_bundle(raw,story,day,slot,backend=BACKEND,semantic=None):
