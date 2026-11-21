@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-21: compare private horror v3 with v2, stronger supernatural actions for 22 Nov 21; no Meta or public previews
+2026-11-21: rerun horror v3 bus stop candidate with verified empty-bench unit assertion, zero Meta access
