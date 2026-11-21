@@ -2,7 +2,7 @@ name: UMBRAL 3 - private storage connectivity
 on:
   push:
     branches: [integration/umbral-3, main]
-    paths: ['ops/umbral3-storage-kick.txt', 'ops/umbral3-lightning-kick.txt']
+    paths: ['ops/umbral3-storage-kick.txt']
   # GitHub schedules run only on default main. Disabled until signed off by
   # visual QA, release CI and an additional main-scoped HF trusted publisher.
   schedule:
