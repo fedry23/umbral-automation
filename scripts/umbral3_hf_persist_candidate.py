@@ -7,6 +7,7 @@ import re
 from scripts.umbral3_hf_storage import HfBucketStore
 from scripts.umbral3_evidence import persist_fixture
 from scripts.umbral3_hf_candidate_index import register
+from scripts.umbral3_hf_review_preview import upload_review
 
 FILENAME=re.compile(r"candidate-(20[0-9]{2}-[01][0-9]-[0-3][0-9])-(09|21)[.]mp4")
 
@@ -34,10 +35,14 @@ def persist(output,filename,summary_path):
     pointer=register(store,data,receipt)
     if pointer["bundle_sha256"]!=receipt["sha256"]:
         raise RuntimeError("Candidate slot pointer not confirmed")
+    review=upload_review(store,root,video,data)
+    if review["files"]!=3:
+        raise RuntimeError("Private individual media preview missing")
     print("UMBRAL3_PRIVATE_CANDIDATE_STORED="+json.dumps({
         "date":data["date"],"slot":data["slot"],"index":data["index"],
         "key":receipt["key"],"bytes":receipt["bytes"],
         "sha256":receipt["sha256"],"private":True,"slot_indexed":True,
+        "private_previews_verified":True,
         "visual_review":"not_performed","ready_to_publish":False}),flush=True)
 
 if __name__=="__main__":
