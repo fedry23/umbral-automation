@@ -20,7 +20,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: umbral-integration-gate-${{ github.sha }}
+  group: umbral-integration-gate-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   tests:
@@ -36,11 +36,12 @@ jobs:
           models: 'false'
       - run: python -m compileall -q render.py audio_engine.py scripts tests
       - run: python -m unittest discover -s tests -v
-      - name: Validate current official receipts
-        run: python -c 'from scripts.episode_state import next_episode; print("Next number from verified official receipts:", next_episode())'
+      - name: Validate official receipts and report future unresolved intent without clearing it
+        run: python -m scripts.ci_receipt_gate
   private-render:
     needs: tests
-    # Heavy CPU model work is explicit and isolated from ordinary PR validation.
+    # Heavy model downloads and CPU renders are explicit integration checks.
+    # They must not rerun automatically on every tiny PR update.
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/integration/umbral-3'
     runs-on: ubuntu-latest
     timeout-minutes: 150

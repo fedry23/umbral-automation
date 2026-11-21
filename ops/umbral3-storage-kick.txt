@@ -1,2 +1,14 @@
 Fedry23/umbral-private
-2026-11-21 15:25 Europe/Madrid: owner added main Trusted Publisher, repeat OIDC private roundtrip only; no Meta publishing.
+2026-11-21: exact scene fingerprint read for owner-reviewed horror-v3 22 Nov 21; no media exposure; no publication
+2026-11-21: read-only integrity audit of fourteen archived candidate ZIPs after branch sync; no approval or Meta publish
+2026-11-21: trigger FULL fourteen-slot horror-v3 private batch after 197 validated tests, skip immutable existing v3, no Instagram posting or approval
+2026-11-21: second idempotent V3 batch run, serialized via umbral3-private-bucket; expected to reuse complete media and produce one private review board
+UMBRAL selective v31 private priority batch 2026-11-21; immutable originals, 7 slots, no Meta publication
+Owner-only encrypted V3.1 preview transport, no raw image export (2026-11-21)
+2026-11-21: owner confirms mixed V3/V3.1 contact images; extract exact scene SHA metadata only, no Meta, no publication.
+2026-11-21: private end-to-end V3.1 2026-11-22 09 test, SHA-verified owner signoff, late-numbered MP4, no Meta and no public media.
+2026-11-21: repeat approved private release smoke with real official staging validator, intro/outro, voice, cover and caption; no Meta.
+2026-11-21: read-only D+7 Nov 28 09/21 actual HF pointer audit; visual approval report; zero Meta.
+2026-11-21: third owner-approved private end-to-end smoke rerun after exact caption LF fix; do not publish.
+2026-11-21: REAL 2026-11-28 09 D+7 smoke, immutable private one-slot generation, no Meta and no owner approval.
+2026-11-21: REAL 2026-11-28 21 D+7 smoke; distinct original story and immutable unpublished private candidate; no Meta, no artistic signoff.

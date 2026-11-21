@@ -1,0 +1,54 @@
+# UMBRAL 3.0 — Gates reales de salida · 21 noviembre 2026
+
+Este documento conserva solo hechos comprobados. **NO habilitar la PR #18 ni la publicación de candidatos** mientras falte revisión audiovisual de cada candidato, integración segura de la ruta de publicación, rollback y observación real. El OIDC de main ya está verificado. No modificar Curio25, JARVIS ni los horarios oficiales (09:00/21:00 Europe/Madrid).
+
+## Producción y número oficial
+- `docs/published/2026-11-21_09.json`: episodio **16**, «La pintura fresca», Instagram media `18137894143763489`, publicado 09:00 Madrid y comprobado mediante lectura Meta.
+- Producción `main` NO publica los candidatos experimentales. `main` ya contiene PR #20 y #22, más la PR #25 que es **solo la prueba OIDC**. No hay activación visual.
+- La prueba real del 22/11 por la mañana [44907218395](https://github.com/fedry23/umbral-automation/actions/runs/44907218395) restauró seis escenas e hizo un MP4 privado, pero arrojó el número **16** usando recibos de integración obsoletos. Esto es un defecto de asignación, no una autorización de producción.
+- Corrección en `scripts/umbral3_finalize_from_reserve.py`: `official_receipts_root` desacopla historias de desarrollo de recibos oficiales actualizados; añade prueba para rechazar numeración obsoleta, y un job que obtiene `main` con `actions/checkout@v4`. **Verificado:** la repetición [44907865366](https://github.com/fedry23/umbral-automation/actions/runs/44907865366) terminó SUCCESS con `UMBRAL3_FINALIZATION` privado: `episode_number=17`, seis imágenes recuperadas sin difusión nueva, MP4 de 5.186.661 bytes, `ready_to_publish=false` y cero POST a Meta. El número 16 obsoleto queda corregido EN PRUEBA, pero la reconciliación Meta inmediatamente antes de publicar sigue pendiente. **Un checkout de main no sustituye la reconciliación Meta inmediatamente antes del POST oficial.**
+
+## HF OIDC production — bloqueo resuelto el 21/11
+- **VERIFICADO:** ejecución real de main [44913916636](https://github.com/fedry23/umbral-automation/actions/runs/44913916636), job `production-oidc-probe` SUCCESS: intercambio OIDC, bucket privado y roundtrip inmutable. No publicar con ese job; no requiere acción adicional del propietario.
+- PR [#25](https://github.com/fedry23/umbral-automation/pull/25) **fusionada** en `main` SHA `78ef999dd3ca6a36f512865e869ba6227f9d29ec`, tras 88/88 pruebas. Añade el único job `production-oidc-probe` a `.github/workflows/umbral3_hf_storage.yml`: exclusivamente `main`, `contents:read`, `id-token:write`, sin Meta, sin render y sin cron.
+- Prueba `main` [44907590484](https://github.com/fedry23/umbral-automation/actions/runs/44907590484) FAILED exclusivamente en el intercambio OIDC: `OIDC exchange failed; check trusted publisher claims`. El publisher existente en Hugging Face solo cubre la rama `integration/umbral-3`.
+- **Histórico superado:** el antiguo error requirió añadir un Trusted Publisher específico de `main` sin reemplazar el de integración. La prueba posterior de producción [44913916636](https://github.com/fedry23/umbral-automation/actions/runs/44913916636) confirmó acceso; no solicitar de nuevo esta configuración mientras continúe funcionando.
+- La rama de integración incorpora ya el mismo job `production-oidc-probe` en su workflow completo, con `daily-refill` condicionado a `vars.UMBRAL3_RESERVE_ENABLED=='true'`.
+
+## Reserva, datos y revisión audiovisual real
+- [44891884792](https://github.com/fedry23/umbral-automation/actions/runs/44891884792) comprobó `stored_complete=14`, `missing=[]`, `corrupt=[]`, `ready_reels=0`, `visual_approved=0`, `total_bytes=238507865` para los catorce candidatos fechados **21–27/11**. **NO equivale a 14 huecos futuros**: el del 21/11 a las 09:00 ya está consumido oficialmente; la reposición D+7 requiere historias adicionales del 28/11.
+- Para inspección humana, [44907692744](https://github.com/fedry23/umbral-automation/actions/runs/44907692744) produjo un solo JPEG `2664×3032` con las **84 escenas**, a partir de los 14 ZIP verificados y sus SHA, conservado únicamente en la zona privada `umbral3/private-review/_boards/`. Hash del panel: `b0c3dce9db310a2882dd15905017a961db26921ff5b5da80ac3a71a017e323e2`. No publicar este JPEG ni adjuntarlo a GitHub Actions público; el propietario puede descargarlo de su bucket privado y compartirlo directamente en chat para revisión.
+- El procedimiento `scripts/umbral3_visual_approval.py` impide aprobar el material cambiando simplemente una marca local. Solo admite un registro propietario por fecha/slot, ligado a SHA-256 de la historia y seis PNG exactos, con revisor y fecha. **Aún no hay ninguna revisión humana realizada** y no deben generarse aprobaciones falsas.
+- SDXL Lightning: benchmark [44861295384](https://github.com/fedry23/umbral-automation/actions/runs/44861295384) ~12–15 s/fotograma en CPU. Ningún benchmark confirma coherencia visual cinematográfica.
+
+## Reposición D+7 y horarios
+- El cron anterior `07 17 * * *` caía a las 18:07 CET, **antes de la preparación editorial de las 18:20**. Cambiado en desarrollo a `42 20 * * *` → 21:42 CET / 22:42 CEST, después de la publicación oficial 21:00 y del respaldo 21:20. Pruebas de ambos cambios DST añadidas.
+- La reposición automática sigue desactivada por defecto: requiere main OIDC, historias D+7, aprobación visual, pruebas correctas y activación controlada de la variable. No habilitarla mientras existan candidatos sin revisar.
+
+## Estado GitHub y pruebas
+- Se fusionó `main` hacia `integration/umbral-3` usando dos padres y copiando el recibo y material publicado del 21/11: commit `8cc7def1f89e2b9f3c06f65d7b2e6fc76a0b8876`. Comparación inmediatamente posterior: desarrollo `behind=0` y producción permanece intacta; revalidar HEAD si hay nuevas automatizaciones.
+- **180 pruebas** superadas tanto en [44908137518](https://github.com/fedry23/umbral-automation/actions/runs/44908137518) como en [44908133678](https://github.com/fedry23/umbral-automation/actions/runs/44908133678). Nuevas modificaciones posteriores requieren su propio CI. No contar una prueba `in_progress` como completada.
+- PR #18 permanece sin fusionar por seguridad.
+
+## Condiciones de cierre que NO están verificadas
+1. Inspección humana de los 14 Reels y sus fotogramas; escenas malas regeneradas y aprobaciones reales basadas en hashes.
+2. Observación real de reconciliación Meta, numeración y lock. El doble chequeo inmediatamente antes del POST ya está en producción vía PR #28, probado con mocks, pero no sustituye ejecuciones reales.
+3. Reposición D+7 que no consuma historias inexistentes ni candidatos caducados; prueba con un hueco real y rollback.
+4. PR #18 con gates end-to-end aprobados y fusión segura; siete días consecutivos reales observados.
+
+No declarar finalización hasta lograr estos puntos, aunque el almacenamiento y los 14 ZIPs estén íntegros.
+
+## Resumen ejecutivo al cerrar esta ejecución
+- La prueba real de número 17 con seis PNG recuperados ha pasado. Los catorce ZIP anteriores continúan **sin aprobación artística** y **no pueden entrar a producción**.
+- El panel JPEG de 84 escenas se guarda en el bucket privado, carpeta `umbral3/private-review/_boards/`, nombre que comienza `umbral-2026-11-21-14-scenes-`. No subirlo al repositorio público.
+- OIDC main ya configurado y verificado: run [44913916636](https://github.com/fedry23/umbral-automation/actions/runs/44913916636), SUCCESS. El bloqueo indicado en el run histórico 44907590484 quedó resuelto.
+- La reposición D+7 se ha retrasado a `42 20 * * *` para funcionar después de la preparación editorial de 18:20 CET/CEST y la publicación de 21:00. La variable de habilitación sigue sin activarse.
+- No fusionar PR #18 hasta inspeccionar las escenas y validar integración Meta/rollback; no confundir `stored_complete=14` con 14 futuros aprobados.
+
+
+## Actualización ejecutada tras la aprobación Horror v3 (21/11, posterior)
+
+- PR [#28](https://github.com/fedry23/umbral-automation/pull/28) fusionada en `main` commit `6083d2c`: comprobación final de Meta después de persistir intento y justo antes del único POST; impide publicación duplicada ante una lectura exitosa, falla cerrada ante lecturas inciertas, verifica fecha civil después de Meta; heavy render de PR restringido a disparo manual en integración. Checks PR y job `validar` de main [44924968405](https://github.com/fedry23/umbral-automation/actions/runs/44924968405) SUCCESS; Pages build/deploy SUCCESS. **Esta evidencia no cubre aún 7 días reales.**
+- Producción fusionada de vuelta hacia integración por commit `da3d537`, sin habilitar candidato experimental. [CI de integración](https://github.com/fedry23/umbral-automation/actions/runs/44925041659): **201/201 tests PASS** y controles de regresión/calidad/storyboard verdes.
+- Lote privado de 14 candidatos V3 lanzado en [44921391059](https://github.com/fedry23/umbral-automation/actions/runs/44921391059), ejecución todavía sin conclusión global en esta actualización; verificar **cada** job y el `candidate-inventory` antes de declarar 14/14. Ninguna aprobación se infiere del éxito técnico.
+- El estilo Horror v3 continúa aprobado como referencia; solo existen las aprobaciones de bytes que consten explícitamente en `docs/visual_approvals`. No activar `UMBRAL3_RESERVE_ENABLED` ni publicar candidatos experimentales sin todos los gates.

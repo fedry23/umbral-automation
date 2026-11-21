@@ -1,0 +1,273 @@
+{
+  "version": 1,
+  "owner": "fedry23",
+  "reviewed_at": "2026-11-21T20:18:10.679Z",
+  "approval_source": "Owner explicitly said «Apruebo» in current ChatGPT discussion after seeing all 14 image panels.",
+  "review_scope": "84 exact images in 14 six-frame panels; not the final videos, audio, posting or future creative output",
+  "private_board_sha256": "859be1ef1001f5be6476c87db5c90a47f866a30b19d91a39597bbea748e14b2e",
+  "private_board_size": [
+    2664,
+    3032
+  ],
+  "private_bucket": "Fedry23/umbral-private",
+  "storage_audit_run": 44937491022,
+  "exact_fingerprint_run": 44945226416,
+  "covers": "2026-11-21 through 2026-11-27 inclusive, 09 and 21 Europe/Madrid",
+  "visual_approved": 14,
+  "production_ready": false,
+  "merge_pr_18_authorized": false,
+  "entries": [
+    {
+      "index": 0,
+      "date": "2026-11-21",
+      "slot": "09",
+      "title": "La pintura fresca",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3-1-selective",
+      "story_sha256": "11fa33c1d853ebc6a1b9fedc103a731792e8d7e33ee9628cb5ad5f14fa18db05",
+      "private_candidate_bundle_sha256": "910daf00961177b62d65c82b1e00c09f5920bc0e662435a17aa105346e669ab2",
+      "scene_sha256": {
+        "scene_00.png": "7b52152d50448192032074a5bf21cd762b1d77cce68d91eee4a18dae42324737",
+        "scene_01.png": "813eca8e7ccf3b0f6ca55ebed888eb159e555b7a470ee6cbcc00fd25c3daac3d",
+        "scene_02.png": "6263cf9d86e0118a97e174784ee1a31f424ec89ad570e47761fc49305fce96e2",
+        "scene_03.png": "2ce5dc81b4c79cc3da0de829909a199eb86ff6a74e8476c47963d3a4c28747ff",
+        "scene_04.png": "4ee5ada6e16800b8d73d0a08539626d1403cd7e747630b656a14817685057538",
+        "scene_05.png": "aeb5baf5c3cf4bc219c92f1509d33bd3e5b0386b30c3cd3035a49e06a266e2e8"
+      },
+      "record": "docs/visual_approvals/2026-11-21_09.json"
+    },
+    {
+      "index": 1,
+      "date": "2026-11-21",
+      "slot": "21",
+      "title": "El último doblaje",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3",
+      "story_sha256": "a5c77ea498dd4f7af24f411220979ede0f64711d852ec86bf52f85af2348e564",
+      "private_candidate_bundle_sha256": "c8548ba3bb05da78f1786c9e49344c9c9fe1fa7146648183fb37404d93308d3d",
+      "scene_sha256": {
+        "scene_00.png": "dc88ed74bcbc9daf033646ea244183da316c8117d6051c749e8b62d295fc975d",
+        "scene_01.png": "1ae1fdd8f85c14af1961d3dc1e31eda211c5238c6e03823191a37f327a2ab68c",
+        "scene_02.png": "7cbde2bcf27e7bfe9239b1e1e66115b5d6333dfb9beb0606bb672304619153d3",
+        "scene_03.png": "43c6247c4f248d7df246916209c28790520fbf660cd9cb725bfe8018ffb4828a",
+        "scene_04.png": "41d6b58bf4bc366f7f2393fc78db22504649cea56181d6c9133128895e109497",
+        "scene_05.png": "9c31f85434eac42d929530e4cfb622263cbc236e99f15a873b0564e8253f0a35"
+      },
+      "record": "docs/visual_approvals/2026-11-21.json"
+    },
+    {
+      "index": 2,
+      "date": "2026-11-22",
+      "slot": "09",
+      "title": "El ascensor de servicio",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3-1-selective",
+      "story_sha256": "b804ee2390e562662953a223a48693c57debe9af0705c0f0a3e8e1e146a59d76",
+      "private_candidate_bundle_sha256": "e4e0d0db9d93f9b6ad23b049f470691addd3768e3a18ef2672db24fdc534eae8",
+      "scene_sha256": {
+        "scene_00.png": "9cbe8f8b88e598432a59347d5695bb985f516f82c37fa7d2da0ca0adcac0b423",
+        "scene_01.png": "4d96347142c480900bf272bf3c02695e053aa6c668171099a5a350ae937edece",
+        "scene_02.png": "107684ee0adc696a1c9181ecc19d629825160df3984a00d540e22fadad3fa533",
+        "scene_03.png": "bcbb273e606200fc1ff2bf49e7ccee4e7779fde3a5e45b48ef6583bd6bc63175",
+        "scene_04.png": "abe3c2e01ab76f4222641ccd9e7602046a731e32b0129d4c7255ecf1c07d0987",
+        "scene_05.png": "8da9d91ecf331832159502882fb8c795096ca80346ad20e2618541506cef5cc1"
+      },
+      "record": "docs/visual_approvals/2026-11-22_09.json"
+    },
+    {
+      "index": 3,
+      "date": "2026-11-22",
+      "slot": "21",
+      "title": "El banco de la parada",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3",
+      "story_sha256": "4e7b574f294e0b72b1a7b4739544255479b8a1d21bdbd09850b82a07350068b4",
+      "private_candidate_bundle_sha256": "18f8c19740611eb818eb5262010b85a73d34c1fa96667736e67eecc68b4495a3",
+      "scene_sha256": {
+        "scene_00.png": "6b39dde7ee9cfa5f309bad54beeb4bde8f5c49d1c2a1baeb4cccaf8b22381660",
+        "scene_01.png": "4e9f51eedc937ef3ec16f1c6d1d4cd6956955348d81154d41017101fae4d07e3",
+        "scene_02.png": "2c6e3e8667b03740d664d09417b52749a6b5393da664d488fbc072a6299f8568",
+        "scene_03.png": "9ddea37ce9b7af96dd1a561c32958dd57441b05c6e7b5559fa0a1b82eb546753",
+        "scene_04.png": "169d68f61bc10a27285297f08383b154d6d1178e46c4044e4e51eea49aab4ff0",
+        "scene_05.png": "94e615e0815da4397e96e40d9df4f04e1ca88adfa26fc38db6f471290df87b41"
+      },
+      "record": "docs/visual_approvals/2026-11-22.json"
+    },
+    {
+      "index": 4,
+      "date": "2026-11-23",
+      "slot": "09",
+      "title": "El carrete sin revelar",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3",
+      "story_sha256": "fab60a717065ded7b39100cabff10c24a6497d96083a12594a57b6b5a85a6397",
+      "private_candidate_bundle_sha256": "d8b1019edb570fd58d6dc852b3f444e249da072be011fb4d1a634ec3ae5aa788",
+      "scene_sha256": {
+        "scene_00.png": "51e4fd9d462b04bcdc1d5947900d88afe6a2d1decfd1e067187ae1fbb1b53bce",
+        "scene_01.png": "bff280d1bed7e14932953d0c9aa6f1374c49ff063fc5caf0e2f7bc103a96c7af",
+        "scene_02.png": "20bd0fb5344ce534b40505718a4d1432325dad93306058d6dfd0485240b95548",
+        "scene_03.png": "bf1c64ed25e1346cca85753737f8e329809ab63fbf2c92bc0e2bbe4f975dbb06",
+        "scene_04.png": "319f60d0c21ea6a875a4e0f2eb9537a993094e493ddd7f6dc4ae44be0e5a60a0",
+        "scene_05.png": "25484a77da3aa4a4f8d4913a60b79340dcc7984cac2f9f409923971e77cde594"
+      },
+      "record": "docs/visual_approvals/2026-11-23_09.json"
+    },
+    {
+      "index": 5,
+      "date": "2026-11-23",
+      "slot": "21",
+      "title": "El paquete sin remitente",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3-1-selective",
+      "story_sha256": "3c3f9f2fa7744020d92f0ba68a4019fa117f060fb853daa511b9cac95430d5c2",
+      "private_candidate_bundle_sha256": "08ea3df13fa58214892f6405640b83d81177c2b1de51dd15e8c356460ad09b97",
+      "scene_sha256": {
+        "scene_00.png": "93c0b968f4a81c0e50d5665e0814b09907ab296b9d0c9a255303a298a403e1ed",
+        "scene_01.png": "eae22619287dee34331813aadc0589fcfa25bcf945df71b6d09e4fb2dec4a390",
+        "scene_02.png": "5f00186840fb958275ac8e4bff221b147493cb161aeabfea7f6cca6e7d9ad46e",
+        "scene_03.png": "24eb1bc83952abeab8a8aee34b2457201a005c90ac9e974442b111fff750f869",
+        "scene_04.png": "c389bdd65ed7eeff06b0ec4e568b2b6ca3e3ce4dd17365f6051b67ed6e419562",
+        "scene_05.png": "f09f62e567c395e283da094850548ee63ce2642c9d779303a43fa4f94e693424"
+      },
+      "record": "docs/visual_approvals/2026-11-23.json"
+    },
+    {
+      "index": 6,
+      "date": "2026-11-24",
+      "slot": "09",
+      "title": "El grifo del patio",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3",
+      "story_sha256": "e19fa43ba9fc0e89956687f8aac538966ede390123a169b41b3922814097dd6d",
+      "private_candidate_bundle_sha256": "f3c3d05f0e3c4ba9562d897eb665bcf720a8851f5308bd2fd44f24412239ed13",
+      "scene_sha256": {
+        "scene_00.png": "81333377432bfdbace29063640646e23e8a5f38312c715ab31c075654d865638",
+        "scene_01.png": "84493d524ca0b0e74d030d8ad132eb2ffc87f4e798a26a8f8a2dc6779a782be1",
+        "scene_02.png": "b8c7bf8481945c128c6a3ab22a92f7cfd14a0bce36e2e8cf498dbd5843bd16c5",
+        "scene_03.png": "5708f7a9e21409051dc492c01c7eefb1ae578db092f62bb0c2993adc6a2a6af5",
+        "scene_04.png": "9eb5e995b24c8c5cb1d89dfabbac099aaa16d685674f3578953450270ea75680",
+        "scene_05.png": "5934b45c3d904b6dd230ab0260325535ed45549c166017ff20fd9c077493fd1f"
+      },
+      "record": "docs/visual_approvals/2026-11-24_09.json"
+    },
+    {
+      "index": 7,
+      "date": "2026-11-24",
+      "slot": "21",
+      "title": "La última página",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3",
+      "story_sha256": "96dbbd0982eac7b8fa281e762b6f5c06a9d5a1b8c3ddcb0f3a068fd1f0ad6c02",
+      "private_candidate_bundle_sha256": "39dcf72f7a2efb61e34ed58b793269b0c344b9e27dc354e250626ce4d1a03faa",
+      "scene_sha256": {
+        "scene_00.png": "15e3ed06b271d39d4b49dbb81e9519ce78dd6c54f9e9bbf8685b03d382fc2065",
+        "scene_01.png": "3fb66e029abbe85fbf9a6b64cdc5dbf1d6a84acda023ff65b4fd158ea1e7caf9",
+        "scene_02.png": "4ad2394dd7ae5d3bf2798a1c96a99442093d9ebf83be9b2a4acc760ad659feac",
+        "scene_03.png": "0dd58fa5afea666fdc8505bec927ddf1a584550af3455e08aefc2310ffda3412",
+        "scene_04.png": "f530184f10e81ba7300695898e9aa326a20e21327e920f2f62fa82140f3ab2af",
+        "scene_05.png": "922f1d05bed413586ad37d1431ee512cda18c1a0938f86c9c24f70871a23cb23"
+      },
+      "record": "docs/visual_approvals/2026-11-24.json"
+    },
+    {
+      "index": 8,
+      "date": "2026-11-25",
+      "slot": "09",
+      "title": "El plano del desván",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3-1-selective",
+      "story_sha256": "c1a8b78d599f2532cb2e766dd6e63c3e327087cd1f9b491cc0d6bad736779e97",
+      "private_candidate_bundle_sha256": "fcba70501ee46e7afbc04d265d126dabab1febb1f236e85bfe31f3fc36b43e52",
+      "scene_sha256": {
+        "scene_00.png": "1aaa9dc4cb1dbbee15316d41062cde216e47d3a8e20f2d1fe419bf19d889ef25",
+        "scene_01.png": "cb7e5fa8352244c5cf5568a2f9aa27d9c79c28ca484db9c15868c07d98c93a16",
+        "scene_02.png": "41d15ff0428e37facdb07eb195752641dda82824f1f9e0b28cbc67a11c259ec7",
+        "scene_03.png": "f01a57aebd79681437a50a9874a6c1e642b2efca04a94149975497e64effe12d",
+        "scene_04.png": "4784329e8faf91ae86c8b340656b04ef770bf6b3a82126139083fcf1d3905af7",
+        "scene_05.png": "63bc81c66b6f5da02725511ce3949cc3268a5f1d6a0a27a4efb68460176c23a6"
+      },
+      "record": "docs/visual_approvals/2026-11-25_09.json"
+    },
+    {
+      "index": 9,
+      "date": "2026-11-25",
+      "slot": "21",
+      "title": "El taxi de la otra acera",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3",
+      "story_sha256": "20091a3c4e0e50b2240acb828b674722acc543dfb1ec47f4b091c213ddf6ce8e",
+      "private_candidate_bundle_sha256": "934d24b0ec7173bdef54cdf1b53ee31b871e0bfa3c34f473e38ba1efff0fd848",
+      "scene_sha256": {
+        "scene_00.png": "a407ed8da22bb65f6d0b0d39120535f1bea3356416a0cbd522c75b2d58b7e313",
+        "scene_01.png": "bcc8b55e1630184a3a61e32c381b605f5ff50a92573ae6ea06c0d1af9f5f7bf9",
+        "scene_02.png": "8a99da2fd89b3025cf755bd14b7f471543c35d8dea65a4542108a795493f1912",
+        "scene_03.png": "fc7bfefc50ab14c4bf83c740b549c05a96035f079a2593e7a4059d12b4ce7021",
+        "scene_04.png": "4c654d04b8173efa27b320cd18195c06f2cb22e9497009e633854207decb2d6f",
+        "scene_05.png": "cabf54ccdbc1f05d5e24ab792ec1f47670c398eca3db61d9a988d24b19370da2"
+      },
+      "record": "docs/visual_approvals/2026-11-25.json"
+    },
+    {
+      "index": 10,
+      "date": "2026-11-26",
+      "slot": "09",
+      "title": "El botón verde",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3-1-selective",
+      "story_sha256": "b354c7e28949b10e520e8de1e2a514ee42bf7250324cbc58125de8e986444839",
+      "private_candidate_bundle_sha256": "38ef1415018bbabe4f6675bc7ca090c69a6ca921797e6f44efb421805df42845",
+      "scene_sha256": {
+        "scene_00.png": "7c9be9e2714df82e483340f18fb18fe5117215415dba8d3d3932fa49cface1ed",
+        "scene_01.png": "b2aa68e2d22c23d270a8b68efa0d5a93592783b79137816b130c92eb449e6996",
+        "scene_02.png": "7889cfc657ada8d99476433530777b1e63744c5c82a2510cc8d529d21dade5b7",
+        "scene_03.png": "43f70f0508770d21190db3e6e09d36e259c15a8f4ec32c82a6a00fdb1d211848",
+        "scene_04.png": "d3a16c3eaaba8ecd2f0458f60007daba113e8d53610cf3ead7b1bbc35bd9a5d7",
+        "scene_05.png": "6493ac8998487a72dc803b1f564ce458b5197f9f3f55a5fb6d70d4e3bb3b9a6b"
+      },
+      "record": "docs/visual_approvals/2026-11-26_09.json"
+    },
+    {
+      "index": 11,
+      "date": "2026-11-26",
+      "slot": "21",
+      "title": "La radio del sótano",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3-1-selective",
+      "story_sha256": "171ae8c160aa1f1c307ea2a109e04156c1bb136ac8e5686ac534d9ec820b9e90",
+      "private_candidate_bundle_sha256": "d31a229672b33b1c14c6e330eaa7f52de1f2d8358063be9ce516d9de0768a00b",
+      "scene_sha256": {
+        "scene_00.png": "5156e5aa09d1bdc740d129910fb17e61a91d31ad793f3bd222159bb8bbf04527",
+        "scene_01.png": "d27d6b2e013c46c59ff55d99345494e211fd8a2d3108cb054ef14159da0fa2b8",
+        "scene_02.png": "b7db0183928d3436e723035b75d171f5251cd4b2d51b704482bac4d359d01e88",
+        "scene_03.png": "c6dde673e58912456e7b07943a2fa1a3897f88558cc4f21da00817849744d1c0",
+        "scene_04.png": "9427f95df2c0c85be3e4448c315a9ee369d153413b81fc0c6cab7cc99ba9e3ce",
+        "scene_05.png": "f6351e5826b171633a194298beeb3ec2d4821cd7e2c6923adcf3293f67b6ffdd"
+      },
+      "record": "docs/visual_approvals/2026-11-26.json"
+    },
+    {
+      "index": 12,
+      "date": "2026-11-27",
+      "slot": "09",
+      "title": "Las huellas de sal",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3-1-selective",
+      "story_sha256": "a82fca2dcaf4299798119ef794b4b17559346ff5f90250fb02255ec2ceb9d6d4",
+      "private_candidate_bundle_sha256": "b62dc532cc7d8dacad46a4a8460b5dbc456cd620551af3d0e6d13700bdb026f5",
+      "scene_sha256": {
+        "scene_00.png": "977c36be340e9a02cf99fe133513b269ff6fe9183dda48395b148a52c0599b0c",
+        "scene_01.png": "c22fcbdbfeda84b21e177e5dce2c8bfeec2d155ec2998be8004266439a0bfe16",
+        "scene_02.png": "16315c8eec8e320bc0fb7ea7dc0226b3c6e712a6b30c50742e2d4dd0bb08cd5f",
+        "scene_03.png": "293fc0e959efdee9374a3f79ff120fadd03c7f3846acc830d44bbc423d2925ab",
+        "scene_04.png": "9e1995928c5a35be771544c7cec3a3d9fc05983a94368a90f6316316d78eb796",
+        "scene_05.png": "4d748dacef2f9f8aa636d564b811bbaf03e4046515c9a92f0cffed8f0200226b"
+      },
+      "record": "docs/visual_approvals/2026-11-27_09.json"
+    },
+    {
+      "index": 13,
+      "date": "2026-11-27",
+      "slot": "21",
+      "title": "El abrigo de la consigna",
+      "backend": "sdxl-lightning-2steps-ov-int8-horror-v3",
+      "story_sha256": "20b006eb92633280e05ca14146b1600e8c3e1a9be4cd3cd7bd58127dc02c7623",
+      "private_candidate_bundle_sha256": "9303453fc76a68f0c29a034b70fa71897417604129b63abe3735b5ab0dc3a4a4",
+      "scene_sha256": {
+        "scene_00.png": "521d64aaf37ba8de325a8467f8d429832fce83eff62c124c6902b11f32ae2950",
+        "scene_01.png": "dd45ccd3cd93028bd576e61039a9459b8c9c8d85d3a23d830f7b0f5424fb5643",
+        "scene_02.png": "39910fe73adc3c770709c3812dd157316caed4ddfe3f2b729366624caddef900",
+        "scene_03.png": "7c0cf31ca7afe5ca88c03d72ecb9c39004a5961f7a0debfbee046b8069f6b2fe",
+        "scene_04.png": "d6b7d06427a1fe660f2c334629727eed522277dcb3cd21fdb67de5a3bf6ebf5f",
+        "scene_05.png": "49d64486da242cca3634f123195ae179d202ec3926a8c3d6d3ba03466dd3d058"
+      },
+      "record": "docs/visual_approvals/2026-11-27.json"
+    }
+  ]
+}

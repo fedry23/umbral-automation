@@ -1,19 +1,606 @@
-name: UMBRAL 3 - private production storage
-# Isolated MAIN identity probe: does not generate or publish any Reel.
-# Scope Hugging Face Trusted Publisher to repository + branch + filename.
+name: UMBRAL 3 - private storage connectivity
 on:
-  workflow_dispatch:
   push:
-    branches: [main]
+    branches: [integration/umbral-3, main]
     paths: ['ops/umbral3-storage-kick.txt']
+  # GitHub schedules run only on default main. Disabled until signed off by
+  # visual QA, release CI and an additional main-scoped HF trusted publisher.
+  schedule:
+    # 21:42 CET / 22:42 CEST: after editorial preparation at 18:20,
+    # after the 21:00 official publication and 21:20 independent backup.
+    - cron: '42 20 * * *'
+    - cron: '17 5 * * *'   # 09 local: primary pre-publication preparation
+    - cron: '17 6 * * *'   # 09 local: DST-safe preparation backup
+    - cron: '17 17 * * *' # 21 local: primary preparation
+    - cron: '17 18 * * *' # 21 local: DST-safe preparation backup
+  workflow_dispatch:
+    inputs:
+      render_private:
+        description: 'Explicitly render a full private trial Reel'
+        type: boolean
+        default: false
+      preview_one:
+        description: 'Render one dated, private six-shot candidate only'
+        type: boolean
+        default: false
+      lightning_one:
+        description: 'One SDXL Lightning six-shot complete Reel for private visual review'
+        type: boolean
+        default: false
+      lightning_all:
+        description: 'Full fourteen-slot SDXL Lightning candidate queue; NEVER publish'
+        type: boolean
+        default: false
+      preview_all:
+        description: 'Render 14 private candidate Reels; NONE approved for publication'
+        type: boolean
+        default: false
+      audit_candidates:
+        description: 'Read-only audit of all 14 SHA-verified private candidate Reels'
+        type: boolean
+        default: false
+      audit_private:
+        description: 'Audit existing private archive inventory without generating media'
+        type: boolean
+        default: false
+      selective_priority:
+        description: 'Private selective V3.1 regeneration of seven priority Reels, never publish'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
-  group: umbral3-production-private-storage
+  # Long private CPU refills must never queue or block an official 09/21 Reel.
+  # The official job still shares umbral-instagram-official with both legacy publishers.
+  group: ${{ github.event_name == 'schedule' && github.event.schedule != '42 20 * * *' && 'umbral3-official-schedule' || 'umbral3-private-bucket' }}
   cancel-in-progress: false
 jobs:
+  verify:
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_PROGRESS_BARS: '1'
+      HF_HUB_VERBOSITY: error
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Isolated storage SDK
+        run: python -m pip install --disable-pip-version-check huggingface_hub==1.19.0 Pillow==11.3.0
+      - name: Verify private bucket and exact content read-back
+        run: |
+          set -euo pipefail
+          export UMBRAL_HF_BUCKET="$(head -n 1 ops/umbral3-storage-kick.txt)"
+          python -m scripts.umbral3_hf_probe
+      - name: Fingerprint exact owner-reviewed mixed V3/V3.1 board and 84 scene bytes
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL owner review evidence')
+        run: python -u -m scripts.umbral3_owner_approval_evidence
+      - name: Extract exact V3 scene hashes for owner approval registry (no image disclosure)
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL reviewed v3 fingerprint')
+        run: python -u -m scripts.umbral3_hf_review_fingerprint
+      - name: Read-only authentic D+7 refill preflight for both 28 Nov slots
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL D7 private preflight')
+        run: |
+          python -u -m scripts.umbral3_refill_gate --today 2026-11-21 --slot 09
+          python -u -m scripts.umbral3_refill_gate --today 2026-11-21 --slot 21
+          python -u -m scripts.umbral3_release_policy --future
+      - name: Round-trip validated six-scene bundle with immutable metadata
+        run: python -m scripts.umbral3_hf_roundtrip
+      - name: Prove full v2 audiovisual archive contract using synthetic private files
+        run: python -m scripts.umbral3_hf_full_archive_smoke
+      - name: Verify persisted private archives after workflow restart
+        if: (github.event_name == 'workflow_dispatch' && inputs.audit_private == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL private inventory'))
+        run: python -m scripts.umbral3_hf_inventory
+      - name: Create one private 84-scene human review image from actual cached Reels
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL visual contact board')
+        run: python -u -m scripts.umbral3_hf_contact_board
+      - name: Reconcile all 14 full private candidate ZIPs without publication
+        if: (github.event_name == 'workflow_dispatch' && inputs.audit_candidates == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL candidate audit'))
+        run: python -u -m scripts.umbral3_hf_candidate_audit --anchor 2026-11-21
+
+  render-fixture:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.render_private == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL private full render')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        fixture: [0, 1, 2]
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_PRIVATE_STORE: hf_bucket
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_IMAGE_BACKEND: turbo
+      UMBRAL_IMAGE_PROFILE: quality
+      UMBRAL_IMAGE_ATTEMPTS: '3'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_PROGRESS_BARS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Install private SDK in independent environment
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Render real private test Reel and verify remote full media readback
+        run: python -u -m scripts.umbral3_private_render --index ${{ matrix.fixture }} --private-evidence
+
+  candidate-smoke:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.preview_one == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL reserve candidate smoke')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_IMAGE_BACKEND: turbo
+      UMBRAL_IMAGE_PROFILE: quality
+      UMBRAL_IMAGE_ATTEMPTS: '3'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Isolate OIDC storage SDK from image-generation dependency pins
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Render complete but unapproved 21-Nov editorial candidate
+        run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index 0
+
+  candidate-batch:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.preview_all == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL reserve candidates full')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_IMAGE_BACKEND: turbo
+      UMBRAL_IMAGE_PROFILE: quality
+      UMBRAL_IMAGE_ATTEMPTS: '3'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Isolate OIDC storage SDK from image-generation dependency pins
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Archive complete but unapproved editorial candidate in private bucket
+        run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index ${{ matrix.index }}
+
+  lightning-smoke:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.lightning_one == true || inputs.lightning_all == true) || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'UMBRAL lightning private smoke') || startsWith(github.event.head_commit.message, 'UMBRAL lightning private full'))))
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v3
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install private bucket SDK in separate interpreter
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Reuse fully verified V3 archive when already present
+        id: v3-gate
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --anchor 2026-11-21 --index 0
+      - uses: actions/cache@v4
+        if: steps.v3-gate.outputs.generate == 'true'
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        if: steps.v3-gate.outputs.generate == 'true'
+        with:
+          models: 'true'
+      - name: Install pinned accelerated SDXL Lightning CPU environment
+        if: steps.v3-gate.outputs.generate == 'true'
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Generate six coherent, unapproved storyboard images privately
+        if: steps.v3-gate.outputs.generate == 'true'
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor 2026-11-21 --index 0 --output "$RUNNER_TEMP/umbral3-review"
+      - name: Assemble full Reel, verify WAV MP4 ASS and sealed bucket readback
+        if: steps.v3-gate.outputs.generate == 'true'
+        run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index 0 --prepared-dir "$RUNNER_TEMP/umbral3-review"
+
+  lightning-batch:
+    needs: [verify, lightning-smoke]
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.lightning_all == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL lightning private full')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v3
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install private bucket SDK in separate interpreter
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Reuse fully verified V3 archive when already present
+        id: v3-gate
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --anchor 2026-11-21 --index ${{ matrix.index }}
+      - uses: actions/cache@v4
+        if: steps.v3-gate.outputs.generate == 'true'
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        if: steps.v3-gate.outputs.generate == 'true'
+        with:
+          models: 'true'
+      - name: Install pinned accelerated SDXL Lightning CPU environment
+        if: steps.v3-gate.outputs.generate == 'true'
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Generate six coherent, unapproved storyboard images privately
+        if: steps.v3-gate.outputs.generate == 'true'
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor 2026-11-21 --index ${{ matrix.index }} --output "$RUNNER_TEMP/umbral3-review"
+      - name: Assemble full Reel, verify WAV MP4 ASS and sealed bucket readback
+        if: steps.v3-gate.outputs.generate == 'true'
+        run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index ${{ matrix.index }} --prepared-dir "$RUNNER_TEMP/umbral3-review"
+
+  candidate-inventory:
+    needs: [verify, lightning-smoke, lightning-batch]
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.lightning_all == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL lightning private full')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install private bucket read-only inventory SDK
+        run: python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Verify every candidate after separate GitHub runner restart
+        run: python -u -m scripts.umbral3_hf_candidate_audit --anchor 2026-11-21 --backend sdxl-lightning-2steps-ov-int8-horror-v3
+
+
+  v3-private-review-board:
+    needs: [candidate-inventory]
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.lightning_all == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL lightning private full')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install private review dependencies
+        run: python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Build private V3 contact sheet after all 14 archives pass
+        run: python -u -m scripts.umbral3_hf_contact_board --backend sdxl-lightning-2steps-ov-int8-horror-v3
+
+
+  selective-priority:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.selective_priority == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL selective v31 private')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        index: [0, 2, 5, 8, 10, 11, 12]
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v3-1-selective
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install isolated private OIDC storage SDK
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Read back SHA-verified originals and determine exact scenes to replace
+        id: selective
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_hf_selective_restore --anchor 2026-11-21 --index ${{ matrix.index }} --output "$RUNNER_TEMP/umbral3-v31"
+      - uses: actions/cache@v4
+        if: steps.selective.outputs.generate == 'true'
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        if: steps.selective.outputs.generate == 'true'
+        with:
+          models: 'true'
+      - name: Install pinned SDXL Lightning CPU generator
+        if: steps.selective.outputs.generate == 'true'
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Generate ONLY the selected paranormal scenes; keep remaining PNG bytes
+        if: steps.selective.outputs.generate == 'true'
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor 2026-11-21 --index ${{ matrix.index }} --output "$RUNNER_TEMP/umbral3-v31"
+      - name: Render complete MP4 with swapped voices and immutable V3.1 provenance
+        if: steps.selective.outputs.generate == 'true'
+        run: python -u -m scripts.umbral3_reserve_render --single --anchor 2026-11-21 --index ${{ matrix.index }} --prepared-dir "$RUNNER_TEMP/umbral3-v31"
+      - name: Remove local private media
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-v31"
+
+  selective-integrity-audit:
+    needs: selective-priority
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.selective_priority == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL selective v31 private')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install read-only private audit dependencies
+        run: python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0'
+      - name: Verify 14 complete MP4 ZIPs, 84 scene hashes, exact replacements and retained PNGs
+        run: python -u -m scripts.umbral3_hf_selective_audit
+
+  selective-private-review-board:
+    needs: selective-integrity-audit
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.selective_priority == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL selective v31 private')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install private board dependencies
+        run: python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Publish SHA-verified 84-frame mixed V3/V3.1 board to private bucket ONLY
+        run: python -u -m scripts.umbral3_hf_contact_board --backend sdxl-lightning-2steps-ov-int8-horror-v3 --priority-mix
+
+
+  private-encrypted-owner-preview:
+    # One-off owner preview: the ONLY uploaded bytes are RSA/AES authenticated ciphertext.
+    # This does NOT reveal raw private HF media in public GitHub Actions artifacts or logs.
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL owner encrypted image review')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_PROGRESS_BARS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned private readback and encryption dependencies
+        run: python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'cryptography==46.0.3' 'Pillow==11.3.0'
+      - name: Read exact owner board and encrypt before it touches any artifact
+        env:
+          PREVIEW_PUBLIC_KEY_DER_B64: 'MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA6eJnjWXWjToW8YMtHRQ9ZV8sXxX42dBguM4WbaduPq+ZCChzoeAjNlxzfs/IfEfNd/y58O4ZIVjVO9RbnU672qRugne9B1jyJ2d3bWdKpFZiBLCkZk+zyeNlW+3XrXV9r8jOgThQcuKItJl80KIjvbb50ns+cvwzQbUaJ4GRwU0ioVB+/ITukDaXMvyDr9ZLnvKkZHtk4Ke4CdEIUU16uGPGaAuLElrXb3IRUUCgLB+3tFRMHi3Q9SE6RPQP4TjyrDRive1Fq2Nx5vZxJMgPdZUgqeNPVXtYX7+hhyGG7NjRabzTPrih27yUMbt+H/7Y1x4qnjYT8B3m8FH1rTLLvVQxwP0Ut05cc5eJWF1X7AlN6XdojZKqLcAtbebjXg7FVM5hJTnEEIlJhFD3wCNePdQIypYjS5KuJYgEumMpoQahBN1Pmu07zz+WJF1oVruB/fcGESZF7xoIetPGr20oOWc4XbhSV/aXoCDdc/qYbvd2yV3CYvjUPlKMUhjlRh/PAgMBAAE='
+        run: |
+          python - <<'PY'
+          import base64, hashlib, os
+          from pathlib import Path
+          from PIL import Image
+          from cryptography.hazmat.primitives import hashes, serialization
+          from cryptography.hazmat.primitives.asymmetric import padding
+          from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+          from scripts.umbral3_hf_storage import HfBucketStore
+
+          name = 'umbral3/private-review/_boards/umbral-2026-11-21-v3-v31-priority-mix-14-scenes-859be1ef1001f5be6476c87db5c90a47f866a30b19d91a39597bbea748e14b2e.jpg'
+          expected_sha = '859be1ef1001f5be6476c87db5c90a47f866a30b19d91a39597bbea748e14b2e'
+          store = HfBucketStore.from_oidc()
+          entries = [x for x in store.api.list_bucket_tree(store.bucket, recursive=True, token=store.token)
+                     if getattr(x, 'path', None) == name]
+          if len(entries) != 1 or entries[0].size != 1902350:
+              raise RuntimeError('Exact private review image is missing or ambiguous')
+          from tempfile import TemporaryDirectory
+          with TemporaryDirectory() as folder:
+              path=Path(folder)/'private.jpg'
+              store.api.download_bucket_files(store.bucket, files=[(name,path)], token=store.token)
+              raw=path.read_bytes()
+              if len(raw)!=1902350 or hashlib.sha256(raw).hexdigest()!=expected_sha:
+                  raise RuntimeError('Private image SHA256/length mismatch')
+              with Image.open(path) as im:
+                  if im.format!='JPEG' or im.size!=(2664,3032):
+                      raise RuntimeError('Unexpected private board image')
+              public=serialization.load_der_public_key(base64.b64decode(os.environ['PREVIEW_PUBLIC_KEY_DER_B64']))
+              key,nonce=os.urandom(32),os.urandom(12)
+              wrapped=public.encrypt(key,padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),
+                                                     algorithm=hashes.SHA256(),label=None))
+              if len(wrapped)!=384:
+                  raise RuntimeError('Invalid RSA key size')
+              encrypted=AESGCM(key).encrypt(nonce,raw,b'UMBRAL V3.1 owner visual review')
+              output=Path(os.environ['RUNNER_TEMP'])/'umbral-owner-review.enc'
+              output.write_bytes(b'UV31'+wrapped+nonce+encrypted)
+              print('OWNER_REVIEW_ENCRYPTED: bytes='+str(output.stat().st_size)
+                    +' image_sha256='+expected_sha+' raw_media_not_exposed=true')
+          PY
+      - name: Temporary encrypted-only owner delivery
+        uses: actions/upload-artifact@v4
+        with:
+          name: umbral-owner-review-encrypted
+          path: ${{ runner.temp }}/umbral-owner-review.enc
+          retention-days: 1
+          if-no-files-found: error
+
+  approved-private-release-smoke:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL approved private release smoke')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify official main against stale integration receipts
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: official-main
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Prepare isolated OIDC storage SDK
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Inspect exact owner-approved V3.1 candidate without publication
+        run: |
+          set -euo pipefail
+          test -z "${IG_ACCESS_TOKEN:-}"
+          python -m scripts.umbral3_release_policy --date 2026-11-22 --slot 09
+          /tmp/umbral3-hf-storage/bin/python -m scripts.umbral3_approved_restore --date 2026-11-22 --slot 09 --output "$RUNNER_TEMP/umbral3-release"
+      - name: Render, decode, validate numbered video and swapped voices privately
+        run: |
+          python -u -m scripts.umbral3_finalize_from_reserve --date 2026-11-22 --slot 09 --media-dir "$RUNNER_TEMP/umbral3-release" --official-receipts-root official-main --private-test
+          python - <<'PY'
+          import json,os,subprocess
+          from pathlib import Path
+          from PIL import Image
+          folder=Path(os.environ['RUNNER_TEMP'])/'umbral3-release'
+          video=folder/'umbral_20261122_09.mp4'
+          for name in ('voice.wav','music.wav','subtitles.ass','cover.jpg','branding_timing.json','story_used.json'):
+              assert (folder/name).is_file(), name
+          marks=json.loads((folder/'branding_timing.json').read_text())
+          assert 0 < marks['intro_end'] < marks['outro_start'] < marks['duration']
+          assert (folder/'subtitles.ass').read_text().count('Dialogue:')>0
+          from scripts import stage_morning_reel as stage
+          staged_story=json.loads((folder/'story_used.json').read_text())
+          caption=(folder/'caption.txt').read_text()
+          stage.verify_story(staged_story,caption,'2026-11-22')
+          stage.validate_cover(folder/'cover.jpg')
+          stage.validate_mp4(video)
+          assert staged_story['episode_number'] == 18
+          assert caption.startswith('Historia 18: El ascensor de servicio\n')
+          with Image.open(folder/'cover.jpg') as image:
+              assert image.format=='JPEG' and image.size==(1080,1920)
+          for file in (video,folder/'voice.wav',folder/'music.wav'):
+              subprocess.run(['ffmpeg','-v','error','-xerror','-i',str(file),'-f','null','-'],check=True)
+          print('UMBRAL3_APPROVED_PRIVATE_SMOKE: six exact owner-approved images, voice, music, subtitles, MP4 decoded; Meta untouched')
+          PY
+      - name: Remove unpublished owner-approved media from ephemeral runner
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-release"
+
   production-oidc-probe:
-    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main'
+    # No Meta credentials, image model execution, publishing, artifact upload,
+    # or production auto-enable. This is the SAME trusted-publisher filename.
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
     runs-on: ubuntu-latest
     timeout-minutes: 12
     permissions:
@@ -31,18 +618,543 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Validate exact OIDC probe and target (no Meta credentials)
-        run: |
-          python -m py_compile scripts/umbral3_hf_probe.py
-          python - <<'PY'
-          import os
-          from scripts.umbral3_hf_probe import BUCKET, PROBE
-          assert os.environ["UMBRAL_HF_BUCKET"] == "Fedry23/umbral-private"
-          assert BUCKET.fullmatch(os.environ["UMBRAL_HF_BUCKET"])
-          assert len(PROBE) == 1048576
-          print("UMBRAL3_MAIN_OIDC_PROBE_POLICY=ok; no published media")
-          PY
-      - name: Install pinned private bucket client
+      - name: Install private bucket client only
         run: python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
-      - name: Verify main OIDC, bucket privacy and immutable roundtrip
+      - name: Verify main OIDC and SHA256 roundtrip without any Meta call
         run: python -m scripts.umbral3_hf_probe
+
+  live-routing:
+    # Read the owner-authorized, dated rollout on main. No Meta/HF token.
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      eligible: ${{ steps.route.outputs.eligible }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Check exact owner-reviewed civil slot before using any CPU/GPU models
+        id: route
+        shell: bash
+        env:
+          UMBRAL3_ROLLOUT_OVERRIDE: ${{ vars.UMBRAL3_LIVE_ENABLED }}
+        run: |
+          set -euo pipefail
+          case "${{ github.event.schedule }}" in
+            '17 5 * * *'|'17 6 * * *') slot=09 ;;
+            '17 17 * * *'|'17 18 * * *') slot=21 ;;
+            *) echo '::error::Unknown V3.1 schedule'; exit 1 ;;
+          esac
+          python -m scripts.umbral3_rollout --mode v31 --slot "$slot"
+  live-owner-approved-release:
+    needs: live-routing
+    # Active only for exact reviewed dates/scene hashes in the owner-authorized rollout.
+    # OFF by default. Main OIDC uses THIS trusted-publisher workflow filename.
+    # The older official workflows keep the same Meta lock and provide late
+    # fallback at their distinct backup cron slots when this route is enabled.
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && needs.live-routing.outputs.eligible == 'true' && vars.UMBRAL3_LIVE_ENABLED != 'false' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    concurrency:
+      group: umbral-instagram-official
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      actions: read
+      pages: write
+      id-token: write
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      UMBRAL_DYNAMIC_EPISODES: '1'
+      UMBRAL_DURABLE_GUARD: '1'
+      UMBRAL_COVER_REQUIRED: '1'
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - name: Checkout current main for official receipts and production media
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Select the EXACT scheduled civil slot
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${{ github.event.schedule }}" in
+            '17 5 * * *'|'17 6 * * *') slot=09 ;;
+            '17 17 * * *'|'17 18 * * *') slot=21 ;;
+            *) echo '::error::Unrecognized scheduled V3.1 slot'; exit 1 ;;
+          esac
+          echo "UMBRAL_SLOT=$slot" >> "$GITHUB_ENV"
+          echo "UMBRAL_DAY=$(TZ=Europe/Madrid date +%F)" >> "$GITHUB_ENV"
+          git pull --ff-only origin main
+      - name: Reconcile uncertain historical Meta intents before doing anything
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python scripts/reconcile_publications.py
+      - name: Refuse duplicate receipt or pending publish intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          key="$UMBRAL_DAY"
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; fi
+          if [ -f "docs/published/$key.json" ]; then
+            echo 'UMBRAL_SKIP=true' >> "$GITHUB_ENV"
+            echo 'Official media already published; V3.1 cannot duplicate'
+          elif [ -f "docs/pending/$key.json" ]; then
+            echo '::error::Unreconciled persistent Meta intent: fail closed'
+            exit 1
+          else
+            echo 'UMBRAL_SKIP=false' >> "$GITHUB_ENV"
+          fi
+      - uses: ./.github/actions/setup-render
+        if: env.UMBRAL_SKIP == 'false'
+        with:
+          models: 'true'
+      - name: Isolate trusted main bucket reader from the image/model environment
+        if: env.UMBRAL_SKIP == 'false'
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Restore exact owner-approved images and late-bind final episode number
+        if: env.UMBRAL_SKIP == 'false'
+        run: python -u -m scripts.umbral3_live_stage --date "$UMBRAL_DAY" --slot "$UMBRAL_SLOT"
+      - name: Verify conservative Meta-compatible MP4 before public hosting
+        if: env.UMBRAL_SKIP == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          key="\${UMBRAL_DAY//-/}"
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; fi
+          python scripts/ensure_meta_compatible.py "staged/umbral_$key.mp4"
+      - name: Store exact final daily MP4 and cover on the official Pages branch
+        if: env.UMBRAL_SKIP == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          key="$UMBRAL_DAY"
+          short="\${UMBRAL_DAY//-/}"
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; short="\${short}_09"; fi
+          cp "staged/umbral_$short.mp4" "docs/reels/$key.mp4"
+          cp staged/cover.jpg "docs/reels/$key.jpg"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "docs/reels/$key.mp4" "docs/reels/$key.jpg"
+          if ! git diff --cached --quiet; then
+            git commit -m "UMBRAL3: prepare owner-approved official Reel $key"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Trigger official GitHub Pages build without publishing to Meta yet
+        if: env.UMBRAL_SKIP == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
+      - name: Verify served MP4 and cover byte-for-byte
+        if: env.UMBRAL_SKIP == 'false'
+        run: python scripts/wait_public_video.py
+      - name: Prepare Instagram container using existing official, fail-closed code
+        if: env.UMBRAL_SKIP == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          python scripts/publish_daily.py prepare --date "$UMBRAL_DAY" \
+            --video-url "$(cat staged/public_video_url.txt)" \
+            --cover-url "$(cat staged/public_cover_url.txt)"
+      - name: Publish only at the official civil slot after final Meta readback
+        if: env.UMBRAL_SKIP == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python scripts/publish_daily.py publish --date "$UMBRAL_DAY"
+      - name: Commit officially verified permalink and media ID; no guessed receipts
+        if: always() && env.UMBRAL_SKIP == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -s staged/published.json ]; then exit 0; fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          row=json.loads(Path('staged/published.json').read_text())
+          if row.get('verification')!='published_media_read_back':
+              raise SystemExit('No complete Meta readback; publication remains pending')
+          PY
+          key="$UMBRAL_DAY"
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; fi
+          mkdir -p docs/published
+          cp staged/published.json "docs/published/$key.json"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "docs/published/$key.json"
+          git commit -m "UMBRAL3: Meta readback confirms official $key" || true
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Preserve sanitized receipt for review; no unpublished media uploaded
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: umbral3-official-publication-receipt
+          path: staged/published.json
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Report fail-closed fallback eligibility without forcing another Meta POST
+        if: failure()
+        run: echo '::error::V3.1 official pipeline failed. Legacy backup slot will reconcile Meta and try safely under the shared lock.'
+
+  integration-nextweek-refill-smoke:
+    # One explicitly requested REAL private D+7 rehearsal; never runs on main.
+    # The exact push subject is a one-off safety gate for 28-Nov 09.
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && github.event.head_commit.message == 'UMBRAL D+7 private refill 2026-11-28 09'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v3
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Isolated OIDC bucket client; no Meta token
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Check exact 28-Nov morning story, index and immutable content
+        id: gate
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --today 2026-11-21 --slot 09
+      - name: Reuse pinned Lightning model if private candidate is missing
+        if: steps.gate.outputs.generate == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        if: steps.gate.outputs.generate == 'true'
+        with:
+          models: 'true'
+      - name: Install pinned private CPU renderer
+        if: steps.gate.outputs.generate == 'true'
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Generate SIX unapproved 28-Nov images without publishing
+        if: steps.gate.outputs.generate == 'true'
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --output "$RUNNER_TEMP/umbral3-d7-smoke"
+      - name: Persist ONE immutable private candidate with placeholder number
+        if: steps.gate.outputs.generate == 'true'
+        run: python -u -m scripts.umbral3_reserve_render --single --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --prepared-dir "$RUNNER_TEMP/umbral3-d7-smoke"
+      - name: Independently read back and verify SHA256 and complete media
+        run: |
+          /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --today 2026-11-21 --slot 09 |
+            tee /tmp/umbral3-d7-verification.log
+          grep -q '"stored_full_candidate": true' /tmp/umbral3-d7-verification.log
+          grep -q '"ready_to_publish": false' /tmp/umbral3-d7-verification.log
+      - name: Remove private transient media
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-d7-smoke"
+
+  integration-nextweek-refill-evening-smoke:
+    # One explicitly requested REAL private D+7 rehearsal; never runs on main.
+    # The exact push subject is a one-off safety gate for 28-Nov 21.
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && github.event.head_commit.message == 'UMBRAL D+7 private refill 2026-11-28 21'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v3
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Isolated OIDC bucket client; no Meta token
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Check exact 28-Nov evening story, index and immutable content
+        id: gate
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --today 2026-11-21 --slot 21
+      - name: Reuse pinned Lightning model if private candidate is missing
+        if: steps.gate.outputs.generate == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        if: steps.gate.outputs.generate == 'true'
+        with:
+          models: 'true'
+      - name: Install pinned private CPU renderer
+        if: steps.gate.outputs.generate == 'true'
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Generate SIX unapproved 28-Nov images without publishing
+        if: steps.gate.outputs.generate == 'true'
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --output "$RUNNER_TEMP/umbral3-d7-smoke"
+      - name: Persist ONE immutable private candidate with placeholder number
+        if: steps.gate.outputs.generate == 'true'
+        run: python -u -m scripts.umbral3_reserve_render --single --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --prepared-dir "$RUNNER_TEMP/umbral3-d7-smoke"
+      - name: Independently read back and verify SHA256 and complete media
+        run: |
+          /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --today 2026-11-21 --slot 21 |
+            tee /tmp/umbral3-d7-verification.log
+          grep -q '"stored_full_candidate": true' /tmp/umbral3-d7-verification.log
+          grep -q '"ready_to_publish": false' /tmp/umbral3-d7-verification.log
+      - name: Remove private transient media
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-d7-smoke"
+
+  daily-refill:
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED != 'false' && github.event.schedule == '42 20 * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        slot: ['09', '21']
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      # Approved V3 direction for new private candidates; not permission to publish.
+      UMBRAL_HORROR_DIRECTION: horror-v3
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Confirm Git-tracked owner authorization for private D+7 refill
+        env:
+          UMBRAL3_RESERVE_OVERRIDE: ${{ vars.UMBRAL3_RESERVE_ENABLED }}
+        run: python -m scripts.umbral3_rollout --mode refill
+      - name: Authenticate the authorized main publisher; no Meta tokens
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Verify existing private candidate or select exactly one missing D+7 slot
+        id: gate
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --recover-backlog --slot ${{ matrix.slot }}
+      - name: Reuse pinned Lightning weights when a candidate is missing
+        if: steps.gate.outputs.generate == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        if: steps.gate.outputs.generate == 'true'
+        with:
+          models: 'true'
+      - name: Install pinned 2-step SDXL Lightning CPU environment
+        if: steps.gate.outputs.generate == 'true'
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Create six unapproved, hashed, dated cinematic storyboard shots
+        if: steps.gate.outputs.generate == 'true'
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --output "$RUNNER_TEMP/umbral3-refill"
+      - name: Assemble and privately persist one complete candidate, never publish
+        if: steps.gate.outputs.generate == 'true'
+        run: python -u -m scripts.umbral3_reserve_render --single --anchor "${{ steps.gate.outputs.anchor }}" --index "${{ steps.gate.outputs.index }}" --prepared-dir "$RUNNER_TEMP/umbral3-refill"
+      - name: Verify the EXACT refilled date's private index and hashes
+        if: steps.gate.outputs.generate == 'true'
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --index "${{ steps.gate.outputs.index }}" --anchor "${{ steps.gate.outputs.anchor }}"
+
+  late-finalization-smoke:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL late-number smoke')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      UMBRAL_IMAGE_BACKEND: turbo
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout fresh authoritative main publication receipts
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: official-main
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Prepare OIDC read-only media restoration
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0 Pillow==11.3.0
+      - name: Verify complete private candidate and restore exactly six original scenes
+        run: |
+          set -euo pipefail
+          test -z "${IG_ACCESS_TOKEN:-}"
+          STORY_SHA="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts.umbral3_reserve import story_key
+          stories=json.loads(Path('stories_morning.json').read_text())
+          rows=[s for s in stories if s.get('publish_date')=='2026-11-22']
+          assert len(rows)==1
+          print(story_key(rows[0]))
+          PY
+          )"
+          /tmp/umbral3-hf-storage/bin/python -m scripts.umbral3_hf_restore_candidate --date 2026-11-22 --slot 09 --backend sdxl-lightning-2steps-ov-int8 --story-sha "$STORY_SHA" --output "$RUNNER_TEMP/umbral3-numbered"
+          echo "UMBRAL3_RESTORED_SHOTS=6"
+      - name: Recreate late-numbered final media without diffusion or publication
+        run: |
+          test -f official-main/docs/published/2026-11-21_09.json
+          python -u -m scripts.umbral3_finalize_from_reserve --date 2026-11-22 --slot 09 --media-dir "$RUNNER_TEMP/umbral3-numbered" --private-test --official-receipts-root official-main
+      - name: Confirm no private output is uploaded as a public artifact
+        run: |
+          test -f "$RUNNER_TEMP/umbral3-numbered/umbral_20261122_09.mp4"
+          test -f "$RUNNER_TEMP/umbral3-numbered/cover.jpg"
+          python - <<'PY'
+          from pathlib import Path
+          import os,hashlib
+          folder=Path(os.environ["RUNNER_TEMP"])/"umbral3-numbered"
+          frames=[folder/f"scene_{n:02}.png" for n in range(6)]
+          assert all(p.is_file() for p in frames)
+          assert len({hashlib.sha256(p.read_bytes()).hexdigest() for p in frames})==6
+          print("UMBRAL3_LATE_NUMBER_PASS: 6 original images, new official-numbered preview; nothing published")
+          PY
+      - name: Erase test media from ephemeral runner
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-numbered"
+
+  horror-direction-smoke:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL horror private smoke')
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v2
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Verify all fourteen curated horror storyboards without Meta
+        run: python -m unittest tests.test_umbral3_horror_direction
+      - name: Isolate private storage SDK
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Install pinned Lightning model in isolated runtime
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Generate six darker story-specific scenes (no official approval)
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor 2026-11-21 --index 3 --output "$RUNNER_TEMP/umbral3-horror"
+      - name: Seal new horror version privately without overwriting first 14 originals
+        run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index 3 --prepared-dir "$RUNNER_TEMP/umbral3-horror" --single
+      - name: Delete ephemeral media after private hash readback
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-horror"
+
+  horror-v3-smoke:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL horror v3 private smoke')
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v3
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Verify focused six-shot horror storyline without Meta
+        run: python -m unittest tests.test_umbral3_horror_v3
+      - name: Isolate private storage SDK
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Install pinned Lightning model in isolated runtime
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Generate six specific paranormal bus-stop events (not visually approved)
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor 2026-11-21 --index 3 --output "$RUNNER_TEMP/umbral3-v3"
+      - name: Seal new horror version privately without overwriting first 14 originals
+        run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index 3 --prepared-dir "$RUNNER_TEMP/umbral3-v3" --single
+      - name: Delete ephemeral media after private hash readback
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-v3"

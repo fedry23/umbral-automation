@@ -1,0 +1,104 @@
+"""Run a single isolated fixture with actual models and fail-closed media checks."""
+import argparse
+import datetime as dt
+import json
+import os
+from pathlib import Path
+import subprocess
+import tempfile
+import time
+
+import render
+from scripts.storyboard import validate_storyboard
+
+ROOT = Path(__file__).resolve().parents[1]
+FIXTURE = ROOT / 'tests/fixtures/umbral3_stories.json'
+
+def load_fixture(index):
+    if type(index) is not int or index not in (0, 1, 2):
+        raise ValueError('Unknown fixture')
+    stories = json.loads(FIXTURE.read_text(encoding='utf-8'))
+    story = stories[index]
+    if 'publish_date' in story or story.get('episode_number') != 9001 + index:
+        raise ValueError('Fixture could collide with official publication')
+    validate_storyboard(story)
+    if not 140 <= len(story['narration'].split()) <= 170:
+        raise ValueError('Invalid fixture duration contract')
+    return story
+
+def run_fixture(index, private_store=None, storage_python=None):
+    # Do not accept credentials, official output paths, or a production slot.
+    if any(os.environ.get(k) for k in ('IG_ACCESS_TOKEN', 'IG_PUBLISH_ENABLED', 'UMBRAL_META_PUBLISH_ENABLED')):
+        raise RuntimeError('Meta environment must be absent')
+    story = load_fixture(index)
+    with tempfile.TemporaryDirectory(prefix='umbral3-fixture-') as tmp:
+        out = Path(tmp)
+        start = time.monotonic()
+        video = render.render_story_media(story, out, dt.date(2000, 1, 1),
+                                          f'private-fixture-{index + 1}.mp4')
+        if video.parent != out or video.name != f'private-fixture-{index + 1}.mp4':
+            raise ValueError('Unexpected output path')
+        from PIL import Image
+        for name in ('cover.jpg', 'scene_contact_sheet.jpg', *(f'scene_{i:02}.png' for i in range(6))):
+            with Image.open(out / name) as image:
+                if name == 'cover.jpg' and (image.size != (1080, 1920) or image.format != 'JPEG'):
+                    raise ValueError('Invalid cover')
+                image.verify()
+        for path in (video, out/'voice.wav', out/'music.wav'):
+            subprocess.run(['ffmpeg','-v','error','-xerror','-i',str(path),'-f','null','-'], check=True)
+        if 'Dialogue:' not in (out/'subtitles.ass').read_text(encoding='utf-8'):
+            raise ValueError('No subtitle events')
+        timeline = json.loads((out/'shot_timeline.json').read_text(encoding='utf-8'))
+        report = json.loads((out/'image_quality_report.json').read_text(encoding='utf-8'))
+        if len(timeline) != 6 or len(report) != 6:
+            raise ValueError('Incomplete shots')
+        if any(a['end'] != b['start'] for a,b in zip(timeline,timeline[1:])):
+            raise ValueError('Discontinuous timeline')
+        # Only non-sensitive metrics leave the runner; never print media bytes.
+        summary = {'fixture': index + 1, 'media_decoded': True,
+                   'video_bytes': video.stat().st_size,
+                   'elapsed_seconds': round(time.monotonic()-start, 2),
+                   'timings': json.loads((out/'timings.json').read_text()),
+                   'image_qa': report,
+                   'shot_durations': [round(s['end']-s['start'],2) for s in timeline],
+                   'visual_review': 'not_performed'}
+        if private_store is not None:
+            from scripts.umbral3_evidence import persist_fixture
+            summary['private_evidence'] = persist_fixture(private_store, out, video, summary)
+        elif storage_python is not None:
+            # HF bucket SDK is deliberately isolated from pinned diffusers/hub.
+            python = Path(storage_python)
+            if not python.is_file() or not python.name.startswith("python"):
+                raise ValueError("Invalid isolated private storage interpreter")
+            verified_summary = out / "verified_private_summary.json"
+            verified_summary.write_text(json.dumps(summary, sort_keys=True), encoding="utf-8")
+            subprocess.run([str(python), "-m", "scripts.umbral3_hf_persist_media",
+                            "--output", str(out), "--video", video.name,
+                            "--summary", str(verified_summary)], check=True,
+                           cwd=ROOT)
+            summary["private_evidence"] = {"readback_verified": True,
+                                            "storage": "hf_bucket",
+                                            "visual_review": "not_performed"}
+        print('UMBRAL3_PRIVATE_RESULT=' + json.dumps(summary, ensure_ascii=False), flush=True)
+        return summary
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--index', type=int, required=True, choices=(0,1,2))
+    parser.add_argument('--private-evidence', action='store_true')
+    args = parser.parse_args()
+    store = None
+    storage_python = None
+    if args.private_evidence:
+        if os.getenv("UMBRAL_PRIVATE_STORE", "hf_bucket") == "hf_bucket":
+            storage_python = os.environ.get("UMBRAL_HF_STORAGE_PYTHON")
+            if not storage_python:
+                raise RuntimeError("Isolated private storage Python is required")
+        elif os.getenv("UMBRAL_PRIVATE_STORE") == "dropbox":
+            from scripts.umbral3_storage import DropboxStore
+            from scripts.umbral3_evidence import probe
+            store = DropboxStore.from_env()
+            probe(store)
+        else:
+            raise ValueError("Unsupported private storage backend")
+    run_fixture(args.index, store, storage_python)

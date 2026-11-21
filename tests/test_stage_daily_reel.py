@@ -39,37 +39,57 @@ class StageDailyReelTests(unittest.TestCase):
                     stage.extract_run_zip(bytes(raw), "2026-11-17")
 
     def test_extract_preserves_mp4_filename_after_story_validation(self):
+        for dynamic in ("0", "1"):
+            with self.subTest(dynamic=dynamic), patch.dict(os.environ, {"UMBRAL_DYNAMIC_EPISODES": dynamic}):
+                self.check_extract(dynamic == "1")
+
+    def check_extract(self, dynamic):
+        from scripts.technical_learning import load_profile
+        from scripts.episode_state import planned_episode
         day = "2026-11-17"
         name = "umbral_20261117.mp4"
-        story = {
-            "date": day, "publish_date": day, "title": "Test",
-            "episode_number": 1, "narration": "palabra " * 150,
-            "scenes": ["escena"] * 6, "caption": "Texto",
-        }
-        files = {
-            name: b"video-placeholder",
-            "story_used.json": json.dumps(story).encode(),
-            "caption.txt": b"Texto",
-            "music.wav": b"0" * 20001,
-            "cover.jpg": b"jpeg-placeholder",
-            "intro_card.png": b"png",
-            "outro_card.png": b"png",
-            "branding_timing.json": json.dumps(
-                {"intro_end": 1, "outro_start": 20, "duration": 30}).encode(),
-        }
-        stream = io.BytesIO()
-        with zipfile.ZipFile(stream, "w") as archive:
-            for filename, data in files.items():
-                archive.writestr(filename, data)
         with tempfile.TemporaryDirectory() as tmp:
             original = os.getcwd()
             try:
                 os.chdir(tmp)
+                number = planned_episode(day, "21") if dynamic else 1
+                story = {
+                    "date": day, "publish_date": day, "title": "Test",
+                    "episode_number": number, "narration": "palabra " * 150,
+                    "scenes": ["escena"] * 6, "caption": "Texto",
+                }
+                caption = "Texto"
+                if dynamic:
+                    story["technical_profile"] = load_profile(day, "21")
+                    caption = f"Historia {number}: Test\nTexto"
+                files = {
+                    name: b"video-placeholder",
+                    "story_used.json": json.dumps(story).encode(),
+                    "caption.txt": caption.encode(),
+                    "music.wav": b"0" * 20001,
+                    "cover.jpg": b"jpeg-placeholder",
+                    "intro_card.png": b"png",
+                    "outro_card.png": b"png",
+                    "branding_timing.json": json.dumps(
+                        {"intro_end": 1, "outro_start": 20, "duration": 30}).encode(),
+                }
+                def archive_bytes(entries):
+                    stream = io.BytesIO()
+                    with zipfile.ZipFile(stream, "w") as archive:
+                        for filename, data in entries.items():
+                            archive.writestr(filename, data)
+                    return stream.getvalue()
                 Path("stories.json").write_text(json.dumps([story]), encoding="utf-8")
                 with (patch.object(stage, "OUT", Path("staged")),
                      patch.object(stage, "validate_cover", return_value=True),
                      patch.object(stage, "validate_mp4", return_value=30.0)):
-                    result = stage.extract_run_zip(stream.getvalue(), day)
+                    result = stage.extract_run_zip(archive_bytes(files), day)
+                    if dynamic:
+                        stale = dict(story, episode_number=number + 1)
+                        with self.assertRaisesRegex(ValueError, "Stale episode number"):
+                            stage.extract_run_zip(archive_bytes({
+                                **files, "story_used.json": json.dumps(stale).encode()
+                            }), day)
                 self.assertEqual(result["file"], "staged/" + name)
                 self.assertEqual(Path(result["file"]).read_bytes(), b"video-placeholder")
             finally:

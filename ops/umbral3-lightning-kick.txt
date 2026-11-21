@@ -1,0 +1,2 @@
+2026-11-21: first independent 2-step SDXL Lightning CPU benchmark, no uploads
+2026-11-21: owner accepted visual direction horror-v3; queue all fourteen privately, skip SHA-verified indexed V3, preserve Meta publication isolation

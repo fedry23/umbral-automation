@@ -143,7 +143,8 @@ class PublicationTests(unittest.TestCase):
         import yaml
         yml = yaml.load((BASE / ".github/workflows/publish_daily.yml").read_text(), Loader=yaml.BaseLoader)
         cron = [item["cron"] for item in yml["on"]["schedule"]]
-        self.assertEqual(cron, ["17 17 * * *", "17 18 * * *"])
+        self.assertEqual(cron[:2], ["17 17 * * *", "17 18 * * *"])
+        self.assertEqual(cron[2:], ["0 19 * * *", "0 20 * * *"])
         self.assertIn("UMBRAL_META_PUBLISH_ENABLED", yml["jobs"]["publicar"]["if"])
         steps = yml["jobs"]["publicar"]["steps"]
         self.assertTrue(any("publicar" in s.get("name","").lower() for s in steps))

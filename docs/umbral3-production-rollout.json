@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "mode": "owner-reviewed-staged-rollout",
+  "enabled": true,
+  "first_date": "2026-11-22",
+  "last_date": "2026-11-27",
+  "owner": "fedry23",
+  "approval_reference": "UMBRAL 3.0 finalización autorizada por el propietario en ChatGPT, 2026-11-21",
+  "review_source": "docs/umbral3-owner-visual-signoff-2026-11-21.json",
+  "approved_board_sha256": "859be1ef1001f5be6476c87db5c90a47f866a30b19d91a39597bbea748e14b2e",
+  "future_unreviewed_policy": "legacy-fallback",
+  "private_d7_refill": true,
+  "rollback": "Change enabled to false via reviewed GitHub commit; no Meta secret changes"
+}

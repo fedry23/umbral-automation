@@ -61,7 +61,76 @@
       "Upward shot of a shoulder shaped bulge emerging from a white plaster ceiling above the doorway. Empty rectangular room, cool window daylight, thirty year old painter with short dark hair and grey work overalls looking upward, cinematic horror, vertical frame, no text."
     ],
     "publish_date": "2026-11-21",
-    "editorial_protocol": "fixed-v1"
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "empty room with bare wooden floor",
+        "anchor1": "white plaster wall",
+        "anchor2": "painter in grey overalls"
+      },
+      "shots": [
+        {
+          "narration": "La pintura de la pared se abombó con la forma de una mano. Soy pintor y aquella mañana estaba reformando una habitación vacía de una casa antigua. Pensé que había humedad.",
+          "action": "Hand-shaped bulge in wet paint, white plaster wall, empty room with bare wooden floor",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Hand-shaped bulge in wet paint, white plaster wall, empty room with bare wooden floor, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Rasqué la pintura con la espátula y el relieve desapareció. Entonces descubrí que la mano había dejado cinco marcas profundas en el yeso.",
+          "action": "Steel scraper uncovering five grooves in a white plaster wall, painter in grey overalls",
+          "camera": "close-up",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Steel scraper uncovering five grooves in a white plaster wall, painter in grey overalls, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Para descartar que alguien estuviera al otro lado, golpeé la pared con el mango. Sonó maciza.",
+          "action": "Painter in grey overalls tapping a white plaster wall with a scraper handle",
+          "camera": "medium",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Painter in grey overalls tapping a white plaster wall with a scraper handle, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Cubrí las marcas con una capa de pintura blanca.",
+          "action": "Paint roller covering five grooves on a white plaster wall",
+          "camera": "close-up",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Paint roller covering five grooves on a white plaster wall, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Antes de que secara, apareció el relieve de un antebrazo, unido a la misma mano. Retiré la pintura y encontré otro surco, mucho más profundo. Comprendí que cada capa nueva permitía que aquello avanzara un poco hacia la superficie. Cerré el bote y recogí mis herramientas.",
+          "action": "Elongated forearm-shaped relief in a white plaster wall, painter in grey overalls staring",
+          "camera": "detail",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Elongated forearm-shaped relief in a white plaster wall, painter in grey overalls staring, cinematic realistic horror, vertical frame, no text"
+        },
+        {
+          "narration": "Al llegar a la puerta recordé que, antes de empezar la habitación, había dado dos manos de pintura al techo. Levanté la vista. Sobre mi cabeza sobresalía un hombro.",
+          "action": "Upward view of shoulder-shaped bulge in white ceiling over doorway, empty room with bare wooden floor, painter in grey overalls",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Upward view of shoulder-shaped bulge in white ceiling over doorway, empty room with bare wooden floor, painter in grey overalls, cinematic realistic horror, vertical frame, no text"
+        }
+      ]
+    }
   },
   {
     "title": "El ascensor de servicio",

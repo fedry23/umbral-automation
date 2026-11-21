@@ -1,0 +1,43 @@
+name: UMBRAL 3 - isolated OpenVINO feasibility
+on:
+  push:
+    branches: [integration/umbral-3]
+    paths:
+      - '.github/workflows/umbral3_openvino.yml'
+      - 'ops/umbral3-openvino-kick.txt'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: umbral3-openvino-feasibility
+  cancel-in-progress: false
+jobs:
+  benchmark:
+    if: github.ref == 'refs/heads/integration/umbral-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        backend: [sdxl, flux]
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install isolated CPU runtime
+        run: |
+          python -m pip install --disable-pip-version-check 'openvino-genai==2025.2.0.0' 'huggingface-hub==0.32.4' 'Pillow==11.3.0'
+          python -m pip check
+          free -h
+          df -h
+      - name: Measure pinned models, no uploads or production credentials
+        run: /usr/bin/time -v python -u -m scripts.umbral3_openvino_benchmark --backend ${{ matrix.backend }}

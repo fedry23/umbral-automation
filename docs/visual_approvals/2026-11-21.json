@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "status": "approved",
+  "date": "2026-11-21",
+  "slot": "21",
+  "reviewer": "fedry23",
+  "reviewed_at": "2026-11-21T20:18:10.679Z",
+  "private_bucket": "Fedry23/umbral-private",
+  "story_sha256": "a5c77ea498dd4f7af24f411220979ede0f64711d852ec86bf52f85af2348e564",
+  "scene_sha256": {
+    "scene_00.png": "dc88ed74bcbc9daf033646ea244183da316c8117d6051c749e8b62d295fc975d",
+    "scene_01.png": "1ae1fdd8f85c14af1961d3dc1e31eda211c5238c6e03823191a37f327a2ab68c",
+    "scene_02.png": "7cbde2bcf27e7bfe9239b1e1e66115b5d6333dfb9beb0606bb672304619153d3",
+    "scene_03.png": "43c6247c4f248d7df246916209c28790520fbf660cd9cb725bfe8018ffb4828a",
+    "scene_04.png": "41d6b58bf4bc366f7f2393fc78db22504649cea56181d6c9133128895e109497",
+    "scene_05.png": "9c31f85434eac42d929530e4cfb622263cbc236e99f15a873b0564e8253f0a35"
+  },
+  "notes": "The owner explicitly approved the 14 six-scene mixed V3/V3.1 image panels in ChatGPT on 2026-11-21. Exact reviewed board SHA256: 859be1ef1001f5be6476c87db5c90a47f866a30b19d91a39597bbea748e14b2e; this candidate ZIP SHA256: c8548ba3bb05da78f1786c9e49344c9c9fe1fa7146648183fb37404d93308d3d. Approval applies ONLY to these exact six visual scene bytes for this date/slot/story; it does not approve audio, subtitles, complete final video, historical posting, future frames, or authorize publication without all release gates."
+}

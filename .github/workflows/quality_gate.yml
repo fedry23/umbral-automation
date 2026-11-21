@@ -2,7 +2,7 @@ name: UMBRAL - Verificar montaje, caratulas y Meta
 
 on:
   push:
-    branches: [main, release/editorial-week-2026-11-21]
+    branches: [main]
     paths:
       - 'render.py'
       - 'music_engine.py'
@@ -18,22 +18,18 @@ on:
       - '.github/workflows/publish_daily.yml'
   pull_request:
     branches: [main]
-    paths:
-      - 'scripts/**'
-      - 'tests/**'
-      - '.github/workflows/umbral3_hf_storage.yml'
-      - '.github/workflows/quality_gate.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: umbral-quality-gate-${{ github.ref }}
+  group: umbral-quality-gate-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   validar:
+    if: github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'integration/umbral-3')
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
