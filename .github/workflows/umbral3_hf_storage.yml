@@ -1,0 +1,48 @@
+name: UMBRAL 3 - private production storage
+# Isolated MAIN identity probe: does not generate or publish any Reel.
+# Scope Hugging Face Trusted Publisher to repository + branch + filename.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['ops/umbral3-storage-kick.txt']
+permissions:
+  contents: read
+concurrency:
+  group: umbral3-production-private-storage
+  cancel-in-progress: false
+jobs:
+  production-oidc-probe:
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_BUCKET: 'Fedry23/umbral-private'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_PROGRESS_BARS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate exact OIDC probe and target (no Meta credentials)
+        run: |
+          python -m py_compile scripts/umbral3_hf_probe.py
+          python - <<'PY'
+          import os
+          from scripts.umbral3_hf_probe import BUCKET, PROBE
+          assert os.environ["UMBRAL_HF_BUCKET"] == "Fedry23/umbral-private"
+          assert BUCKET.fullmatch(os.environ["UMBRAL_HF_BUCKET"])
+          assert len(PROBE) == 1048576
+          print("UMBRAL3_MAIN_OIDC_PROBE_POLICY=ok; no published media")
+          PY
+      - name: Install pinned private bucket client
+        run: python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Verify main OIDC, bucket privacy and immutable roundtrip
+        run: python -m scripts.umbral3_hf_probe
