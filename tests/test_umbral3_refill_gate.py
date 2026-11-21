@@ -6,9 +6,22 @@ import json
 import unittest
 from unittest.mock import Mock,patch
 import zipfile
-from scripts.umbral3_refill_gate import check,BACKEND,PIN
+from scripts.umbral3_refill_gate import check,BACKEND,PIN,batch_target
 
 class RefillTests(unittest.TestCase):
+    def test_private_batch_index_maps_all_fourteen_exact_slots(self):
+        anchor=dt.date(2026,11,21)
+        for i in range(14):
+            today,slot=batch_target(anchor,i)
+            self.assertEqual(today+dt.timedelta(days=7),
+                             anchor+dt.timedelta(days=i//2))
+            self.assertEqual(slot,"09" if i%2==0 else "21")
+        for invalid in (-1,14,True,"3",None):
+            with self.subTest(invalid=invalid),self.assertRaises(ValueError):
+                batch_target(anchor,invalid)
+        with self.assertRaises(ValueError):
+            batch_target(dt.datetime(2026,11,21),0)
+
     def test_missing_21nov_slot_asks_for_one_reel(self):
         store=Mock()
         with patch("scripts.umbral3_refill_gate.find",return_value=None):

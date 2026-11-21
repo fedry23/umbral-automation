@@ -32,6 +32,26 @@ class RefillScheduleTests(unittest.TestCase):
         self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'", job["if"])
         self.assertNotIn("IG_ACCESS_TOKEN", job.get("env", {}))
 
+    def test_private_v3_batch_reuses_archives_and_avoids_meta(self):
+        flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
+                       Loader=yaml.BaseLoader)
+        for key in ("lightning-smoke","lightning-batch"):
+            job=flow["jobs"][key]
+            self.assertEqual(job["env"]["UMBRAL_HORROR_DIRECTION"],"horror-v3")
+            self.assertIn("integration/umbral-3",job["if"])
+            self.assertEqual(job["permissions"]["contents"],"read")
+            self.assertEqual(job["permissions"]["id-token"],"write")
+            self.assertNotIn("IG_ACCESS_TOKEN",job.get("env",{}))
+            steps=job["steps"]
+            gate=next(s for s in steps if s.get("id")=="v3-gate")
+            self.assertIn("--index",gate["run"])
+            self.assertIn("--anchor 2026-11-21",gate["run"])
+            for step in steps:
+                if "Install pinned accelerated" in step.get("name","") or "Generate six" in step.get("name","") or "Assemble full Reel" in step.get("name",""):
+                    self.assertEqual(step["if"],"steps.v3-gate.outputs.generate == 'true'")
+        inv=flow["jobs"]["candidate-inventory"]["steps"][-1]["run"]
+        self.assertIn("--backend sdxl-lightning-2steps-ov-int8-horror-v3",inv)
+
     def test_refill_still_fails_closed_until_visual_gate_and_main_oidc(self):
         flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
                        Loader=yaml.BaseLoader)

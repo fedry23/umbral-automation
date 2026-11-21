@@ -62,7 +62,9 @@ def audit(store,anchor,backend=BACKEND):
 if __name__=="__main__":
     p=argparse.ArgumentParser()
     p.add_argument("--anchor",default="2026-11-21")
+    p.add_argument("--backend",default=BACKEND,
+                   help="Exact visual backend namespace; no approval inferred")
     args=p.parse_args()
     print("UMBRAL3_CANDIDATE_INVENTORY="+json.dumps(
-        audit(HfBucketStore.from_oidc(),dt.date.fromisoformat(args.anchor)),
+        audit(HfBucketStore.from_oidc(),dt.date.fromisoformat(args.anchor),args.backend),
         sort_keys=True),flush=True)

@@ -61,15 +61,40 @@ def check(store, day, slot, all_stories=None):
     result["stored_full_candidate"]=True
     return result
 
+def batch_target(anchor, index):
+    """Map an existing fourteen-slot date/index to check()'s D+7 input.
+
+    No token exchange or media generation: a private batch must not rebuild
+    a fully verified V3 candidate, nor reuse the original visual backend.
+    """
+    if (type(anchor) is not dt.date or type(index) is not int
+            or index not in range(14)):
+        raise ValueError("Invalid private batch anchor or index")
+    day=anchor+dt.timedelta(days=index//2)
+    return day-dt.timedelta(days=7), ("09" if index%2==0 else "21")
+
 def main():
     from scripts.umbral3_hf_storage import HfBucketStore
     parser=argparse.ArgumentParser()
-    parser.add_argument("--slot",choices=["09","21"],required=True)
+    mode=parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--slot",choices=["09","21"],
+                      help="Scheduled D+7 slot, based on Madrid civil today")
+    mode.add_argument("--index",type=int,
+                      help="Explicit immutable private fourteen-slot batch index")
     parser.add_argument("--today")
+    parser.add_argument("--anchor")
     args=parser.parse_args()
-    today=(dt.date.fromisoformat(args.today) if args.today else
-           dt.datetime.now(MADRID).date())
-    result=check(HfBucketStore.from_oidc(),today,args.slot)
+    if args.index is not None:
+        if args.today is not None or args.anchor is None:
+            parser.error("--index requires --anchor and rejects --today")
+        today,slot=batch_target(dt.date.fromisoformat(args.anchor),args.index)
+    else:
+        if args.anchor is not None:
+            parser.error("--anchor is only valid with --index")
+        today=(dt.date.fromisoformat(args.today) if args.today else
+               dt.datetime.now(MADRID).date())
+        slot=args.slot
+    result=check(HfBucketStore.from_oidc(),today,slot)
     print("UMBRAL3_REFILL="+json.dumps(result,sort_keys=True),flush=True)
     out=os.environ.get("GITHUB_OUTPUT")
     if out:

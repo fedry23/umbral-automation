@@ -197,6 +197,7 @@ jobs:
       id-token: write
     env:
       UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v3
       HF_HUB_DISABLE_TELEMETRY: '1'
       HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
       HF_HUB_DISABLE_XET: '1'
@@ -206,25 +207,36 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install private bucket SDK in separate interpreter
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Reuse fully verified V3 archive when already present
+        id: v3-gate
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --anchor 2026-11-21 --index 0
       - uses: actions/cache@v4
+        if: steps.v3-gate.outputs.generate == 'true'
         with:
           path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
           key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
       - uses: ./.github/actions/setup-render
+        if: steps.v3-gate.outputs.generate == 'true'
         with:
           models: 'true'
-      - name: Install private bucket SDK in separate interpreter
-        run: |
-          python -m venv /tmp/umbral3-hf-storage
-          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
       - name: Install pinned accelerated SDXL Lightning CPU environment
+        if: steps.v3-gate.outputs.generate == 'true'
         run: |
           python -m venv /tmp/umbral3-lightning
           /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
           /tmp/umbral3-lightning/bin/python -m pip check
       - name: Generate six coherent, unapproved storyboard images privately
+        if: steps.v3-gate.outputs.generate == 'true'
         run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor 2026-11-21 --index 0 --output "$RUNNER_TEMP/umbral3-review"
       - name: Assemble full Reel, verify WAV MP4 ASS and sealed bucket readback
+        if: steps.v3-gate.outputs.generate == 'true'
         run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index 0 --prepared-dir "$RUNNER_TEMP/umbral3-review"
 
   lightning-batch:
@@ -237,6 +249,7 @@ jobs:
       id-token: write
     env:
       UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v3
       HF_HUB_DISABLE_TELEMETRY: '1'
       HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
       HF_HUB_DISABLE_XET: '1'
@@ -251,25 +264,36 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install private bucket SDK in separate interpreter
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Reuse fully verified V3 archive when already present
+        id: v3-gate
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --anchor 2026-11-21 --index ${{ matrix.index }}
       - uses: actions/cache@v4
+        if: steps.v3-gate.outputs.generate == 'true'
         with:
           path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
           key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
       - uses: ./.github/actions/setup-render
+        if: steps.v3-gate.outputs.generate == 'true'
         with:
           models: 'true'
-      - name: Install private bucket SDK in separate interpreter
-        run: |
-          python -m venv /tmp/umbral3-hf-storage
-          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
       - name: Install pinned accelerated SDXL Lightning CPU environment
+        if: steps.v3-gate.outputs.generate == 'true'
         run: |
           python -m venv /tmp/umbral3-lightning
           /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
           /tmp/umbral3-lightning/bin/python -m pip check
       - name: Generate six coherent, unapproved storyboard images privately
+        if: steps.v3-gate.outputs.generate == 'true'
         run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor 2026-11-21 --index ${{ matrix.index }} --output "$RUNNER_TEMP/umbral3-review"
       - name: Assemble full Reel, verify WAV MP4 ASS and sealed bucket readback
+        if: steps.v3-gate.outputs.generate == 'true'
         run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index ${{ matrix.index }} --prepared-dir "$RUNNER_TEMP/umbral3-review"
 
   candidate-inventory:
@@ -290,7 +314,7 @@ jobs:
       - name: Install private bucket read-only inventory SDK
         run: python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
       - name: Verify every candidate after separate GitHub runner restart
-        run: python -u -m scripts.umbral3_hf_candidate_audit --anchor 2026-11-21
+        run: python -u -m scripts.umbral3_hf_candidate_audit --anchor 2026-11-21 --backend sdxl-lightning-2steps-ov-int8-horror-v3
 
 
   production-oidc-probe:
