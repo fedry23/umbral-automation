@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-21: compare latest main receipts, restore 2026-11-22 09 private scenes and verify new episode allocation
+2026-11-21: horror-v2 opt-in six-scene private preview of El banco de la parada, unique indexed backend; no production, no Meta
