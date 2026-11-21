@@ -394,7 +394,8 @@ jobs:
           echo "UMBRAL3_RESTORED_SHOTS=6"
       - name: Recreate late-numbered final media without diffusion or publication
         run: |
-          test -f official-main/docs/published/2026-11-21_09.json\n          python -u -m scripts.umbral3_finalize_from_reserve --date 2026-11-22 --slot 09 --media-dir "$RUNNER_TEMP/umbral3-numbered" --private-test --official-receipts-root official-main
+          test -f official-main/docs/published/2026-11-21_09.json
+          python -u -m scripts.umbral3_finalize_from_reserve --date 2026-11-22 --slot 09 --media-dir "$RUNNER_TEMP/umbral3-numbered" --private-test --official-receipts-root official-main
       - name: Confirm no private output is uploaded as a public artifact
         run: |
           test -f "$RUNNER_TEMP/umbral3-numbered/umbral_20261122_09.mp4"
