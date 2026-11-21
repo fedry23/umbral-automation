@@ -53,3 +53,26 @@ class D7IsolationTests(unittest.TestCase):
         self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'", refill["if"])
         self.assertIn("refs/heads/main", refill["if"])
         self.assertIn("42 20 * * *", refill["if"])
+
+    def test_nextweek_pair_exists_without_fabricating_owner_signoff(self):
+        import datetime as dt
+        import json
+        from zoneinfo import ZoneInfo
+        from scripts.storyboard import validate_storyboard
+        from scripts.umbral3_reserve import story_key
+        from scripts.umbral3_release_policy import approved_slot
+        day = "2026-11-28"
+        ids = set()
+        for slot, filename in (("09", "stories_morning.json"), ("21", "stories.json")):
+            stories = json.loads((ROOT / filename).read_text(encoding="utf-8"))
+            selected = [s for s in stories if s.get("publish_date") == day]
+            self.assertEqual(len(selected), 1, f"Expected one D+7 story for {slot}")
+            story = selected[0]
+            self.assertEqual(len(validate_storyboard(story)), 6)
+            self.assertTrue(140 <= len(story["narration"].split()) <= 170)
+            self.assertNotIn("episode_number", story)
+            ids.add(story_key(story))
+            with self.assertRaisesRegex(RuntimeError, "No exact owner-approved artwork"):
+                approved_slot(day, slot, ROOT, dt.datetime(2026, 11, 21, 22, 0,
+                              tzinfo=ZoneInfo("Europe/Madrid")))
+        self.assertEqual(len(ids), 2)
