@@ -362,7 +362,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup-render
         with:
-          models: 'false'
+          models: 'true'
       - name: Prepare OIDC read-only media restoration
         run: |
           python -m venv /tmp/umbral3-hf-storage
