@@ -518,6 +518,65 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
+  approved-private-release-smoke:
+    needs: verify
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL approved private release smoke')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify official main against stale integration receipts
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: official-main
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Prepare isolated OIDC storage SDK
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Inspect exact owner-approved V3.1 candidate without publication
+        run: |
+          set -euo pipefail
+          test -z "${IG_ACCESS_TOKEN:-}"
+          python -m scripts.umbral3_release_policy --date 2026-11-22 --slot 09
+          /tmp/umbral3-hf-storage/bin/python -m scripts.umbral3_approved_restore --date 2026-11-22 --slot 09 --output "$RUNNER_TEMP/umbral3-release"
+      - name: Render, decode, validate numbered video and swapped voices privately
+        run: |
+          python -u -m scripts.umbral3_finalize_from_reserve --date 2026-11-22 --slot 09 --media-dir "$RUNNER_TEMP/umbral3-release" --official-receipts-root official-main --private-test
+          python - <<'PY'
+          import json,os,subprocess
+          from pathlib import Path
+          from PIL import Image
+          folder=Path(os.environ['RUNNER_TEMP'])/'umbral3-release'
+          video=folder/'umbral_20261122_09.mp4'
+          for name in ('voice.wav','music.wav','subtitles.ass','cover.jpg','branding_timing.json','story_used.json'):
+              assert (folder/name).is_file(), name
+          marks=json.loads((folder/'branding_timing.json').read_text())
+          assert 0 < marks['intro_end'] < marks['outro_start'] < marks['duration']
+          assert (folder/'subtitles.ass').read_text().count('Dialogue:')>0
+          with Image.open(folder/'cover.jpg') as image:
+              assert image.format=='JPEG' and image.size==(1080,1920)
+          for file in (video,folder/'voice.wav',folder/'music.wav'):
+              subprocess.run(['ffmpeg','-v','error','-xerror','-i',str(file),'-f','null','-'],check=True)
+          print('UMBRAL3_APPROVED_PRIVATE_SMOKE: six exact owner-approved images, voice, music, subtitles, MP4 decoded; Meta untouched')
+          PY
+      - name: Remove unpublished owner-approved media from ephemeral runner
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-release"
+
   production-oidc-probe:
     # No Meta credentials, image model execution, publishing, artifact upload,
     # or production auto-enable. This is the SAME trusted-publisher filename.
