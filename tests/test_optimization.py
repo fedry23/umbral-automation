@@ -13,6 +13,19 @@ from scripts import publish_daily as publisher
 from scripts.wait_public_video import stream_digest, check_remote
 
 class OptimizationsTests(unittest.TestCase):
+    def test_expensive_private_render_is_explicit_and_branch_scoped(self):
+        """Normal PR validation must never download models or spend CPU on renders."""
+        import yaml
+        workflow = yaml.load(
+            Path(".github/workflows/episode_integration_gate.yml").read_text(),
+            Loader=yaml.BaseLoader)
+        condition = workflow["jobs"]["private-render"]["if"]
+        self.assertEqual(condition,
+            "github.event_name == 'workflow_dispatch' && "
+            "github.ref == 'refs/heads/integration/umbral-3'")
+        self.assertIn("pull_request", workflow["on"])
+        self.assertIn("workflow_dispatch", workflow["on"])
+
     def test_stream_hash_uses_bounded_reads(self):
         class Bounded(io.BytesIO):
             def read(self, n=-1):
