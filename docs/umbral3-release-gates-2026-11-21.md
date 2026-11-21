@@ -6,7 +6,7 @@ Este documento conserva solo hechos comprobados. **NO habilitar la PR #18 ni la 
 - `docs/published/2026-11-21_09.json`: episodio **16**, «La pintura fresca», Instagram media `18137894143763489`, publicado 09:00 Madrid y comprobado mediante lectura Meta.
 - Producción `main` NO publica los candidatos experimentales. `main` ya contiene PR #20 y #22, más la PR #25 que es **solo la prueba OIDC**. No hay activación visual.
 - La prueba real del 22/11 por la mañana [44907218395](https://github.com/fedry23/umbral-automation/actions/runs/44907218395) restauró seis escenas e hizo un MP4 privado, pero arrojó el número **16** usando recibos de integración obsoletos. Esto es un defecto de asignación, no una autorización de producción.
-- Corrección en `scripts/umbral3_finalize_from_reserve.py`: `official_receipts_root` desacopla historias de desarrollo de recibos oficiales actualizados; añade prueba para rechazar numeración obsoleta, y un job que obtiene `main` con `actions/checkout@v4`. La repetición [44907865366](https://github.com/fedry23/umbral-automation/actions/runs/44907865366) debe examinarse antes de afirmar que está resuelto. **Un checkout de main no sustituye la reconciliación Meta inmediatamente antes del POST oficial.**
+- Corrección en `scripts/umbral3_finalize_from_reserve.py`: `official_receipts_root` desacopla historias de desarrollo de recibos oficiales actualizados; añade prueba para rechazar numeración obsoleta, y un job que obtiene `main` con `actions/checkout@v4`. **Verificado:** la repetición [44907865366](https://github.com/fedry23/umbral-automation/actions/runs/44907865366) terminó SUCCESS con `UMBRAL3_FINALIZATION` privado: `episode_number=17`, seis imágenes recuperadas sin difusión nueva, MP4 de 5.186.661 bytes, `ready_to_publish=false` y cero POST a Meta. El número 16 obsoleto queda corregido EN PRUEBA, pero la reconciliación Meta inmediatamente antes de publicar sigue pendiente. **Un checkout de main no sustituye la reconciliación Meta inmediatamente antes del POST oficial.**
 
 ## HF OIDC production, bloqueo humano conocido
 - PR [#25](https://github.com/fedry23/umbral-automation/pull/25) **fusionada** en `main` SHA `78ef999dd3ca6a36f512865e869ba6227f9d29ec`, tras 88/88 pruebas. Añade el único job `production-oidc-probe` a `.github/workflows/umbral3_hf_storage.yml`: exclusivamente `main`, `contents:read`, `id-token:write`, sin Meta, sin render y sin cron.
@@ -26,7 +26,7 @@ Este documento conserva solo hechos comprobados. **NO habilitar la PR #18 ni la 
 
 ## Estado GitHub y pruebas
 - Se fusionó `main` hacia `integration/umbral-3` usando dos padres y copiando el recibo y material publicado del 21/11: commit `8cc7def1f89e2b9f3c06f65d7b2e6fc76a0b8876`. Comparación inmediatamente posterior: desarrollo `behind=0` y producción permanece intacta; revalidar HEAD si hay nuevas automatizaciones.
-- Al menos **175 pruebas** superadas en [44907780544](https://github.com/fedry23/umbral-automation/actions/runs/44907780544); pruebas añadidas posteriores y rama actual deben volver a validarse. No contar una prueba `in_progress` como completada.
+- **180 pruebas** superadas tanto en [44908137518](https://github.com/fedry23/umbral-automation/actions/runs/44908137518) como en [44908133678](https://github.com/fedry23/umbral-automation/actions/runs/44908133678). Nuevas modificaciones posteriores requieren su propio CI. No contar una prueba `in_progress` como completada.
 - PR #18 permanece sin fusionar por seguridad.
 
 ## Condiciones de cierre que NO están verificadas
@@ -37,3 +37,10 @@ Este documento conserva solo hechos comprobados. **NO habilitar la PR #18 ni la 
 5. PR #18 con gates end-to-end aprobados y fusión segura; siete días consecutivos reales observados.
 
 No declarar finalización hasta lograr estos puntos, aunque el almacenamiento y los 14 ZIPs estén íntegros.
+
+## Resumen ejecutivo al cerrar esta ejecución
+- La prueba real de número 17 con seis PNG recuperados ha pasado. Los catorce ZIP anteriores continúan **sin aprobación artística** y **no pueden entrar a producción**.
+- El panel JPEG de 84 escenas se guarda en el bucket privado, carpeta `umbral3/private-review/_boards/`, nombre que comienza `umbral-2026-11-21-14-scenes-`. No subirlo al repositorio público.
+- El propietario debe configurar un Trusted Publisher de Hugging Face con EXACTO repo `fedry23/umbral-automation`, rama `main`, workflow `umbral3_hf_storage.yml`, proveedor GitHub Actions, read-only desmarcado, manteniendo el publisher de integración. La ejecución main [44907590484](https://github.com/fedry23/umbral-automation/actions/runs/44907590484) falló en OIDC porque aún no está configurado.
+- La reposición D+7 se ha retrasado a `42 20 * * *` para funcionar después de la preparación editorial de 18:20 CET/CEST y la publicación de 21:00. La variable de habilitación sigue sin activarse.
+- No fusionar PR #18 hasta inspeccionar las escenas, obtener el publisher main y validar reconciliación Meta/rollback; no confundir `stored_complete=14` con 14 futuros aprobados.
