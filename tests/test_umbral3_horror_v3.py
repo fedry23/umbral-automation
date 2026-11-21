@@ -33,7 +33,7 @@ class V3Tests(unittest.TestCase):
         for p,phrase in zip(prompts,critical):
             self.assertIn(phrase,p)
             self.assertIn("no text",p)
-        self.assertIn("bench is EMPTY",prompts[5])
+        self.assertIn("BENCH is EMPTY",prompts[5])
         self.assertIn("MAN SITTING",prompts[5])
     def test_unrelated_story_is_not_styled_or_approved(self):
         with self.assertRaisesRegex(ValueError,"limited"):
