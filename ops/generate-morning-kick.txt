@@ -1,1 +1,1 @@
-2026-11-19T06:23:43+01:00 Europe/Madrid | respaldo generación 09 | solo render
+2026-11-21 04:25 Europe/Madrid | recuperacion anticipada generacion 09 | solo render, sin Meta ni publicación | la programación cron no había arrancado
