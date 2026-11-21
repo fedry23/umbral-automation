@@ -61,7 +61,11 @@ def eligible(day, slot, root=ROOT, now=None, override=None):
     override = os.getenv("UMBRAL3_ROLLOUT_OVERRIDE", "") if override is None else override
     if override == "false":
         return False  # Emergency stop from GitHub Variables; legacy remains live.
-    row = read_config(root)
+    try:
+        row = read_config(root)
+    except (RuntimeError, ValueError, TypeError, KeyError, OSError):
+        # Missing/corrupt Git release gate cannot suppress the legacy route.
+        return False
     if not row["enabled"] or not row["first_date"] <= day <= row["last_date"]:
         return False
     try:
