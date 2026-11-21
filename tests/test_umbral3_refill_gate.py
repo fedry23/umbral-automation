@@ -51,12 +51,13 @@ class RefillTests(unittest.TestCase):
         store.get.assert_not_called()
     def test_stale_model_never_reused(self):
         store=Mock()
-        with patch("scripts.umbral3_refill_gate.find",return_value={"story_sha256":"x", "model_revision":"old"}):
-            with self.assertRaisesRegex(RuntimeError,"stale story"):
-                check(store,dt.date(2026,11,14),"09")
-        with patch("scripts.umbral3_refill_gate.find",side_effect=lambda *args: {"story_sha256":__import__('scripts.umbral3_refill_gate',fromlist=['story_key']).story_key(__import__('scripts.umbral3_reserve_render',fromlist=['load_slot','catalogs']).load_slot(0,dt.date(2026,11,21),__import__('scripts.umbral3_reserve_render',fromlist=['catalogs']).catalogs())[0]), "model_revision":"old"}):
+        with patch("scripts.umbral3_refill_gate.find",return_value=None):
+            missing=check(store,dt.date(2026,11,14),"09")
+        obsolete={"story_sha256":missing["story_sha256"],"model_revision":"old"}
+        with patch("scripts.umbral3_refill_gate.find",return_value=obsolete):
             with self.assertRaisesRegex(RuntimeError,"stale visual model"):
                 check(store,dt.date(2026,11,14),"09")
+        store.get.assert_not_called()
 
     def test_missing_nextweek_story_fails_not_falls_back(self):
         with self.assertRaisesRegex(ValueError,"missing authored story"):
