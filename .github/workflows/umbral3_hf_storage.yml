@@ -9,6 +9,10 @@ on:
     # 21:42 CET / 22:42 CEST: after editorial preparation at 18:20,
     # after the 21:00 official publication and 21:20 independent backup.
     - cron: '42 20 * * *'
+    - cron: '17 5 * * *'   # 09 local: primary pre-publication preparation
+    - cron: '17 6 * * *'   # 09 local: DST-safe preparation backup
+    - cron: '17 17 * * *' # 21 local: primary preparation
+    - cron: '17 18 * * *' # 21 local: DST-safe preparation backup
   workflow_dispatch:
     inputs:
       render_private:
@@ -603,8 +607,165 @@ jobs:
       - name: Verify main OIDC and SHA256 roundtrip without any Meta call
         run: python -m scripts.umbral3_hf_probe
 
+  live-owner-approved-release:
+    # OFF by default. Main OIDC uses THIS trusted-publisher workflow filename.
+    # The older official workflows keep the same Meta lock and provide late
+    # fallback at their distinct backup cron slots when this route is enabled.
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_LIVE_ENABLED == 'true' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    concurrency:
+      group: umbral-instagram-official
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      actions: read
+      pages: write
+      id-token: write
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      UMBRAL_DYNAMIC_EPISODES: '1'
+      UMBRAL_DURABLE_GUARD: '1'
+      UMBRAL_COVER_REQUIRED: '1'
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - name: Checkout current main for official receipts and production media
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Select the EXACT scheduled civil slot
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${{ github.event.schedule }}" in
+            '17 5 * * *'|'17 6 * * *') slot=09 ;;
+            '17 17 * * *'|'17 18 * * *') slot=21 ;;
+            *) echo '::error::Unrecognized scheduled V3.1 slot'; exit 1 ;;
+          esac
+          echo "UMBRAL_SLOT=$slot" >> "$GITHUB_ENV"
+          echo "UMBRAL_DAY=$(TZ=Europe/Madrid date +%F)" >> "$GITHUB_ENV"
+          git pull --ff-only origin main
+      - name: Reconcile uncertain historical Meta intents before doing anything
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python scripts/reconcile_publications.py
+      - name: Refuse duplicate receipt or pending publish intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          key="$UMBRAL_DAY"
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; fi
+          if [ -f "docs/published/$key.json" ]; then
+            echo 'UMBRAL_SKIP=true' >> "$GITHUB_ENV"
+            echo 'Official media already published; V3.1 cannot duplicate'
+          elif [ -f "docs/pending/$key.json" ]; then
+            echo '::error::Unreconciled persistent Meta intent: fail closed'
+            exit 1
+          else
+            echo 'UMBRAL_SKIP=false' >> "$GITHUB_ENV"
+          fi
+      - uses: ./.github/actions/setup-render
+        if: env.UMBRAL_SKIP == 'false'
+        with:
+          models: 'true'
+      - name: Isolate trusted main bucket reader from the image/model environment
+        if: env.UMBRAL_SKIP == 'false'
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0'
+      - name: Restore exact owner-approved images and late-bind final episode number
+        if: env.UMBRAL_SKIP == 'false'
+        run: python -u -m scripts.umbral3_live_stage --date "$UMBRAL_DAY" --slot "$UMBRAL_SLOT"
+      - name: Verify conservative Meta-compatible MP4 before public hosting
+        if: env.UMBRAL_SKIP == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          key="\${UMBRAL_DAY//-/}"
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; fi
+          python scripts/ensure_meta_compatible.py "staged/umbral_$key.mp4"
+      - name: Store exact final daily MP4 and cover on the official Pages branch
+        if: env.UMBRAL_SKIP == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          key="$UMBRAL_DAY"
+          short="\${UMBRAL_DAY//-/}"
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; short="\${short}_09"; fi
+          cp "staged/umbral_$short.mp4" "docs/reels/$key.mp4"
+          cp staged/cover.jpg "docs/reels/$key.jpg"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "docs/reels/$key.mp4" "docs/reels/$key.jpg"
+          if ! git diff --cached --quiet; then
+            git commit -m "UMBRAL3: prepare owner-approved official Reel $key"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Trigger official GitHub Pages build without publishing to Meta yet
+        if: env.UMBRAL_SKIP == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
+      - name: Verify served MP4 and cover byte-for-byte
+        if: env.UMBRAL_SKIP == 'false'
+        run: python scripts/wait_public_video.py
+      - name: Prepare Instagram container using existing official, fail-closed code
+        if: env.UMBRAL_SKIP == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          python scripts/publish_daily.py prepare --date "$UMBRAL_DAY" \
+            --video-url "$(cat staged/public_video_url.txt)" \
+            --cover-url "$(cat staged/public_cover_url.txt)"
+      - name: Publish only at the official civil slot after final Meta readback
+        if: env.UMBRAL_SKIP == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python scripts/publish_daily.py publish --date "$UMBRAL_DAY"
+      - name: Commit officially verified permalink and media ID; no guessed receipts
+        if: always() && env.UMBRAL_SKIP == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -s staged/published.json ]; then exit 0; fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          row=json.loads(Path('staged/published.json').read_text())
+          if row.get('verification')!='published_media_read_back':
+              raise SystemExit('No complete Meta readback; publication remains pending')
+          PY
+          key="$UMBRAL_DAY"
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; fi
+          mkdir -p docs/published
+          cp staged/published.json "docs/published/$key.json"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "docs/published/$key.json"
+          git commit -m "UMBRAL3: Meta readback confirms official $key" || true
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Preserve sanitized receipt for review; no unpublished media uploaded
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: umbral3-official-publication-receipt
+          path: staged/published.json
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Report fail-closed fallback eligibility without forcing another Meta POST
+        if: failure()
+        run: echo '::error::V3.1 official pipeline failed. Legacy backup slot will reconcile Meta and try safely under the shared lock.'
+
   daily-refill:
-    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED == 'true'
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED == 'true' && github.event.schedule == '42 20 * * *'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     strategy:

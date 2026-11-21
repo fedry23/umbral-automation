@@ -12,7 +12,7 @@ class RefillScheduleTests(unittest.TestCase):
     def test_refill_after_editorial_and_both_official_slots_winter_and_summer(self):
         flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
                        Loader=yaml.BaseLoader)
-        self.assertEqual(flow["on"]["schedule"],[{"cron":"42 20 * * *"}])
+        self.assertIn({"cron":"42 20 * * *"},flow["on"]["schedule"])
         for date in (dt.date(2026,11,21),dt.date(2027,7,15)):
             with self.subTest(date=date):
                 run=dt.datetime(date.year,date.month,date.day,20,42,
@@ -77,5 +77,6 @@ class RefillScheduleTests(unittest.TestCase):
                        Loader=yaml.BaseLoader)
         gate=flow["jobs"]["daily-refill"]["if"]
         self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'",gate)
+        self.assertIn("github.event.schedule == '42 20 * * *'",gate)
         self.assertIn("refs/heads/main",gate)
         self.assertIn("github.event_name == 'schedule'",gate)

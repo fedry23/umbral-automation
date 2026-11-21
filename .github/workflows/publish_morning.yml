@@ -6,6 +6,8 @@ on:
   schedule:
     - cron: '17 5 * * *'
     - cron: '17 6 * * *'
+    - cron: '0 7 * * *' # Recuperación tardía V3.1; mismo bloqueo oficial
+    - cron: '0 8 * * *' # Recuperación tardía V3.1; mismo bloqueo oficial
   # Respaldo por push: activado por la tarea diaria externa; no publica fuera de hora.
   push:
     branches: [main]
@@ -32,7 +34,7 @@ jobs:
   publicar:
     # Publicación programada autorizada. La tarea antigua de ChatGPT está desactivada.
     # Bloqueo manual de emergencia: UMBRAL_META_PUBLISH_ENABLED=false en Variables.
-    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_call' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push') && github.event.workflow_run.head_repository.full_name == github.repository)) && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' }}
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_call' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push') && github.event.workflow_run.head_repository.full_name == github.repository)) && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && (vars.UMBRAL3_LIVE_ENABLED != 'true' || (github.event_name == 'schedule' && (github.event.schedule == '0 7 * * *' || github.event.schedule == '0 8 * * *'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 240
     env:
