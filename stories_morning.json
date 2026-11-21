@@ -560,5 +560,86 @@
         }
       ]
     }
+  },
+  {
+    "title": "La cinta amarilla",
+    "hook": "La cinta amarilla del pasillo apareció dos metros más cerca de mi puerta.",
+    "narration": "La cinta amarilla del pasillo apareció dos metros más cerca de mi puerta. Soy conserje y la había colocado sobre una baldosa rota. Pensé que alguien la había movido. La devolví a la grieta y fotografié el arreglo. En la fotografía, sin embargo, estaba delante de mi despacho. Volví al pasillo. La cinta estaba allí, intacta. La observé durante un minuto: avanzó otro metro sin despegarse del suelo. Comprendí que se acercaba a la última persona que la había tocado. Busqué unas tijeras en el almacén, pero la cinta alcanzó la entrada antes que yo. Me encerré en el despacho. Llamé al encargado para pedir ayuda. Mientras hablábamos, escuché un roce adhesivo bajo la puerta. La cinta estaba entrando. Miré mis zapatos. Una tira amarilla rodeaba mis tobillos. Quise arrancarla, pero recordé que tocarla la hacía seguirme. El reloj completó otro minuto. La cinta se tensó.",
+    "caption": "La cinta amarilla. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Wide shot of yellow floor warning tape lying near a closed brown office door. Spanish office corridor, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering.",
+      "Close-up of a hand placing yellow floor warning tape beside a cracked grey corridor tile. Spanish office corridor, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering.",
+      "Medium shot of yellow floor warning tape advancing across grey corridor tiles. Spanish office corridor, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering.",
+      "Low angle of yellow floor warning tape crossing a storeroom threshold. Spanish office storeroom, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering.",
+      "Floor-level shot of yellow floor warning tape sliding beneath a closed office door. Spanish office, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering.",
+      "Extreme close-up of yellow floor warning tape tightening around black work shoes. Spanish office, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering."
+    ],
+    "publish_date": "2026-11-28",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "yellow floor warning tape",
+        "anchor1": "cracked grey corridor tile",
+        "anchor2": "navy blue janitor uniform"
+      },
+      "shots": [
+        {
+          "narration": "La cinta amarilla del pasillo apareció dos metros más cerca de mi puerta. Soy conserje y la había colocado sobre una baldosa rota.",
+          "action": "Wide shot of yellow floor warning tape lying near a closed brown office door",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Wide shot of yellow floor warning tape lying near a closed brown office door. Spanish office corridor, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering."
+        },
+        {
+          "narration": "Pensé que alguien la había movido. La devolví a la grieta y fotografié el arreglo. En la fotografía, sin embargo, estaba delante de mi despacho.",
+          "action": "Close-up of a hand placing yellow floor warning tape beside a cracked grey corridor tile",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Close-up of a hand placing yellow floor warning tape beside a cracked grey corridor tile. Spanish office corridor, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering."
+        },
+        {
+          "narration": "Volví al pasillo. La cinta estaba allí, intacta. La observé durante un minuto: avanzó otro metro sin despegarse del suelo.",
+          "action": "Medium shot of yellow floor warning tape advancing across grey corridor tiles",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Medium shot of yellow floor warning tape advancing across grey corridor tiles. Spanish office corridor, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering."
+        },
+        {
+          "narration": "Comprendí que se acercaba a la última persona que la había tocado. Busqué unas tijeras en el almacén, pero la cinta alcanzó la entrada antes que yo.",
+          "action": "Low angle of yellow floor warning tape crossing a storeroom threshold",
+          "camera": "wide",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Low angle of yellow floor warning tape crossing a storeroom threshold. Spanish office storeroom, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering."
+        },
+        {
+          "narration": "Me encerré en el despacho. Llamé al encargado para pedir ayuda. Mientras hablábamos, escuché un roce adhesivo bajo la puerta. La cinta estaba entrando.",
+          "action": "Floor-level shot of yellow floor warning tape sliding beneath a closed office door",
+          "camera": "close-up",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Floor-level shot of yellow floor warning tape sliding beneath a closed office door. Spanish office, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering."
+        },
+        {
+          "narration": "Miré mis zapatos. Una tira amarilla rodeaba mis tobillos. Quise arrancarla, pero recordé que tocarla la hacía seguirme. El reloj completó otro minuto. La cinta se tensó.",
+          "action": "Extreme close-up of yellow floor warning tape tightening around black work shoes",
+          "camera": "detail",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Extreme close-up of yellow floor warning tape tightening around black work shoes. Spanish office, grey tiles, fluorescent light. Photorealistic cinematic horror, vertical 9:16, realistic shadows, single visible action, no text or lettering."
+        }
+      ]
+    }
   }
 ]
