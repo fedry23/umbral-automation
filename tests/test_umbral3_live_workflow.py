@@ -16,6 +16,7 @@ class OwnerLiveWorkflowTests(unittest.TestCase):
         self.assertIn("refs/heads/main",guard)
         self.assertIn("github.event_name == 'schedule'",guard)
         self.assertIn("vars.UMBRAL3_LIVE_ENABLED == 'v31-owner-reviewed-859be1ef'",guard)
+        self.assertIn("vars.UMBRAL_META_PUBLISH_ENABLED != 'false'",guard)
         self.assertEqual(job["concurrency"]["group"],"umbral-instagram-official")
         self.assertEqual(job["concurrency"]["cancel-in-progress"],"false")
         self.assertEqual(job["permissions"]["id-token"],"write")

@@ -625,7 +625,7 @@ jobs:
     # OFF by default. Main OIDC uses THIS trusted-publisher workflow filename.
     # The older official workflows keep the same Meta lock and provide late
     # fallback at their distinct backup cron slots when this route is enabled.
-    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_LIVE_ENABLED == 'v31-owner-reviewed-859be1ef' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_LIVE_ENABLED == 'v31-owner-reviewed-859be1ef' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')
     runs-on: ubuntu-latest
     timeout-minutes: 240
     concurrency:
