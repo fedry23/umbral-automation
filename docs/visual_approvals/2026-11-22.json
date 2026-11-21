@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "status": "approved",
+  "date": "2026-11-22",
+  "slot": "21",
+  "reviewer": "fedry23",
+  "reviewed_at": "2026-11-21T16:19:00+01:00",
+  "private_bucket": "Fedry23/umbral-private",
+  "story_sha256": "4e7b574f294e0b72b1a7b4739544255479b8a1d21bdbd09850b82a07350068b4",
+  "scene_sha256": {
+    "scene_00.png": "6b39dde7ee9cfa5f309bad54beeb4bde8f5c49d1c2a1baeb4cccaf8b22381660",
+    "scene_01.png": "4e9f51eedc937ef3ec16f1c6d1d4cd6956955348d81154d41017101fae4d07e3",
+    "scene_02.png": "2c6e3e8667b03740d664d09417b52749a6b5393da664d488fbc072a6299f8568",
+    "scene_03.png": "9ddea37ce9b7af96dd1a561c32958dd57441b05c6e7b5559fa0a1b82eb546753",
+    "scene_04.png": "169d68f61bc10a27285297f08383b154d6d1178e46c4044e4e51eea49aab4ff0",
+    "scene_05.png": "94e615e0815da4397e96e40d9df4f04e1ca88adfa26fc38db6f471290df87b41"
+  },
+  "notes": "The owner viewed the six-frame horror-v3 contact sheet and explicitly accepted this cinematic art direction on 2026-11-21. Approval covers only these six exact image bytes for the 2026-11-22 21 slot. It is not a review of other Reels, narration, sound or final publication readiness."
+}
