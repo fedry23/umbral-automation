@@ -584,7 +584,7 @@ jobs:
           stage.validate_cover(folder/'cover.jpg')
           stage.validate_mp4(video)
           assert staged_story['episode_number'] == 18
-          assert caption.startswith('Historia 18: El ascensor de servicio\\n')
+          assert caption.startswith('Historia 18: El ascensor de servicio\n')
           with Image.open(folder/'cover.jpg') as image:
               assert image.format=='JPEG' and image.size==(1080,1920)
           for file in (video,folder/'voice.wav',folder/'music.wav'):
