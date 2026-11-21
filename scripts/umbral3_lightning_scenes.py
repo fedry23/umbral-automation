@@ -40,7 +40,7 @@ def render_images(index, anchor, output):
         prompts = visual_shots(story)
     else:
         raise ValueError("Unrecognized private horror direction")
-    if len(prompts)!=6 or len(set(prompts))!=6:
+    if prompts is not None and (len(prompts)!=6 or len(set(prompts))!=6):
         raise ValueError("Six distinct storyboard prompts required")
     started=time.monotonic()
     with tempfile.TemporaryDirectory(prefix="umbral3-lightning-model-") as tmp:
