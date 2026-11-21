@@ -242,3 +242,23 @@ jobs:
         run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor 2026-11-21 --index ${{ matrix.index }} --output "$RUNNER_TEMP/umbral3-review"
       - name: Assemble full Reel, verify WAV MP4 ASS and sealed bucket readback
         run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index ${{ matrix.index }} --prepared-dir "$RUNNER_TEMP/umbral3-review"
+
+  candidate-inventory:
+    needs: [verify, lightning-smoke, lightning-batch]
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.lightning_all == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL lightning private full')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install private bucket read-only inventory SDK
+        run: python -m pip install --disable-pip-version-check huggingface_hub==1.19.0
+      - name: Verify every candidate after separate GitHub runner restart
+        run: python -u -m scripts.umbral3_hf_candidate_audit --anchor 2026-11-21
