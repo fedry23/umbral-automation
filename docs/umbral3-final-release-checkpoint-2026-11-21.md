@@ -16,11 +16,11 @@
 5. El nuevo job está **desactivado por defecto** y requiere `vars.UMBRAL3_LIVE_ENABLED == 'v31-owner-reviewed-859be1ef'` y `vars.UMBRAL_META_PUBLISH_ENABLED != 'false'`. La versión anterior conserva ventanas de recuperación. La variable jamás se ha activado aquí.
 6. En los commits de integración `37001546265e5a7505a4afab8384f5e2f9a82981` y `d1d18d4c6e2864a1c42ba136ee03c9fb9b6cc751` el conjunto CI superó **227/227** pruebas de calidad/integración; verificar de nuevo las ejecuciones posteriores. `scripts/episode_state` mantiene el último episodio oficial 17 y ninguna intención pendiente no resuelta.
 7. Auditoría HF privada real `44947563100`: el 28 Nov 09 y 21 tienen guiones pero `generate=true`, `generated=false`, no están guardados; el informe de próximas 14 franjas marca 12 aprobadas y 2 faltantes. No existe una reserva continua de 14 medios aprobados.
-8. Segunda prueba privada `44947175216` detectó error EN LA ASERCIÓN del salto de línea de caption, aunque el MP4 decodificó correctamente. Corrección `1c88107578904d4b7e465f103a344ebfc8f086fa`; nuevo job de prueba privada `44947626821` solicitado. Consultar su conclusión, y no afirmar PASS si está inacabado.
+8. Segunda prueba privada `44947175216` detectó error EN LA ASERCIÓN del salto de línea de caption, aunque el MP4 decodificó correctamente. Corrección `1c88107578904d4b7e465f103a344ebfc8f086fa`. **Tercera prueba real `44947626821` SUCCESS**: seis PNG V3.1 privados recuperados con hashes exactos, portada y H.264/AAC validados por el contrato oficial, caption con salto de línea verificado, voz y música decodificadas, numeración final de prueba `18`, MP4 de `4.835.161` bytes. Ninguna credencial Meta ni publicación de prueba.
 
 ## Bloqueos reales pendientes
 
-- Confirmar PASS de la prueba privada reforzada `44947626821`, incluidas portada, duración, metadatos y caption del stage oficial.
+- La prueba privada reforzada `44947626821` ha pasado. Todavía falta la **primera ejecución real de main con un Reel aprobado**, que se pospone hasta satisfacer los siguientes gates.
 - Probar la ruta principal con una ejecución oficial real programada **sin pruebas Meta ficticias** y verificar su permalink/recibo en Meta. Antes de activarla, asegurar rollback real y diferenciar fallo del modelo de fallo de la red.
 - Mantener la PR #18 draft hasta comprobar identidad main OIDC, contratos staging/Meta y rollback, y verificar que el interruptor no salta las medidas de seguridad. No fusionar 200+ commits sin revisión.
 - Generar **nuevos** medios para el 28 Nov y guiones desde el 29 Nov en adelante. Sus nuevas escenas **requieren revisión explícita**, por voluntad del propietario; no autoconceder aprobación.
