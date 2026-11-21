@@ -15,6 +15,7 @@ from zoneinfo import ZoneInfo
 import zipfile
 
 from scripts.umbral3_hf_candidate_index import find
+from scripts.umbral3_lightning_scenes import PIN
 from scripts.umbral3_reserve import story_key
 from scripts.umbral3_reserve_render import catalogs,load_slot
 from scripts.umbral3_evidence import verify_media_bundle
@@ -38,6 +39,8 @@ def check(store, day, slot, all_stories=None):
         return result
     if pointer["story_sha256"]!=digest:
         raise RuntimeError("A previously indexed candidate has a stale story")
+    if pointer.get("model_revision")!=PIN:
+        raise RuntimeError("A previously indexed candidate uses a stale visual model")
     raw=store.get(pointer["bundle_sha256"]+".zip")
     if raw is None or len(raw)!=pointer["bundle_bytes"]:
         raise RuntimeError("A previously indexed candidate is missing")
