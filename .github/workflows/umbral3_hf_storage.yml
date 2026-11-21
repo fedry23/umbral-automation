@@ -170,7 +170,7 @@ jobs:
 
   lightning-smoke:
     needs: verify
-    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.lightning_one == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL lightning private smoke')))
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.lightning_one == true || inputs.lightning_all == true) || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'UMBRAL lightning private smoke') || startsWith(github.event.head_commit.message, 'UMBRAL lightning private full'))))
     runs-on: ubuntu-latest
     timeout-minutes: 150
     permissions:
@@ -204,7 +204,7 @@ jobs:
         run: python -u -m scripts.umbral3_reserve_render --anchor 2026-11-21 --index 0 --prepared-dir "$RUNNER_TEMP/umbral3-review"
 
   lightning-batch:
-    needs: verify
+    needs: [verify, lightning-smoke]
     if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-3' && ((github.event_name == 'workflow_dispatch' && inputs.lightning_all == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL lightning private full')))
     runs-on: ubuntu-latest
     timeout-minutes: 150
@@ -221,7 +221,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+        index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     steps:
       - uses: actions/checkout@v4
         with:
