@@ -512,7 +512,7 @@ def render():
                               active_profile=active_profile)
 
 
-def render_story_media(story, out, date, filename, *, active_profile=None, reserve_store=None, reserve_slot=None):
+def render_story_media(story, out, date, filename, *, active_profile=None, reserve_store=None, reserve_slot=None, prepared_images=None):
     """Render media only; never publish or select a production episode."""
     if not isinstance(filename, str) or Path(filename).name != filename or not filename.endswith('.mp4'):
         raise ValueError('Invalid output filename')
@@ -540,7 +540,18 @@ def render_story_media(story, out, date, filename, *, active_profile=None, reser
              'narration': shot['narration']}
             for i, shot in enumerate(storyboard)
         ], ensure_ascii=False, indent=2), encoding='utf-8')
-    if reserve_store is None:
+    if prepared_images is not None:
+        if reserve_store is not None or reserve_slot not in ('09', '21'):
+            raise ValueError("Prepared scenes need an exclusive trusted civil slot")
+        from scripts.umbral3_reserve import validated_prepared_images
+        images = validated_prepared_images(prepared_images, story, date.isoformat(),
+                                           reserve_slot, out)
+        (out / 'reserve_status.json').write_text(json.dumps({
+            'status': 'private_candidate_scenes_reused',
+            'story_sha256': prepared_images['story_sha256'],
+            'visual_approved': prepared_images['visual_approved'],
+        }), encoding='utf-8')
+    elif reserve_store is None:
         images = generate_images(story, out)
     else:
         from scripts.umbral3_prepare import visual_recipe
