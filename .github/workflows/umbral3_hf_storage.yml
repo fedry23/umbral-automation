@@ -624,11 +624,14 @@ jobs:
         run: python -m scripts.umbral3_hf_probe
 
   live-routing:
-    # Read the owner-authorized, dated rollout on main. No Meta/HF token.
+    # Owner-reviewed until 27 Nov; from 28 Nov check separate private SHA
+    # machine QA certificate using a workflow-scoped OIDC token (no Meta).
+
     if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
     outputs:
       eligible: ${{ steps.route.outputs.eligible }}
     steps:
@@ -636,11 +639,20 @@ jobs:
         with:
           ref: main
           persist-credentials: false
-      - name: Check exact owner-reviewed civil slot before using any CPU/GPU models
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Initialize isolated private SHA+QA certificate lookup (no Meta)
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0'
+      - name: Check exact owner OR previously certified automatic civil slot
         id: route
         shell: bash
         env:
           UMBRAL3_ROLLOUT_OVERRIDE: ${{ vars.UMBRAL3_LIVE_ENABLED }}
+          UMBRAL3_AUTO_QA_ENABLED: ${{ vars.UMBRAL3_AUTO_QA_ENABLED }}
+          HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
         run: |
           set -euo pipefail
           case "${{ github.event.schedule }}" in
@@ -648,7 +660,7 @@ jobs:
             '17 17 * * *'|'17 18 * * *') slot=21 ;;
             *) echo '::error::Unknown V3.1 schedule'; exit 1 ;;
           esac
-          python -m scripts.umbral3_rollout --mode v31 --slot "$slot"
+          /tmp/umbral3-hf-storage/bin/python -m scripts.umbral3_rollout --mode v31 --slot "$slot"
   live-owner-approved-release:
     needs: live-routing
     # Active only for exact reviewed dates/scene hashes in the owner-authorized rollout.
@@ -1000,6 +1012,26 @@ jobs:
       - name: Verify the EXACT refilled date's private index and hashes
         if: steps.gate.outputs.generate == 'true'
         run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --index "${{ steps.gate.outputs.index }}" --anchor "${{ steps.gate.outputs.anchor }}"
+      - name: Install automatic-QA image metrics into OIDC-only reader
+        if: steps.gate.outputs.generate == 'true'
+        run: /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'numpy==1.26.4'
+      - name: Independently assess all six frames with pinned public CLIP
+        if: steps.gate.outputs.generate == 'true'
+        continue-on-error: true
+        shell: bash
+        env:
+          UMBRAL3_AUTO_QA_ENABLED: ${{ vars.UMBRAL3_AUTO_QA_ENABLED }}
+        run: |
+          set -euo pipefail
+          if [ "${UMBRAL3_AUTO_QA_ENABLED:-}" = 'false' ]; then
+            echo 'Automatic quality gate disabled; no certificate minted'
+            exit 0
+          fi
+          export UMBRAL_CLIP_PYTHON="$(command -v python)"
+          DAY="$(date -d "${{ steps.gate.outputs.anchor }}" +%F)"
+          /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa \
+             --mode certify --date "$DAY" --slot "${{ matrix.slot }}"
+
 
   late-finalization-smoke:
     needs: verify
