@@ -6,3 +6,4 @@ Fedry23/umbral-private
 UMBRAL selective v31 private priority batch 2026-11-21; immutable originals, 7 slots, no Meta publication
 Owner-only encrypted V3.1 preview transport, no raw image export (2026-11-21)
 2026-11-21: owner confirms mixed V3/V3.1 contact images; extract exact scene SHA metadata only, no Meta, no publication.
+2026-11-21: private end-to-end V3.1 2026-11-22 09 test, SHA-verified owner signoff, late-numbered MP4, no Meta and no public media.
