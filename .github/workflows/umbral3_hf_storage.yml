@@ -76,6 +76,9 @@ jobs:
       - name: Verify persisted private archives after workflow restart
         if: (github.event_name == 'workflow_dispatch' && inputs.audit_private == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL private inventory'))
         run: python -m scripts.umbral3_hf_inventory
+      - name: Create one private 84-scene human review image from actual cached Reels
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL visual contact board')
+        run: python -u -m scripts.umbral3_hf_contact_board
       - name: Reconcile all 14 full private candidate ZIPs without publication
         if: (github.event_name == 'workflow_dispatch' && inputs.audit_candidates == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL candidate audit'))
         run: python -u -m scripts.umbral3_hf_candidate_audit --anchor 2026-11-21
