@@ -82,7 +82,7 @@ class RefillBacklogTests(unittest.TestCase):
                        Loader=yaml.BaseLoader)
         job=flow["jobs"]["daily-refill"]
         self.assertIn("refs/heads/main",job["if"])
-        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'",job["if"])
+        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED != 'false'",job["if"])
         self.assertEqual(job["permissions"],{"contents":"read","id-token":"write"})
         steps=job["steps"]
         gate=next(s for s in steps if s.get("id")=="gate")["run"]
