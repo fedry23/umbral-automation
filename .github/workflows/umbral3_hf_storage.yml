@@ -71,6 +71,9 @@ jobs:
           set -euo pipefail
           export UMBRAL_HF_BUCKET="$(head -n 1 ops/umbral3-storage-kick.txt)"
           python -m scripts.umbral3_hf_probe
+      - name: Extract exact V3 scene hashes for owner approval registry (no image disclosure)
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'UMBRAL reviewed v3 fingerprint')
+        run: python -u -m scripts.umbral3_hf_review_fingerprint
       - name: Round-trip validated six-scene bundle with immutable metadata
         run: python -m scripts.umbral3_hf_roundtrip
       - name: Prove full v2 audiovisual archive contract using synthetic private files
