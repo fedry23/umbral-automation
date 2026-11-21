@@ -21,7 +21,7 @@ from scripts.umbral3_reserve_render import catalogs,load_slot
 from scripts.umbral3_evidence import verify_media_bundle
 
 MADRID=ZoneInfo("Europe/Madrid")
-BACKEND="sdxl-lightning-2steps-ov-int8"
+BACKEND="sdxl-lightning-2steps-ov-int8-horror-v3"
 
 def check(store, day, slot, all_stories=None):
     if isinstance(day,dt.datetime) or type(day) is not dt.date or slot not in ("09","21"):

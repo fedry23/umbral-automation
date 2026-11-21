@@ -21,6 +21,17 @@ class RefillScheduleTests(unittest.TestCase):
                 self.assertGreater((run.hour,run.minute),(21,20))
                 self.assertLess((run.hour,run.minute),(24,0))
                 self.assertGreater((run.hour,run.minute),(18,20))
+    def test_new_refill_selects_v3_without_auto_publication(self):
+        """D+7 must select the V3 artifact namespace and retain the release switch."""
+        from scripts.umbral3_refill_gate import BACKEND
+        self.assertEqual(BACKEND, 'sdxl-lightning-2steps-ov-int8-horror-v3')
+        flow = yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
+                         Loader=yaml.BaseLoader)
+        job = flow["jobs"]["daily-refill"]
+        self.assertEqual(job["env"]["UMBRAL_HORROR_DIRECTION"], "horror-v3")
+        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'", job["if"])
+        self.assertNotIn("IG_ACCESS_TOKEN", job.get("env", {}))
+
     def test_refill_still_fails_closed_until_visual_gate_and_main_oidc(self):
         flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
                        Loader=yaml.BaseLoader)

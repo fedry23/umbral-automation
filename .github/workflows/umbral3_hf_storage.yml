@@ -333,6 +333,8 @@ jobs:
       id-token: write
     env:
       UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      # Approved V3 direction for new private candidates; not permission to publish.
+      UMBRAL_HORROR_DIRECTION: horror-v3
       HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
       HF_HUB_DISABLE_TELEMETRY: '1'
       HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
