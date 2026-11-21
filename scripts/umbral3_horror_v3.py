@@ -30,16 +30,45 @@ PROMPTS = (
     "Impossible reflection, clearly empty bench above, cold light, no text.",
 )
 
-def directed_prompts_v3(story, tokenizer):
-    if story.get("title") != TITLE:
-        raise ValueError("Horror v3 is deliberately limited to the visually rejected bus stop story")
-    if len(validate_storyboard(story)) != len(PROMPTS):
-        raise ValueError("Storyboard scene count changed")
-    prompts = []
-    for i, prompt in enumerate(PROMPTS):
-        if len(tokenizer(prompt, truncation=False).input_ids) > tokenizer.model_max_length:
-            raise ValueError(f"Horror v3 scene {i+1} exceeds actual SDXL tokenizer context")
+def _new_story_prompts(shots, tokenizer):
+    """V3 film language for unseen authored episodes, not automatic approval.
+
+    Prioritizes the *visible physical action* and a stable authored location.
+    We must not invent story-specific supernatural events or drop the action
+    at CLIP's actual tokenizer limit.
+    """
+    prompts=[]
+    for i, shot in enumerate(shots):
+        action=shot["action"].strip(" .")
+        original=shot["prompt"].split(". ")
+        setting=original[1].strip(" .") if len(original)>1 else ""
+        if not action or len(action)>400:
+            raise ValueError("Invalid authored physical horror action")
+        light=("eerie empty space, cold teal shadows, one dim amber practical light"
+               if i<2 else "deep supernatural dread, hard teal-green sidelight, heavy dark shadows")
+        candidates=(
+            f"Photoreal cinematic psychological horror, portrait. {action}. {setting}. {light}. No text",
+            f"Photoreal cinematic horror, portrait. {action}. {setting}. dark shadows, eerie atmosphere. No text",
+            f"Photoreal cinematic horror, portrait. {action}. ominous shadows. No text",
+        )
+        prompt=next((p for p in candidates if len(tokenizer(p,truncation=False).input_ids)<=tokenizer.model_max_length),None)
+        if prompt is None:
+            raise ValueError(f"Horror v3 scene {i+1} exceeds actual tokenizer context")
         prompts.append(prompt)
-    if len(set(prompts)) != 6:
+    return prompts
+
+
+def directed_prompts_v3(story, tokenizer):
+    shots=validate_storyboard(story)
+    if len(shots)!=6:
+        raise ValueError("Storyboard scene count changed")
+    if story.get("title")==TITLE:
+        prompts=list(PROMPTS)
+    else:
+        prompts=_new_story_prompts(shots,tokenizer)
+    for i,prompt in enumerate(prompts):
+        if len(tokenizer(prompt,truncation=False).input_ids)>tokenizer.model_max_length:
+            raise ValueError(f"Horror v3 scene {i+1} exceeds actual tokenizer context")
+    if len(set(prompts))!=6:
         raise ValueError("Repeated visual beats")
     return prompts
