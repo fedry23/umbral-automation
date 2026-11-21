@@ -15,7 +15,7 @@ class OwnerLiveWorkflowTests(unittest.TestCase):
         guard=job["if"]
         self.assertIn("refs/heads/main",guard)
         self.assertIn("github.event_name == 'schedule'",guard)
-        self.assertIn("vars.UMBRAL3_LIVE_ENABLED == 'true'",guard)
+        self.assertIn("vars.UMBRAL3_LIVE_ENABLED == 'v31-owner-reviewed-859be1ef'",guard)
         self.assertEqual(job["concurrency"]["group"],"umbral-instagram-official")
         self.assertEqual(job["concurrency"]["cancel-in-progress"],"false")
         self.assertEqual(job["permissions"]["id-token"],"write")
@@ -45,7 +45,7 @@ class OwnerLiveWorkflowTests(unittest.TestCase):
             with self.subTest(filename=filename):
                 f=flow(filename)
                 guard=f["jobs"]["publicar"]["if"]
-                self.assertIn("vars.UMBRAL3_LIVE_ENABLED != 'true'",guard)
+                self.assertIn("vars.UMBRAL3_LIVE_ENABLED != 'v31-owner-reviewed-859be1ef'",guard)
                 self.assertIn("umbral-instagram-official",f["concurrency"]["group"])
                 for cron in backup:
                     self.assertIn(cron,[x["cron"] for x in f["on"]["schedule"]])
