@@ -31,3 +31,19 @@
 - Job `horror-direction-smoke` dentro del workflow OIDC autorizado, sin permisos Meta; muestra el caso crítico `El banco de la parada` (22/11 21h) como **preview privado no aprobado**.
 
 **Gates de aprobación pendientes:** comparar panel antiguo/nuevo sin ocultar escenas erróneas; verificar anomalías inequívocas que sucedan donde dicta la narración, misma identidad/escenario en planos relacionados, exposición que permita entender la acción, cinematografía de miedo y sincronía de escenas/audio. Mantener `visual_approved=false` y `ready_to_publish=false` hasta revisión real del propietario. No mover `main`, no activar reposición D+7 ni PR #18 por estos cambios experimentales.
+
+
+## Revisión adicional del propietario — 22/11 21h, El banco de la parada (horror-v2)
+
+El propietario adjuntó el panel **real** de seis escenas de `horror-v2` el 21/11/2026. El panel se leyó visualmente y se cotejó con la narración del repositorio. Resultado: **rechazado para publicar; mejora de atmósfera pero insuficiente fidelidad de la acción**.
+
+1. Parada: ambiente de niebla y verde apagado; funciona como localización, falta el charco inquietante bajo el asiento.
+2. Reflejo: parada y reflejo legibles, pero no se ve una parada **sumergida** en su reflejo.
+3. Agua: formas negras que parecen objetos o barcas; no se reconocen zapatos y piernas siendo engullidos.
+4. Huida: escena paisajística mojada y reflejo de árbol; no hay huellas humanas húmedas inequívocas.
+5. Autobús: dos figuras en una puerta o umbral, **no** pasajeros golpeando el cristal de un autobús.
+6. Paradoja final: un hombre sentado de verdad y reflejado con normalidad; la historia requiere **banco vacío en realidad y hombre sentado solo en el agua reflejada**.
+
+**Corrección implementada:** `scripts/umbral3_horror_v3.py`, prompts cortos centrados primero en el hecho sobrenatural; `UMBRAL_HORROR_DIRECTION=horror-v3` con semillas y backend distintos para evitar sobrescritura; nuevo job `horror-v3-smoke` en workflow privado y test `tests/test_umbral3_horror_v3.py`. La producción `main`, el publicador y los catorce candidatos anteriores permanecen intactos. Revisar visualmente el nuevo contacto antes de aprobación; un pipeline verde no equivale a terror aprobado.
+
+Prueba privada V3: https://github.com/fedry23/umbral-automation/actions/runs/44916727088 (resultado sujeto a comprobación posterior).
