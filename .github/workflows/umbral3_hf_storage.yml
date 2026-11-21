@@ -571,6 +571,14 @@ jobs:
           marks=json.loads((folder/'branding_timing.json').read_text())
           assert 0 < marks['intro_end'] < marks['outro_start'] < marks['duration']
           assert (folder/'subtitles.ass').read_text().count('Dialogue:')>0
+          from scripts import stage_morning_reel as stage
+          staged_story=json.loads((folder/'story_used.json').read_text())
+          caption=(folder/'caption.txt').read_text()
+          stage.verify_story(staged_story,caption,'2026-11-22')
+          stage.validate_cover(folder/'cover.jpg')
+          stage.validate_mp4(video)
+          assert staged_story['episode_number'] == 18
+          assert caption.startswith('Historia 18: El ascensor de servicio\\n')
           with Image.open(folder/'cover.jpg') as image:
               assert image.format=='JPEG' and image.size==(1080,1920)
           for file in (video,folder/'voice.wav',folder/'music.wav'):
