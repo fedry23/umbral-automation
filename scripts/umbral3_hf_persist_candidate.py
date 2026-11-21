@@ -25,9 +25,10 @@ def persist(output,filename,summary_path):
         or len(data.get("story_sha256",""))!=64
         or len(data.get("narration_sha256",""))!=64):
         raise ValueError("Invalid private candidate contract")
-    receipt=persist_fixture(HfBucketStore.from_oidc(),root,video,data)
-    if receipt["bytes"]<100_000 or hashlib.sha256(
-       HfBucketStore.from_oidc().get(receipt["key"])).hexdigest()!=receipt["sha256"]:
+    store=HfBucketStore.from_oidc()
+    receipt=persist_fixture(store,root,video,data)
+    payload=store.get(receipt["key"])
+    if receipt["bytes"]<100_000 or payload is None or hashlib.sha256(payload).hexdigest()!=receipt["sha256"]:
         raise RuntimeError("Private candidate readback mismatch")
     print("UMBRAL3_PRIVATE_CANDIDATE_STORED="+json.dumps({
         "date":data["date"],"slot":data["slot"],"index":data["index"],
