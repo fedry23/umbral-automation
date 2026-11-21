@@ -29,7 +29,7 @@ class RefillScheduleTests(unittest.TestCase):
                          Loader=yaml.BaseLoader)
         job = flow["jobs"]["daily-refill"]
         self.assertEqual(job["env"]["UMBRAL_HORROR_DIRECTION"], "horror-v3")
-        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'", job["if"])
+        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED != 'false'", job["if"])
         self.assertNotIn("IG_ACCESS_TOKEN", job.get("env", {}))
 
     def test_private_full_batch_uses_existing_storage_kick_without_main_oidc_expansion(self):
@@ -76,7 +76,7 @@ class RefillScheduleTests(unittest.TestCase):
         flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
                        Loader=yaml.BaseLoader)
         gate=flow["jobs"]["daily-refill"]["if"]
-        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED == 'true'",gate)
+        self.assertIn("vars.UMBRAL3_RESERVE_ENABLED != 'false'",gate)
         self.assertIn("github.event.schedule == '42 20 * * *'",gate)
         self.assertIn("refs/heads/main",gate)
         self.assertIn("github.event_name == 'schedule'",gate)
