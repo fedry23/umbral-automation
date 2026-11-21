@@ -16,6 +16,13 @@ on:
       - '.github/workflows/quality_gate.yml'
       - '.github/workflows/reel.yml'
       - '.github/workflows/publish_daily.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/umbral3_hf_storage.yml'
+      - '.github/workflows/quality_gate.yml'
   workflow_dispatch:
 
 permissions:
