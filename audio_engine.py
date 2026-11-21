@@ -130,11 +130,11 @@ def generate_ambient_score(duration, cues, out, seed=7300):
 
 
 def generate_branded_narration(intro, story, outro, out, split_phrases, pipeline=None, story_speed=None):
-    """Intro/outro lowered by ~3 semitones; story waveform is NOT pitch-shifted.
+    """The story uses the former lower-pitched branding voice; intro/outro are natural.
 
     A single Kokoro pipeline is reused for all three segments to keep CPU cost down.
-    Each segment is synthesised as normal Spanish speech; FFmpeg only processes
-    the opening and closing sections. Cue offsets are adjusted to actual samples.
+    Only the central story is pitch-shifted by ~3 semitones using FFmpeg.
+    Each section keeps correctly scaled cue offsets and audio boundaries.
     """
     import subprocess
     import tempfile
@@ -146,7 +146,7 @@ def generate_branded_narration(intro, story, outro, out, split_phrases, pipeline
         pipeline = KPipeline(lang_code='e', repo_id='hexgrad/Kokoro-82M', device='cpu')
 
     # 20000/24000 = 0.8333, equivalent to approximately -3.2 semitones.
-    # atempo counters the speed change so the opening and close remain brisk.
+    # atempo counters the speed change so the central narration keeps its pace.
     deep_filter = "asetrate=20000,aresample=24000,atempo=1.2"
     blocks, cues, cursor = [], [], 0
     timing = {}
@@ -162,7 +162,7 @@ def generate_branded_narration(intro, story, outro, out, split_phrases, pipeline
                 text, segment, split_phrases, **options)
             src = segment / 'voice.wav'
             final_path = src
-            if key != "story":
+            if key == "story":
                 final_path = segment / 'lowered.wav'
                 subprocess.run([
                     'ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
