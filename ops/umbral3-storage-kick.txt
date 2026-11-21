@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-21: smoke one full dated private candidate, no official numbers, no Meta credentials, no publishing
+2026-11-21: accelerated 2-step Lightning private six-shot full Reel smoke; no official numbering or publication
