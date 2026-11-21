@@ -115,6 +115,30 @@ def prepare(index,anchor,store_python,prepared_dir=None):
             "visual_review":"not_performed",
             "ready_to_publish":False,
         }
+        if "selective_source" in model:
+            source=model["selective_source"]
+            from scripts.umbral3_selective_plan import NEW_BACKEND, OLD_BACKEND, selection
+            from scripts.umbral3_reserve import _assets
+            _,_,_,regenerated=selection(index,anchor)
+            pixels={key:item["sha256"] for key,item in _assets(out,6).items()}
+            original=source.get("original_scene_sha256",{})
+            if (model.get("backend")!=NEW_BACKEND
+                    or source.get("base_backend")!=OLD_BACKEND
+                    or source.get("story_sha256")!=story_key(story)
+                    or tuple(source.get("regenerated",()))!=regenerated
+                    or set(original)!=set(pixels)
+                    or any(original[key]!=pixels[key] for key in pixels
+                           if int(key[6:8]) not in regenerated)
+                    or any(original[key]==pixels[key] for key in pixels
+                           if int(key[6:8]) in regenerated)):
+                raise RuntimeError("Selective render changed preserved pixels or failed to redraw")
+            summary["selective_provenance"]={
+                "base_bundle_sha256":source["base_bundle_sha256"],
+                "original_scene_sha256":original,
+                "regenerated":list(regenerated),
+                "retained":[i for i in range(6) if i not in regenerated],
+                "final_scene_sha256":pixels,
+            }
         report=out/"verified_private_candidate.json"
         report.write_text(json.dumps(summary,sort_keys=True),encoding="utf-8")
         subprocess.run([store_python,"-m","scripts.umbral3_hf_persist_candidate",

@@ -24,11 +24,18 @@ PREFIX="umbral3/private-review/_boards/"
 CONTACT_SIZE=(624,676)
 CELL=(666,758)
 
-def build(store,anchor=dt.date(2026,11,21),backend=BACKEND):
+def build(store,anchor=dt.date(2026,11,21),backend=BACKEND,priority_only=False):
     if isinstance(anchor,dt.datetime) or type(anchor) is not dt.date:
         raise ValueError("Expected civil date")
     if backend not in (BACKEND, BACKEND+"-horror-v3"):
         raise ValueError("Unsupported private review backend")
+    if priority_only:
+        from scripts.umbral3_selective_plan import OLD_BACKEND, NEW_BACKEND, PRIORITY
+        if backend!=OLD_BACKEND or anchor!=dt.date(2026,11,21):
+            raise ValueError("Mixed private review requires exact original V3 baseline")
+        board_backend="v3-v31-priority-mix"
+    else:
+        board_backend=backend
     board=Image.new("RGB",(CELL[0]*4,CELL[1]*4),(16,17,22))
     draw=ImageDraw.Draw(board)
     font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
@@ -38,7 +45,8 @@ def build(store,anchor=dt.date(2026,11,21),backend=BACKEND):
     evidence=[]
     for index in range(14):
         story,day,slot=load_slot(index,anchor,entries)
-        pointer=find(store,day,slot,backend)
+        selected_backend=(NEW_BACKEND if index in PRIORITY else OLD_BACKEND) if priority_only else backend
+        pointer=find(store,day,slot,selected_backend)
         if pointer is None or pointer["story_sha256"]!=story_key(story):
             raise RuntimeError("Cannot compose board from missing/stale private Reel")
         raw=store.get(pointer["bundle_sha256"]+".zip")
@@ -70,7 +78,7 @@ def build(store,anchor=dt.date(2026,11,21),backend=BACKEND):
     board.save(buf,format="JPEG",quality=93,optimize=True,subsampling=0)
     payload=buf.getvalue()
     digest=hashlib.sha256(payload).hexdigest()
-    name=f"{PREFIX}umbral-{anchor.isoformat()}-{backend}-14-scenes-{digest}.jpg"
+    name=f"{PREFIX}umbral-{anchor.isoformat()}-{board_backend}-14-scenes-{digest}.jpg"
     store._ensure_auth()
     current=[x for x in store.api.list_bucket_tree(store.bucket,recursive=True,token=store.token)
              if getattr(x,"path",None)==name]
@@ -92,7 +100,7 @@ def build(store,anchor=dt.date(2026,11,21),backend=BACKEND):
         store.api.download_bucket_files(store.bucket,files=[(name,restored)],token=store.token)
         if not restored.is_file() or hashlib.sha256(restored.read_bytes()).hexdigest()!=digest:
             raise RuntimeError("Private visual board upload/readback integrity failed")
-    return {"private":True,"backend":backend,"episodes":14,"scene_frames":84,
+    return {"private":True,"backend":board_backend,"episodes":14,"scene_frames":84,
             "board_size":list(board.size),"bytes":len(payload),
             "sha256":digest,"remote_file":name,
             "visual_review":"not_performed","visual_approved":0,
@@ -102,6 +110,8 @@ if __name__=="__main__":
     import argparse
     parser=argparse.ArgumentParser()
     parser.add_argument("--backend",default=BACKEND)
+    parser.add_argument("--priority-mix",action="store_true",help="Verified V3 originals + seven V3.1 selective remixes")
     args=parser.parse_args()
-    report=build(HfBucketStore.from_oidc(),backend=args.backend)
+    report=build(HfBucketStore.from_oidc(),backend=args.backend,
+                 priority_only=args.priority_mix)
     print("UMBRAL3_PRIVATE_REVIEW_BOARD="+json.dumps(report,sort_keys=True),flush=True)
