@@ -36,6 +36,9 @@ def render_images(index, anchor, output):
         # Delay until the pinned SDXL tokenizer is available; never truncate
         # the scene action or its horror anomaly without noticing.
         prompts = None
+    elif direction == "horror-v3":
+        from scripts.umbral3_horror_v3 import directed_prompts_v3
+        prompts = None
     elif direction == "original":
         prompts = visual_shots(story)
     else:
@@ -57,6 +60,8 @@ def render_images(index, anchor, output):
             directory,device="CPU",ov_config={"CACHE_DIR":str(Path(tmp)/"cache")})
         if direction == "horror-v2":
             prompts = directed_prompts(story, pipe.tokenizer)
+        elif direction == "horror-v3":
+            prompts = directed_prompts_v3(story, pipe.tokenizer)
         if len(prompts)!=6 or len(set(prompts))!=6:
             raise ValueError("Six unique visual story beats required")
         report=[]
@@ -68,7 +73,7 @@ def render_images(index, anchor, output):
             best=None
             attempts=[]
             for attempt in range(2):
-                seed=(830000 if direction=="horror-v2" else 730000) + index*1000 + i*17 + attempt*123
+                seed=({"original": 730000, "horror-v2": 830000, "horror-v3": 930000}[direction]) + index*1000 + i*17 + attempt*123
                 started_shot=time.monotonic()
                 image=pipe(prompt=prompt,width=W,height=H,
                            num_inference_steps=2,guidance_scale=1.0,
@@ -99,7 +104,7 @@ def render_images(index, anchor, output):
         (output/"visuals_manifest.json").write_text(json.dumps(manifest,sort_keys=True),encoding="utf-8")
         (output/"image_quality_report.json").write_text(json.dumps(report,sort_keys=True),encoding="utf-8")
         (output/"model_used.json").write_text(json.dumps({
-            "backend":("sdxl-lightning-2steps-ov-int8-horror-v2" if direction=="horror-v2" else "sdxl-lightning-2steps-ov-int8"),"model":MODEL,
+            "backend":("sdxl-lightning-2steps-ov-int8" if direction=="original" else f"sdxl-lightning-2steps-ov-int8-{direction}"),"model":MODEL,
             "direction_version":direction,
             "revision":PIN,"steps":2,
             "seconds":round(time.monotonic()-started,2),
