@@ -5,6 +5,7 @@ separate preview videos carry a reversible placeholder number and MUST NOT
 be treated as publishable before human visual review + late finalization.
 """
 import argparse
+from contextlib import nullcontext
 import datetime as dt
 import hashlib
 import json
@@ -51,7 +52,7 @@ def catalogs():
         "21":json.loads((ROOT/"stories.json").read_text(encoding="utf-8")),
     }
 
-def prepare(index,anchor,store_python):
+def prepare(index,anchor,store_python,prepared_dir=None):
     if any(os.environ.get(k) for k in ("IG_ACCESS_TOKEN","IG_PUBLISH_ENABLED","UMBRAL_META_PUBLISH_ENABLED")):
         raise RuntimeError("Meta credentials prohibited in candidate generation")
     if not isinstance(store_python,str) or not store_python.startswith("/tmp/umbral3-hf-storage/"):
@@ -63,9 +64,26 @@ def prepare(index,anchor,store_python):
     preview={**story,"episode_number":9101+index}
     name=f"candidate-{day}-{slot}.mp4"
     started=time.monotonic()
-    with tempfile.TemporaryDirectory(prefix="umbral3-preview-") as directory:
+    if prepared_dir is not None:
+        provided=Path(prepared_dir)
+        if provided.is_symlink() or not provided.is_dir():
+            raise ValueError("Private prepared scene directory is unsafe")
+        context=nullcontext(provided)
+    else:
+        context=tempfile.TemporaryDirectory(prefix="umbral3-preview-")
+    with context as directory:
         out=Path(directory)
-        video=render.render_story_media(preview,out,dt.date.fromisoformat(day),name)
+        if prepared_dir is not None:
+            from scripts.umbral3_lightning_scenes import MODEL,PIN
+            model=json.loads((out/"model_used.json").read_text(encoding="utf-8"))
+            if model.get("model")!=MODEL or model.get("revision")!=PIN:
+                raise ValueError("Unpinned private Lightning scene assets")
+            visual_record=json.loads((out/"visuals_manifest.json").read_text(encoding="utf-8"))
+            video=render.render_story_media(preview,out,dt.date.fromisoformat(day),name,
+                                            reserve_slot=slot,prepared_images=visual_record)
+        else:
+            model={"backend":"sd-turbo-legacy","revision":"unreviewed"}
+            video=render.render_story_media(preview,out,dt.date.fromisoformat(day),name)
         if video!=out/name or not video.is_file() or video.stat().st_size<100_000:
             raise RuntimeError("Invalid rendered candidate")
         for item in (video,out/"voice.wav",out/"music.wav"):
@@ -92,6 +110,8 @@ def prepare(index,anchor,store_python):
             "video_bytes":video.stat().st_size,
             "elapsed_seconds":round(time.monotonic()-started,2),
             "image_qa":quality,
+            "visual_backend":model["backend"],
+            "model_revision":model["revision"],
             "visual_review":"not_performed",
             "ready_to_publish":False,
         }
@@ -109,6 +129,7 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--index",type=int,required=True)
     p.add_argument("--anchor",required=True)
+    p.add_argument("--prepared-dir",type=Path)
     args=p.parse_args()
     date=dt.date.fromisoformat(args.anchor)
     # Validate the entire 14-slot editorial supply BEFORE model downloads.
@@ -116,7 +137,7 @@ def main():
     for i in range(14):
         load_slot(i,date,items)
     python=os.environ.get("UMBRAL_HF_STORAGE_PYTHON","")
-    prepare(args.index,date,python)
+    prepare(args.index,date,python,args.prepared_dir)
 
 if __name__=="__main__":
     main()
