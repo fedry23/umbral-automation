@@ -23,6 +23,7 @@ def audit(store, *, max_items=24, max_bytes=1_000_000_000):
             sum(sizes) > max_bytes):
         raise RuntimeError("Private archive inventory exceeds explicit audit budget")
     stats = {"private": True, "files_checked": 0, "full_media_v2": 0,
+             "candidate_media_v2": 0,
              "synthetic_v2": 0, "legacy_archives": 0,
              "image_reserves": 0, "corrupt": 0,
              "total_bytes": 0, "ready_reels": 0, "visual_approved": 0}
@@ -48,6 +49,8 @@ def audit(store, *, max_items=24, max_bytes=1_000_000_000):
                         report = json.loads(archive.read("summary.json"))
                         if report.get("synthetic_transport_test") is True:
                             stats["synthetic_v2"] += 1
+                        elif report.get("candidate") is True and report.get("media_decoded") is True:
+                            stats["candidate_media_v2"] += 1
                         elif report.get("media_decoded") is True:
                             stats["full_media_v2"] += 1
                         else:
