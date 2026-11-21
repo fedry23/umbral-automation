@@ -17,7 +17,7 @@ class Tokenizer:
     def __call__(self,text,truncation=False):
         if truncation:
             raise AssertionError("Never truncate supernatural beats")
-        return SimpleNamespace(input_ids=re.findall(r"[a-zA-Z0-9]+|[^\\w\\s]",text))
+        return SimpleNamespace(input_ids=re.findall(r"[a-zA-Z0-9]+|[^\w\s]",text))
 
 
 class HorrorV31Tests(unittest.TestCase):
