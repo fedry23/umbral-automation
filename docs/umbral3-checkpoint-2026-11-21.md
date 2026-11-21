@@ -64,3 +64,9 @@ No fusionar PR #18 ni activar media experimental en producción hasta revisar vi
 - Se añadió caché de pesos SDXL Lightning para futuras ejecuciones en el workspace de Github (`HF_HOME`). El primer commit de caché 68053de... produjo workflow YAML inválido por usar `runner.temp` en jobs.env; se corrigió con `github.workspace` en 127cfee..., y tests de integración posteriores pasaron. No reutilizar la versión rota.
 - Tests posteriores de desarrollo: **165/165** exitosos en el job de regresión 136721281869 de run 44863279371, sin publicar. No atribuir 165/165 a commits posteriores hasta que sus propias ejecuciones terminen.
 - Sin inspección visual de los fotogramas del modelo, ningún Reel nuevo está aprobado. Prohibido fusionar PR #18 a main o activar la variable de producción.
+
+## 21/11 — auditoría posterior a matriz privada
+- Se consultó run 44862349621 en GitHub: estado completed, conclusión success (SHA e8bb6e09c255c568610346d54ab61485043c9821). No se infiere calidad visual ni 14/14 de esa conclusión.
+- HEAD observado antes de este commit: main 60acb57a1d509d5f176593343e871eaeadcf698f; integración 61b60d5c40d957f516c3b54b7f053c04619bb7e0. PR #18 continúa draft y abierta.
+- Se solicita una auditoría privada de 14 candidatos mediante el prefijo UMBRAL candidate audit y el workflow OIDC existente, sin render ni Meta. Consultar el run generado y leer el inventario antes de declarar completitud.
+- Publicadores oficiales del 21/11 (runs 44880803980 y 44891724396) concluyeron success, pero para afirmar publicaciones confirmadas hay que inspeccionar recibos y Meta, no solo conclusión de Actions.

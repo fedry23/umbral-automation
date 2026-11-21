@@ -1,2 +1,2 @@
 Fedry23/umbral-private
-2026-11-21: guarded 14 private candidate Reels. 0 smoke must PASS before independent 1..13 matrix; NEVER publish or mark approved
+2026-11-21: read-only candidate inventory after completed run 44862349621; no render, no Meta publication, no visual approval
