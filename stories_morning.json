@@ -709,5 +709,90 @@
         }
       ]
     }
+  },
+  {
+    "title": "La llave gemela",
+    "hook": "Una llave giró sola en la cerradura del archivo.",
+    "narration": "Una llave giró sola en la cerradura del archivo. Soy vigilante de un museo y había vuelto por mi chaqueta. La puerta estaba cerrada con dos vueltas. Mi llave seguía en una anilla roja. Al acercarla a la cerradura, escuché otro giro desde dentro. Retiré la mano y el ruido cesó. Pensé que alguien estaba encerrado. Llamé sin obtener respuesta. Entonces la llave de mi llavero giró despacio, aunque yo sujetaba la anilla. Comprendí que la cerradura repetía cualquier movimiento de aquella llave. Dejé la anilla en el suelo. Ambas quedaron quietas. Necesitaba abrir para recuperar mi chaqueta. Me puse un guante y giré la llave hacia la izquierda. Dentro sonó el mismo movimiento. La puerta cedió un centímetro. Alumbré el perchero vacío. Mi chaqueta colgaba del pomo interior, con una anilla roja asomando del bolsillo. Miré mi mano: sujetaba una llave sin dientes. Al otro lado, alguien empezó a girar la verdadera.",
+    "caption": "La llave gemela. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Medium shot of a red metal key ring beside a locked dark wooden archive door. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering.",
+      "Close-up of a red metal key ring approaching the lock of a dark wooden archive door. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering.",
+      "Close-up of a brass key turning inside a red metal key ring. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering.",
+      "Low angle of a red metal key ring resting on stone floor beside a dark wooden archive door. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering.",
+      "Close-up of a black security glove turning a brass key in a dark wooden archive door. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering.",
+      "Extreme close-up of a toothless key held by a black security glove beside a dark wooden archive door. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+    ],
+    "publish_date": "2026-11-29",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "red metal key ring",
+        "anchor1": "dark wooden archive door",
+        "anchor2": "black security glove"
+      },
+      "shots": [
+        {
+          "narration": "Una llave giró sola en la cerradura del archivo. Soy vigilante de un museo y había vuelto por mi chaqueta. La puerta estaba cerrada con dos vueltas.",
+          "action": "Medium shot of a red metal key ring beside a locked dark wooden archive door",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Medium shot of a red metal key ring beside a locked dark wooden archive door. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Mi llave seguía en una anilla roja. Al acercarla a la cerradura, escuché otro giro desde dentro. Retiré la mano y el ruido cesó.",
+          "action": "Close-up of a red metal key ring approaching the lock of a dark wooden archive door",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Close-up of a red metal key ring approaching the lock of a dark wooden archive door. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Pensé que alguien estaba encerrado. Llamé sin obtener respuesta. Entonces la llave de mi llavero giró despacio, aunque yo sujetaba la anilla.",
+          "action": "Close-up of a brass key turning inside a red metal key ring",
+          "camera": "close-up",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Close-up of a brass key turning inside a red metal key ring. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Comprendí que la cerradura repetía cualquier movimiento de aquella llave. Dejé la anilla en el suelo. Ambas quedaron quietas. Necesitaba abrir para recuperar mi chaqueta.",
+          "action": "Low angle of a red metal key ring resting on stone floor beside a dark wooden archive door",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Low angle of a red metal key ring resting on stone floor beside a dark wooden archive door. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Me puse un guante y giré la llave hacia la izquierda. Dentro sonó el mismo movimiento. La puerta cedió un centímetro. Alumbré el perchero vacío.",
+          "action": "Close-up of a black security glove turning a brass key in a dark wooden archive door",
+          "camera": "detail",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of a black security glove turning a brass key in a dark wooden archive door. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Mi chaqueta colgaba del pomo interior, con una anilla roja asomando del bolsillo. Miré mi mano: sujetaba una llave sin dientes. Al otro lado, alguien empezó a girar la verdadera.",
+          "action": "Extreme close-up of a toothless key held by a black security glove beside a dark wooden archive door",
+          "camera": "wide",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Extreme close-up of a toothless key held by a black security glove beside a dark wooden archive door. empty Spanish museum corridor, warm security lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        }
+      ]
+    }
   }
 ]
