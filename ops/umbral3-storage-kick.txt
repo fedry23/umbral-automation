@@ -13,3 +13,4 @@ Owner-only encrypted V3.1 preview transport, no raw image export (2026-11-21)
 2026-11-21: REAL 2026-11-28 09 D+7 smoke, immutable private one-slot generation, no Meta and no owner approval.
 2026-11-21: REAL 2026-11-28 21 D+7 smoke; distinct original story and immutable unpublished private candidate; no Meta, no artistic signoff.
 2026-11-22: owner-consented automatic CLIP QA private pilot for 2026-11-28 09/21 only; independently review six private frames per slot, no Meta, never forge human signoff.
+2026-11-22: controlled private 28-Nov CLIP numeric inspection for both civil slots (no Meta, no public image/video exports; never approve on failure).
