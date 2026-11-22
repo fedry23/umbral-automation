@@ -13,6 +13,17 @@ VERSION = "horror-v2"
 # Exactly one story-specific supernatural image per narration section.
 # Deliberately specific: a generic horror adjective is not an image event.
 BEATS = {
+    # The 28-Nov early story is threatening because the same strip of tape
+    # MOVES ON ITS OWN and finally restrains someone; a static normal corridor
+    # with yellow tape does not depict the authored supernatural event.
+    "La cinta amarilla": (
+        "The yellow warning tape has CRAWLED several metres toward the closed office door, its loose end curled upward like a living snake in the deserted corridor",
+        "One free end of the yellow tape STRETCHES BY ITSELF toward the janitor's hand as the other end is pressed onto the cracked floor tile",
+        "The long strip of yellow tape SLITHERS ACROSS THE TILES LIKE A LIVING SNAKE, its leading edge lifted from the floor, with impossible black shadows",
+        "The yellow floor tape CRAWLS INTO THE DARK STOREROOM ALONE, curling across the threshold while nobody touches it",
+        "Living yellow tape WRIGGLES THROUGH THE NARROW GAP under the tightly CLOSED office door, creeping inward toward its unseen victim",
+        "Yellow floor tape WRAPS ITSELF TIGHT around a terrified worker's black shoes and ankles, pulling like a constricting serpent, impossible supernatural movement",
+    ),
     "La pintura fresca": (
         "A human palm pushes out from BEHIND the perfectly smooth wet plaster",
         "Five long inward gouges emerge by themselves as the scraper lifts",
