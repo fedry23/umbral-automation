@@ -61,7 +61,7 @@ class AutomaticQATests(unittest.TestCase):
         def load(*args):
             day=args[1]
             seen.append(day)
-            return {"bundle_sha256":"a"*64,"backend":BACKEND}
+            return ({"title":"local fixture"},{"bundle_sha256":"a"*64,"backend":BACKEND})
         def cert(_store,remote):
             return b"certificate" if "2026-11-22" in remote or "2026-11-23" in remote else None
         with patch("scripts.umbral3_machine_qa._pointer",side_effect=load),\
@@ -74,7 +74,7 @@ class AutomaticQATests(unittest.TestCase):
         self.assertFalse(result["ready_to_publish"])
 
     def test_backlog_does_not_override_invalid_existing_certificate(self):
-        with patch("scripts.umbral3_machine_qa._pointer",return_value={"bundle_sha256":"a"*64,"backend":BACKEND}),\
+        with patch("scripts.umbral3_machine_qa._pointer",return_value=({"title":"local fixture"},{"bundle_sha256":"a"*64,"backend":BACKEND})),\
              patch("scripts.umbral3_machine_qa._get",return_value=b"tampered"),\
              patch("scripts.umbral3_machine_qa.check_certificate",side_effect=RuntimeError("tampered")):
             with self.assertRaisesRegex(RuntimeError,"tampered"):
@@ -133,7 +133,7 @@ class AutomaticQATests(unittest.TestCase):
         from scripts.umbral3_reserve import story_key
         p={"story_sha256":story_key(story),"bundle_sha256":"a"*64,
            "model_revision":PIN,"backend":BACKEND}
-        with patch("scripts.umbral3_machine_qa.find",return_value=p),\
+        with patch("scripts.umbral3_machine_qa.find",side_effect=lambda s,d,t,b:p if b==BACKEND else None),\
              patch("scripts.umbral3_machine_qa._get",return_value=None):
             with self.assertRaisesRegex(RuntimeError,"No machine QA certificate"):
                 check_certificate(store,"2026-11-28","09",ROOT)
@@ -154,7 +154,7 @@ class AutomaticQATests(unittest.TestCase):
              "semantic":{"passed":True,"matching_scenes":6,"horror_scenes":6},
              "human_review":False,"machine_approved":True,
              "ready_to_publish":False,"bundle_sha256":"a"*64}
-        with patch("scripts.umbral3_machine_qa.find",return_value=pointer),\
+        with patch("scripts.umbral3_machine_qa.find",side_effect=lambda s,d,t,b:pointer if b==BACKEND else None),\
              patch("scripts.umbral3_machine_qa._get",side_effect=lambda *_: json.dumps(row).encode()):
             self.assertFalse(check_certificate(store,"2026-11-28","09",ROOT)["human_review"])
             row["human_review"]=True
