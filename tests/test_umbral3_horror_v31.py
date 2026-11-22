@@ -60,7 +60,7 @@ class HorrorV31Tests(unittest.TestCase):
             directed_prompts_v31(story,tok)
 
     def test_uncurated_story_not_declared_horror_ready(self):
-        story=next(s for s in self.stories() if s["title"]=="La cinta amarilla")
+        story=next(s for s in self.stories() if s["title"]=="El cristal empañado")
         with self.assertRaisesRegex(ValueError,"Uncurated supernatural beats"):
             directed_prompts_v31(story,Tokenizer())
 
