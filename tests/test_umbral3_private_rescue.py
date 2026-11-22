@@ -7,7 +7,8 @@ from unittest.mock import Mock, patch
 import yaml
 
 from scripts.umbral3_private_rescue import check
-from scripts.umbral3_machine_qa import RECOVERY_BACKEND, BACKEND
+from scripts.umbral3_machine_qa import RECOVERY_BACKEND, BACKEND, POLICY, MODEL, REVISION
+from scripts.umbral3_finalize_from_reserve import require_machine_evidence
 from scripts.umbral3_lightning_scenes import PIN
 from scripts.umbral3_reserve import story_key
 
@@ -66,6 +67,32 @@ class PrivateHorrorRescueTests(unittest.TestCase):
         self.assertIn("--mode certify",str(job))
         self.assertIn("--require-stored",str(job))
         self.assertIn("--mode check",str(job))
+
+    def test_correct_rescued_sha_certificate_is_valid_but_never_human_signed(self):
+        assets={f"scene_{i:02}.png":{"sha256":str(i)*64} for i in range(6)}
+        proof={"version":1,"kind":"umbral3-automatic-machine-qa",
+               "policy":POLICY,"date":DAY,"slot":"09",
+               "story_sha256":story_key(STORY),
+               "backend":RECOVERY_BACKEND,
+               "model_revision":PIN,"clip_model":MODEL,
+               "clip_revision":REVISION,"bundle_sha256":"a"*64,
+               "human_review":False,"machine_approved":True,
+               "ready_to_publish":False,
+               "scene_sha256":{k:v["sha256"] for k,v in assets.items()},
+               "image_scores":[45]*6,
+               "semantic":{"passed":True,"matching_scenes":5,
+                           "horror_scenes":5}}
+        self.assertTrue(require_machine_evidence(proof,DAY,"09",STORY,assets,ROOT))
+        for mutation in (
+            {"backend":"unknown"},
+            {"human_review":True},
+            {"semantic":{"passed":True,"matching_scenes":5,"horror_scenes":1}},
+            {"scene_sha256":{**proof["scene_sha256"],"scene_01.png":"f"*64}},
+            {"ready_to_publish":True},
+            {"bundle_sha256":"invalid"},
+        ):
+            with self.subTest(mutation=mutation),self.assertRaisesRegex(RuntimeError,"Machine certificate"):
+                require_machine_evidence({**proof,**mutation},DAY,"09",STORY,assets,ROOT)
 
     def test_failed_initial_28_nov_pilot_stays_failed(self):
         flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
