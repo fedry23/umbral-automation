@@ -975,17 +975,29 @@ jobs:
           python -m venv /tmp/umbral3-hf-storage
           /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0' 'numpy==1.26.4'
       - name: CLIP-verify already stored future morning without Meta
+        id: auto_morning
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
           export UMBRAL_CLIP_PYTHON="$(command -v python)"
           /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa --mode certify --date 2026-11-28 --slot 09
       - name: CLIP-verify already stored future evening without Meta
+        id: auto_evening
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
           export UMBRAL_CLIP_PYTHON="$(command -v python)"
           /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa --mode certify --date 2026-11-28 --slot 21
+      - name: Fail unless BOTH independently verified private certificates pass
+        if: always()
+        env:
+          MORNING: ${{ steps.auto_morning.outcome }}
+          EVENING: ${{ steps.auto_evening.outcome }}
+        run: |
+          test "$MORNING" = success && test "$EVENING" = success
+          echo 'UMBRAL3_TWO_PRIVATE_AUTO_QA_CERTIFICATES=verified'
 
   daily-refill:
     if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED != 'false' && github.event.schedule == '42 20 * * *'
