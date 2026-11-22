@@ -48,7 +48,8 @@ class MissedMorningScheduleRecoveryTests(unittest.TestCase):
             "scripts/publish_daily.py publish",
         ):
             self.assertIn(critical, steps)
-        self.assertIn("[ \"$(TZ=Europe/Madrid date +%F)\" = '2026-11-22' ]", steps)
+        slot_step = next(s["run"] for s in publisher["steps"] if s.get("name") == "Select the EXACT scheduled civil slot")
+        self.assertIn("[ \"$(TZ=Europe/Madrid date +%F)\" = '2026-11-22' ]", slot_step)
 
     def test_old_scheduled_and_private_jobs_stay_separate(self):
         workflow = self.config
