@@ -13,5 +13,6 @@
   "requires_private_sha_certificate": true,
   "human_review": false,
   "emergency_stop": "UMBRAL3_AUTO_QA_ENABLED=false",
-  "notes": "Owner authorized autonomous technical visual QA for future scenes; not human-reviewed. Fail closed on missing or unsuccessful semantic QA, with isolated legacy publisher backups."
+  "notes": "Owner authorized autonomous technical visual QA for future scenes; not human-reviewed. Fail closed on missing or unsuccessful semantic QA, with isolated legacy publisher backups.",
+  "recovery_backend": "sdxl-lightning-2steps-ov-int8-horror-v3-1"
 }
