@@ -74,7 +74,7 @@ class AutomaticQATests(unittest.TestCase):
         self.assertFalse(result["ready_to_publish"])
 
     def test_backlog_does_not_override_invalid_existing_certificate(self):
-        with patch("scripts.umbral3_machine_qa._pointer",return_value={"bundle_sha256":"a"*64}),\
+        with patch("scripts.umbral3_machine_qa._pointer",return_value={"bundle_sha256":"a"*64,"backend":BACKEND}),\
              patch("scripts.umbral3_machine_qa._get",return_value=b"tampered"),\
              patch("scripts.umbral3_machine_qa.check_certificate",side_effect=RuntimeError("tampered")):
             with self.assertRaisesRegex(RuntimeError,"tampered"):
