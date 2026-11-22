@@ -58,6 +58,18 @@ class MissedMorningScheduleRecoveryTests(unittest.TestCase):
         self.assertIn('key="${key}_09"', shell_runs)
         self.assertIn('short="${UMBRAL_DAY//-/}"', shell_runs)
 
+    def test_early_render_cannot_hold_publish_runner_past_timeout(self):
+        route = self.config["jobs"]["live-routing"]
+        code = route["steps"][-1]["run"]
+        self.assertIn("TZ=Europe/Madrid date +%H%M", code)
+        self.assertIn(' < "0700"', code)
+        self.assertIn("eligible=false", code)
+        self.assertIn('exit 0', code)
+        # Triggered morning render before 07:00 must not attempt Meta;
+        # the separately scheduled official route still exists.
+        self.assertIn("github.event_name == 'schedule'", route["if"])
+        self.assertIn("github.event.schedule == '17 5 * * *'", route["if"])
+
     def test_old_scheduled_and_private_jobs_stay_separate(self):
         workflow = self.config
         self.assertIn("42 20 * * *", [s["cron"] for s in workflow["on"]["schedule"]])
