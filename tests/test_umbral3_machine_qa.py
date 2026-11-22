@@ -64,8 +64,8 @@ class AutomaticQATests(unittest.TestCase):
             return {"bundle_sha256":"a"*64,"backend":BACKEND}
         def cert(_store,remote):
             return b"certificate" if "2026-11-22" in remote or "2026-11-23" in remote else None
-        with patch("scripts.umbral3_machine_qa._pointer",side_effect=load),\\
-             patch("scripts.umbral3_machine_qa._get",side_effect=cert),\\
+        with patch("scripts.umbral3_machine_qa._pointer",side_effect=load),\
+             patch("scripts.umbral3_machine_qa._get",side_effect=cert),\
              patch("scripts.umbral3_machine_qa.check_certificate",return_value={"machine_approved":True}):
             result=oldest_uncertified(Mock(),today,"09")
         self.assertEqual(result["date"],"2026-11-24")
@@ -74,22 +74,22 @@ class AutomaticQATests(unittest.TestCase):
         self.assertFalse(result["ready_to_publish"])
 
     def test_backlog_does_not_override_invalid_existing_certificate(self):
-        with patch("scripts.umbral3_machine_qa._pointer",return_value={"bundle_sha256":"a"*64}),\\
-             patch("scripts.umbral3_machine_qa._get",return_value=b"tampered"),\\
+        with patch("scripts.umbral3_machine_qa._pointer",return_value={"bundle_sha256":"a"*64}),\
+             patch("scripts.umbral3_machine_qa._get",return_value=b"tampered"),\
              patch("scripts.umbral3_machine_qa.check_certificate",side_effect=RuntimeError("tampered")):
             with self.assertRaisesRegex(RuntimeError,"tampered"):
                 oldest_uncertified(Mock(),dt.date(2026,11,21),"21")
 
     def test_backlog_ignores_unstored_images_but_not_stale_candidates(self):
         today=dt.date(2026,11,21)
-        with patch("scripts.umbral3_machine_qa._pointer",side_effect=RuntimeError("Unindexed or stale private candidate")),\\
-             patch("scripts.umbral3_machine_qa.story_for",return_value={}),\\
+        with patch("scripts.umbral3_machine_qa._pointer",side_effect=RuntimeError("Unindexed or stale private candidate")),\
+             patch("scripts.umbral3_machine_qa.story_for",return_value={}),\
              patch("scripts.umbral3_machine_qa.find",return_value=None):
             result=oldest_uncertified(Mock(),today,"09")
             self.assertFalse(result["needs_qa"])
             self.assertEqual(result["missing_or_unready"],7)
-        with patch("scripts.umbral3_machine_qa._pointer",side_effect=RuntimeError("Unindexed or stale private candidate")),\\
-             patch("scripts.umbral3_machine_qa.story_for",return_value={}),\\
+        with patch("scripts.umbral3_machine_qa._pointer",side_effect=RuntimeError("Unindexed or stale private candidate")),\
+             patch("scripts.umbral3_machine_qa.story_for",return_value={}),\
              patch("scripts.umbral3_machine_qa.find",return_value={"malicious":True}):
             with self.assertRaisesRegex(RuntimeError,"Unindexed or stale"):
                 oldest_uncertified(Mock(),today,"09")
