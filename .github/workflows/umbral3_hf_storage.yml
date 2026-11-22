@@ -746,7 +746,7 @@ jobs:
         run: |
           set -euo pipefail
           key="$UMBRAL_DAY"
-          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; fi
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="${key}_09"; fi
           if [ -f "docs/published/$key.json" ]; then
             echo 'UMBRAL_SKIP=true' >> "$GITHUB_ENV"
             echo 'Official media already published; V3.1 cannot duplicate'
@@ -773,8 +773,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          key="\${UMBRAL_DAY//-/}"
-          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; fi
+          key="${UMBRAL_DAY//-/}"
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="${key}_09"; fi
           python scripts/ensure_meta_compatible.py "staged/umbral_$key.mp4"
       - name: Store exact final daily MP4 and cover on the official Pages branch
         if: env.UMBRAL_SKIP == 'false'
@@ -782,8 +782,8 @@ jobs:
         run: |
           set -euo pipefail
           key="$UMBRAL_DAY"
-          short="\${UMBRAL_DAY//-/}"
-          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; short="\${short}_09"; fi
+          short="${UMBRAL_DAY//-/}"
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="${key}_09"; short="${short}_09"; fi
           cp "staged/umbral_$short.mp4" "docs/reels/$key.mp4"
           cp staged/cover.jpg "docs/reels/$key.jpg"
           git config user.name 'github-actions[bot]'
@@ -829,7 +829,7 @@ jobs:
               raise SystemExit('No complete Meta readback; publication remains pending')
           PY
           key="$UMBRAL_DAY"
-          if [ "$UMBRAL_SLOT" = '09' ]; then key="\${key}_09"; fi
+          if [ "$UMBRAL_SLOT" = '09' ]; then key="${key}_09"; fi
           mkdir -p docs/published
           cp staged/published.json "docs/published/$key.json"
           git config user.name 'github-actions[bot]'
