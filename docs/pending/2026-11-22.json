@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-22",
+  "container": "17938875723185965",
+  "status": "publish_intent",
+  "episode_number": 19,
+  "slot": "21",
+  "title": "El banco de la parada",
+  "technical_profile": {
+    "experiment": "music-balance-v1",
+    "arm": "control",
+    "music_gain": 1.0
+  },
+  "duration_seconds": 69.30858333333333,
+  "editorial_protocol": "fixed-v1",
+  "cover_url": "https://fedry23.github.io/umbral-automation/reels/2026-11-22.jpg"
+}
