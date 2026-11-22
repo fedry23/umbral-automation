@@ -54,7 +54,7 @@ class MissedMorningScheduleRecoveryTests(unittest.TestCase):
         # Critical: shell must expand real date/slot variables, not literal
         # escaped $ expressions that produce bad MP4 and receipt names.
         shell_runs = "\\n".join(step.get("run", "") for step in publisher["steps"])
-        self.assertNotIn("\\\\${", shell_runs)
+        self.assertNotIn(chr(92) + "${", shell_runs)
         self.assertIn('key="${key}_09"', shell_runs)
         self.assertIn('short="${UMBRAL_DAY//-/}"', shell_runs)
 
