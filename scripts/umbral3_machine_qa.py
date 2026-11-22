@@ -279,14 +279,69 @@ def certify(store,day,slot,root=ROOT):
     return check_certificate(store,day,slot,root)
 
 
+def oldest_uncertified(store,today,slot,root=ROOT):
+    """Bounded, read-only next-week scan; avoid permanently stranded D+7 art.
+
+    Only a completely missing certificate can be considered for scoring;
+    a corrupt, stale or forged existing certificate is a hard failure.
+    Keep intact every immutable candidate and all prior machine decisions.
+    """
+    if type(today) is not dt.date or slot not in ("09","21"):
+        raise ValueError("Invalid private QA recovery window")
+    skipped=0
+    for offset in range(1,8):
+        day=(today+dt.timedelta(days=offset)).isoformat()
+        try:
+            _pointer(store,day,slot,root)
+        except RuntimeError as exc:
+            if str(exc)=="Machine QA requires exactly one authored story":
+                skipped+=1
+                continue
+            if str(exc)=="Unindexed or stale private candidate":
+                # A missing pointer is not a failure or owner approval, but
+                # a stale pointer must not be silently mistaken for missing.
+                story=story_for(root,day,slot)
+                if find(store,day,slot,BACKEND) is not None:
+                    raise
+                skipped+=1
+                continue
+            raise
+        if _get(store,_remote(day,slot,BACKEND)) is None:
+            return {"date":day,"slot":slot,"needs_qa":True,
+                    "checked_future_dates":offset,"missing_or_unready":skipped,
+                    "ready_to_publish":False}
+        check_certificate(store,day,slot,root)
+    return {"date":None,"slot":slot,"needs_qa":False,
+            "checked_future_dates":7,"missing_or_unready":skipped,
+            "ready_to_publish":False}
+
+
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument("--mode",choices=["certify","check"],required=True)
-    p.add_argument("--date",required=True)
+    p.add_argument("--mode",choices=["certify","check","plan"],required=True)
+    p.add_argument("--date")
+    p.add_argument("--today")
     p.add_argument("--slot",choices=["09","21"],required=True)
     args=p.parse_args()
     from scripts.umbral3_hf_storage import HfBucketStore
+    if args.mode=="plan":
+        if args.date:
+            p.error("Plan mode accepts --today, never --date")
+    elif args.today or not args.date:
+        p.error("Certificate modes require --date, not --today")
     store=HfBucketStore.from_oidc()
+    if args.mode=="plan":
+        today=(dt.date.fromisoformat(args.today) if args.today
+               else dt.datetime.now(dt.timezone.utc).astimezone(
+                   __import__("zoneinfo").ZoneInfo("Europe/Madrid")).date())
+        result=oldest_uncertified(store,today,args.slot)
+        print("UMBRAL3_AUTOMATIC_QA_PLAN="+json.dumps(result,sort_keys=True),flush=True)
+        output=os.environ.get("GITHUB_OUTPUT")
+        if output:
+            with open(output,"a",encoding="utf-8") as fd:
+                fd.write("needs_qa="+("true" if result["needs_qa"] else "false")+"\n")
+                fd.write("qa_date="+(result["date"] or "")+"\n")
+        return
     result=(certify(store,args.date,args.slot) if args.mode=="certify"
             else check_certificate(store,args.date,args.slot))
     print("UMBRAL3_AUTOMATIC_QA="+json.dumps({
