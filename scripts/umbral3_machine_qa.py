@@ -165,6 +165,16 @@ def evaluate_bundle(raw,story,day,slot,backend=BACKEND,semantic=None):
         # always invokes the actual pinned CLIP model on ALL six restored PNGs.
         scores=_clip_logits(images,story) if semantic is None else semantic
         outcome=assess_logits(scores)
+        # Public Actions logs contain only bounded numerical quality evidence,
+        # NEVER private images, narration, prompts or media URLs. These values
+        # separate a true visual failure from a flawed text-image comparison.
+        print("UMBRAL3_PRIVATE_CLIP_METRICS="+json.dumps({
+            "date":day,"slot":slot,"policy":POLICY,
+            "matching_scenes":outcome["matching_scenes"],
+            "horror_scenes":outcome["horror_scenes"],
+            "metrics":outcome["evidence"],
+            "passed":outcome["passed"]
+        },sort_keys=True),flush=True)
         if not outcome["passed"]:
             raise RuntimeError("Visual semantics or horror atmosphere below acceptance gate")
         return {"version":1,"kind":"umbral3-automatic-machine-qa",
