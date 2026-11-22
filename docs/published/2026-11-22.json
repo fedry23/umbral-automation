@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-22",
+  "title": "El banco de la parada",
+  "episode_number": 19,
+  "instagram_media_id": "17997162303074751",
+  "published_at": "2026-11-22T22:36:56+0000",
+  "verification": "published_media_read_back",
+  "cover_url_sent": "https://fedry23.github.io/umbral-automation/reels/2026-11-22.jpg",
+  "slot": "21",
+  "technical_profile": {
+    "experiment": "music-balance-v1",
+    "arm": "control",
+    "music_gain": 1.0
+  },
+  "duration_seconds": 69.30858333333333,
+  "editorial_protocol": "fixed-v1",
+  "permalink": "https://www.instagram.com/reel/DgD5Ij8S-iI/",
+  "cover_verification": {
+    "matched": true,
+    "mean_pixel_error": 0.0,
+    "method": "center-crop resize mean absolute RGB error <18/255"
+  }
+}
