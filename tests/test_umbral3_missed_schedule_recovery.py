@@ -51,6 +51,13 @@ class MissedMorningScheduleRecoveryTests(unittest.TestCase):
         slot_step = next(s["run"] for s in publisher["steps"] if s.get("name") == "Select the EXACT scheduled civil slot")
         self.assertIn("[ \"$(TZ=Europe/Madrid date +%F)\" = '2026-11-22' ]", slot_step)
 
+        # Critical: shell must expand real date/slot variables, not literal
+        # escaped $ expressions that produce bad MP4 and receipt names.
+        shell_runs = "\\n".join(step.get("run", "") for step in publisher["steps"])
+        self.assertNotIn("\\\\${", shell_runs)
+        self.assertIn('key="${key}_09"', shell_runs)
+        self.assertIn('short="${UMBRAL_DAY//-/}"', shell_runs)
+
     def test_old_scheduled_and_private_jobs_stay_separate(self):
         workflow = self.config
         self.assertIn("42 20 * * *", [s["cron"] for s in workflow["on"]["schedule"]])
