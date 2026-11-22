@@ -5,3 +5,5 @@
 2026-11-20T21:31+01:00 | recuperación nocturna autorizada: La cuerda de regreso; reconciliar Meta y publicar solo el episodio oficial pendiente
 
 2026-11-21T18:18+01:00 | respaldo preventivo nocturno 21:00; El último doblaje; publicador oficial con reconciliación y bloqueo compartido; no publicar antes de hora
+
+2026-11-22T18:24+01:00 | respaldo preventivo nocturno 21:00; El banco de la parada; reconciliar pendientes, validar fecha y regenerar si procede; no publicar antes de hora
