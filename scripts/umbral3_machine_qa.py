@@ -303,7 +303,7 @@ def oldest_uncertified(store,today,slot,root=ROOT):
     for offset in range(1,8):
         day=(today+dt.timedelta(days=offset)).isoformat()
         try:
-            _pointer(store,day,slot,root)
+            story,pointer=_pointer(store,day,slot,root)
         except RuntimeError as exc:
             if str(exc)=="Machine QA requires exactly one authored story":
                 skipped+=1
@@ -317,7 +317,6 @@ def oldest_uncertified(store,today,slot,root=ROOT):
                 skipped+=1
                 continue
             raise
-        story,pointer=_pointer(store,day,slot,root)
         if _get(store,_remote(day,slot,pointer["backend"])) is None:
             return {"date":day,"slot":slot,"needs_qa":True,
                     "checked_future_dates":offset,"missing_or_unready":skipped,
