@@ -1038,6 +1038,9 @@ jobs:
       - name: Verify existing private candidate or select exactly one missing D+7 slot
         id: gate
         run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --recover-backlog --slot ${{ matrix.slot }}
+      - name: Select the oldest previously generated but unscored private Reel
+        id: visualqueue
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa --mode plan --slot ${{ matrix.slot }}
       - name: Reuse pinned Lightning weights when a candidate is missing
         if: steps.gate.outputs.generate == 'true'
         uses: actions/cache@v4
@@ -1045,7 +1048,7 @@ jobs:
           path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
           key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
       - uses: ./.github/actions/setup-render
-        if: steps.gate.outputs.generate == 'true'
+        if: steps.gate.outputs.generate == 'true' || steps.visualqueue.outputs.needs_qa == 'true'
         with:
           models: 'true'
       - name: Install pinned 2-step SDXL Lightning CPU environment
@@ -1064,14 +1067,16 @@ jobs:
         if: steps.gate.outputs.generate == 'true'
         run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --index "${{ steps.gate.outputs.index }}" --anchor "${{ steps.gate.outputs.anchor }}"
       - name: Install automatic-QA image metrics into OIDC-only reader
-        if: steps.gate.outputs.generate == 'true'
+        if: steps.gate.outputs.generate == 'true' || steps.visualqueue.outputs.needs_qa == 'true'
         run: /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'numpy==1.26.4'
-      - name: Independently assess all six frames with pinned public CLIP
-        if: steps.gate.outputs.generate == 'true'
+      - name: Independently assess OLDEST missing private QA, including prior rejected slots
+        if: steps.gate.outputs.generate == 'true' || steps.visualqueue.outputs.needs_qa == 'true'
         continue-on-error: true
         shell: bash
         env:
           UMBRAL3_AUTO_QA_ENABLED: ${{ vars.UMBRAL3_AUTO_QA_ENABLED }}
+          OLDEST_UNSCORED: ${{ steps.visualqueue.outputs.qa_date }}
+          NEW_TARGET: ${{ steps.gate.outputs.anchor }}
         run: |
           set -euo pipefail
           if [ "${UMBRAL3_AUTO_QA_ENABLED:-}" = 'false' ]; then
@@ -1079,7 +1084,8 @@ jobs:
             exit 0
           fi
           export UMBRAL_CLIP_PYTHON="$(command -v python)"
-          DAY="$(date -d "${{ steps.gate.outputs.anchor }}" +%F)"
+          DAY="${OLDEST_UNSCORED:-$NEW_TARGET}"
+          test -n "$DAY"
           /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa \
              --mode certify --date "$DAY" --slot "${{ matrix.slot }}"
 
