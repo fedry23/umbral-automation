@@ -26,6 +26,9 @@ ROOT=Path(__file__).resolve().parents[1]
 MODEL="openai/clip-vit-base-patch32"
 REVISION="d15b5f29721ca72dac15f8526b284be910de18be"
 POLICY="umbral3-machine-qa-v1"
+RECOVERY_BACKEND="sdxl-lightning-2steps-ov-int8-horror-v3-1"
+PREFERRED_BACKENDS=(RECOVERY_BACKEND,BACKEND)
+SUPPORTED_BACKENDS=set(PREFERRED_BACKENDS)
 PREFIX="umbral3/automatic-qa/"
 SHA=re.compile(r"[0-9a-f]{64}")
 SCENES=[f"scene_{i:02}.png" for i in range(6)]
@@ -120,8 +123,8 @@ def evaluate_bundle(raw,story,day,slot,backend=BACKEND,semantic=None):
     from image_quality import assess_image
     verify_media_bundle(raw)
     story_digest=story_key(story)
-    if backend!=BACKEND:
-        raise RuntimeError("Automatic QA only permits the pinned full horror V3 backend")
+    if backend not in SUPPORTED_BACKENDS:
+        raise RuntimeError("Automatic QA only permits pinned full horror V3 or V3.1 backends")
     with zipfile.ZipFile(io.BytesIO(raw)) as archive:
         summary=json.loads(archive.read("summary.json"))
         if (summary.get("candidate") is not True
@@ -212,16 +215,23 @@ def _get(store,remote):
 
 def _pointer(store,day,slot,root):
     story=story_for(root,day,slot)
-    pointer=find(store,day,slot,BACKEND)
-    if pointer is None or pointer["story_sha256"]!=story_key(story) or pointer["model_revision"]!=PIN:
-        raise RuntimeError("Unindexed or stale private candidate")
-    return story,pointer
+    for backend in PREFERRED_BACKENDS:
+        pointer=find(store,day,slot,backend)
+        if pointer is None:
+            continue
+        if (pointer["story_sha256"]!=story_key(story)
+                or pointer["model_revision"]!=PIN
+                or pointer["backend"]!=backend):
+            raise RuntimeError("Stale indexed private candidate blocks release")
+        return story,pointer
+    raise RuntimeError("Unindexed or stale private candidate")
 
 
 def check_certificate(store,day,slot,root=ROOT):
     """Fast remote read for live router; NEVER confuses a certificate with owner approval."""
     story,pointer=_pointer(store,day,slot,root)
-    raw=_get(store,_remote(day,slot,BACKEND))
+    backend=pointer["backend"]
+    raw=_get(store,_remote(day,slot,backend))
     if raw is None:
         raise RuntimeError("No machine QA certificate; legacy must take over")
     row=json.loads(raw)
@@ -233,7 +243,7 @@ def check_certificate(store,day,slot,root=ROOT):
             or row["version"]!=1 or row["kind"]!="umbral3-automatic-machine-qa"
             or row["policy"]!=POLICY or row["date"]!=day or row["slot"]!=slot
             or row["story_sha256"]!=story_key(story)
-            or row["backend"]!=BACKEND or row["model_revision"]!=PIN
+            or row["backend"]!=backend or row["model_revision"]!=PIN
             or row["clip_model"]!=MODEL or row["clip_revision"]!=REVISION
             or row["bundle_sha256"]!=pointer["bundle_sha256"]
             or row["human_review"] is not False or row["machine_approved"] is not True
@@ -255,7 +265,8 @@ def check_certificate(store,day,slot,root=ROOT):
 
 def certify(store,day,slot,root=ROOT):
     story,pointer=_pointer(store,day,slot,root)
-    remote=_remote(day,slot,BACKEND)
+    backend=pointer["backend"]
+    remote=_remote(day,slot,backend)
     prior=_get(store,remote)
     if prior is not None:
         return check_certificate(store,day,slot,root)
@@ -264,7 +275,7 @@ def certify(store,day,slot,root=ROOT):
         raise RuntimeError("Candidate ZIP missing or truncated")
     if hashlib.sha256(raw).hexdigest()!=pointer["bundle_sha256"]:
         raise RuntimeError("Private candidate SHA-256 mismatch")
-    record=evaluate_bundle(raw,story,day,slot)
+    record=evaluate_bundle(raw,story,day,slot,backend=backend)
     record["bundle_sha256"]=pointer["bundle_sha256"]
     data=json.dumps(record,sort_keys=True,separators=(",",":")).encode()
     if len(data)>9000:
@@ -301,12 +312,13 @@ def oldest_uncertified(store,today,slot,root=ROOT):
                 # A missing pointer is not a failure or owner approval, but
                 # a stale pointer must not be silently mistaken for missing.
                 story=story_for(root,day,slot)
-                if find(store,day,slot,BACKEND) is not None:
+                if any(find(store,day,slot,name) is not None for name in PREFERRED_BACKENDS):
                     raise
                 skipped+=1
                 continue
             raise
-        if _get(store,_remote(day,slot,BACKEND)) is None:
+        story,pointer=_pointer(store,day,slot,root)
+        if _get(store,_remote(day,slot,pointer["backend"])) is None:
             return {"date":day,"slot":slot,"needs_qa":True,
                     "checked_future_dates":offset,"missing_or_unready":skipped,
                     "ready_to_publish":False}
