@@ -851,5 +851,90 @@
         }
       ]
     }
+  },
+  {
+    "title": "La puerta del andén",
+    "hook": "La puerta de emergencia del andén se abrió sola al pasar un tren.",
+    "narration": "La puerta de emergencia del andén se abrió sola al pasar un tren. Soy limpiadora de una estación y aquella noche revisaba una gotera junto a la salida. Puse un cubo bajo el agua. La puerta se cerró cuando desapareció el último vagón. Pensé que era una corriente y coloqué una cuña de goma. El siguiente tren llegó despacio. La puerta empujó la cuña hasta el borde del andén, aunque el aire no movió ni un papel. Marqué su posición con tiza. Con otro tren, la puerta avanzó hasta la marca y quedó abierta. Detrás había un pasillo oscuro. Escuché el goteo allí dentro, no encima del cubo. Seguí el agua con la linterna. La tubería estaba seca. Encontré otras cuñas arrastradas hacia el pasillo. Cada tren abría aquella puerta un poco más. Corrí hacia la escalera antes del siguiente convoy. Al volver la vista, la puerta estaba abierta de par en par. El cubo seguía allí, recogiendo agua que ahora salía del pasillo.",
+    "caption": "La puerta del andén. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Wide shot of a grey emergency platform door opening beside an empty underground platform. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering.",
+      "Close-up of a rubber door wedge beneath a grey emergency platform door beside a yellow cleaning bucket. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering.",
+      "Low angle of a rubber door wedge sliding away from a grey emergency platform door. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering.",
+      "Medium shot of a grey emergency platform door standing ajar beside a yellow cleaning bucket. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering.",
+      "Close-up of several rubber door wedges scattered on a wet concrete service corridor floor. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering.",
+      "Wide shot of a yellow cleaning bucket beneath water dripping from an open grey emergency platform door. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+    ],
+    "publish_date": "2026-11-29",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "grey emergency platform door",
+        "anchor1": "yellow cleaning bucket",
+        "anchor2": "rubber door wedge"
+      },
+      "shots": [
+        {
+          "narration": "La puerta de emergencia del andén se abrió sola al pasar un tren. Soy limpiadora de una estación y aquella noche revisaba una gotera junto a la salida.",
+          "action": "Wide shot of a grey emergency platform door opening beside an empty underground platform",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Wide shot of a grey emergency platform door opening beside an empty underground platform. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Puse un cubo bajo el agua. La puerta se cerró cuando desapareció el último vagón. Pensé que era una corriente y coloqué una cuña de goma.",
+          "action": "Close-up of a rubber door wedge beneath a grey emergency platform door beside a yellow cleaning bucket",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of a rubber door wedge beneath a grey emergency platform door beside a yellow cleaning bucket. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "El siguiente tren llegó despacio. La puerta empujó la cuña hasta el borde del andén, aunque el aire no movió ni un papel. Marqué su posición con tiza.",
+          "action": "Low angle of a rubber door wedge sliding away from a grey emergency platform door",
+          "camera": "close-up",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Low angle of a rubber door wedge sliding away from a grey emergency platform door. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Con otro tren, la puerta avanzó hasta la marca y quedó abierta. Detrás había un pasillo oscuro. Escuché el goteo allí dentro, no encima del cubo.",
+          "action": "Medium shot of a grey emergency platform door standing ajar beside a yellow cleaning bucket",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Medium shot of a grey emergency platform door standing ajar beside a yellow cleaning bucket. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Seguí el agua con la linterna. La tubería estaba seca. Encontré otras cuñas arrastradas hacia el pasillo. Cada tren abría aquella puerta un poco más.",
+          "action": "Close-up of several rubber door wedges scattered on a wet concrete service corridor floor",
+          "camera": "detail",
+          "references": [
+            "anchor2"
+          ],
+          "prompt": "Close-up of several rubber door wedges scattered on a wet concrete service corridor floor. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Corrí hacia la escalera antes del siguiente convoy. Al volver la vista, la puerta estaba abierta de par en par. El cubo seguía allí, recogiendo agua que ahora salía del pasillo.",
+          "action": "Wide shot of a yellow cleaning bucket beneath water dripping from an open grey emergency platform door",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Wide shot of a yellow cleaning bucket beneath water dripping from an open grey emergency platform door. empty Spanish underground metro station, cold fluorescent lighting, realistic worn surfaces, subdued cinematic shadows, restrained horror atmosphere. Vertical 9:16 framing, photorealistic photography, natural physical perspective, single visible action, no text, no lettering."
+        }
+      ]
+    }
   }
 ]
