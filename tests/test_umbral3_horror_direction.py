@@ -29,7 +29,9 @@ class HorrorDirectionTests(unittest.TestCase):
     def test_all_fourteen_stories_have_six_unique_tension_beats(self):
         self.assertEqual(len(self.stories),14)
         self.assertEqual(VERSION,"horror-v2")
-        self.assertEqual({x["title"] for x in self.stories},set(BEATS))
+        self.assertTrue({x["title"] for x in self.stories}.issubset(set(BEATS)))
+        self.assertIn("La cinta amarilla",BEATS)
+        self.assertEqual(len(BEATS["La cinta amarilla"]),6)
         for story in self.stories:
             with self.subTest(title=story["title"]):
                 prompts=directed_prompts(story,ApproxTokenizer())

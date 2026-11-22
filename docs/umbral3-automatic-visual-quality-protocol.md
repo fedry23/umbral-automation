@@ -57,3 +57,32 @@ made on 2026-11-21.
 The private two-slot 28-Nov pilot must complete and emit real certificates
 before claiming automatic publication is active for those slots. GitHub
 Actions CI alone tests code, not actual unseen frames or model score margins.
+
+
+## November 28 calibration and corrective action (22-Nov-2026)
+
+The full 28-Nov morning run had four scene matches but **only one of
+six horror-atmosphere signals**. The evening run had five scene matches,
+six horror signals, and a SHA-bound private machine certificate. The
+morning frames must NOT be machine-certified merely by lowering thresholds.
+
+A 28-Nov morning private-only V3.1 rescue adds six deliberate, visible
+supernatural actions to the authored yellow-tape story. Its **separate**
+backend is `sdxl-lightning-2steps-ov-int8-horror-v3-1`, preserving the
+original rejected V3 candidate and SHA-index unchanged. New images are
+not approved by generating them; the complete private ZIP must be
+re-read and pass the exact original CLIP+horror gate. Automatic routing
+prefers a verified V3.1 rescue only when it exists, otherwise uses the
+original V3 pointer. The existing evening V3 certificate remains valid.
+
+Daily D+7 now scans the next seven Madrid dates for the **oldest
+uncertified, previously saved** candidate, even if no image generation
+is due that day. Failed QA does not imply certification; retries are
+bounded to one candidate per slot per daily run and do not overwrite
+immutable objects or expose private media.
+
+The earlier pilot's `continue-on-error` allowed a shell `&&` expression
+to fall through to a successful `echo`. The terminal pilot job now
+explicitly `exit 1` when either morning or evening outcome is not
+`success`. A green CI or green pilot without both original steps
+passing is no longer sufficient.

@@ -996,8 +996,77 @@ jobs:
           MORNING: ${{ steps.auto_morning.outcome }}
           EVENING: ${{ steps.auto_evening.outcome }}
         run: |
-          test "$MORNING" = success && test "$EVENING" = success
+          set -euo pipefail
+          if [ "$MORNING" != success ] || [ "$EVENING" != success ]; then
+            echo "::error::Private visual QA failed: morning=$MORNING evening=$EVENING"
+            exit 1
+          fi
           echo 'UMBRAL3_TWO_PRIVATE_AUTO_QA_CERTIFICATES=verified'
+
+
+  automatic-morning-horror-rescue:
+    # One owner-authorized, privacy-preserving rerender of 28-Nov 09;
+    # no overwrite of rejected original V3 and no Meta/GitHub write token.
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.head_commit.message == 'UMBRAL directed horror private rescue 2026-11-28 09'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      UMBRAL_HF_STORAGE_PYTHON: /tmp/umbral3-hf-storage/bin/python
+      UMBRAL_HORROR_DIRECTION: horror-v3-1
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      HF_HUB_DISABLE_XET: '1'
+      OMP_NUM_THREADS: '4'
+      HF_HOME: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Isolated trusted private storage client (no Meta token)
+        run: |
+          python -m venv /tmp/umbral3-hf-storage
+          /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'huggingface_hub==1.19.0' 'Pillow==11.3.0' 'numpy==1.26.4'
+      - name: Inspect dedicated V3.1 index before possible re-render
+        id: rescue
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_private_rescue --date 2026-11-28 --slot 09
+      - uses: actions/cache@v4
+        if: steps.rescue.outputs.generate == 'true'
+        with:
+          path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
+          key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Install pinned isolated 2-step V3.1 CPU renderer
+        if: steps.rescue.outputs.generate == 'true'
+        run: |
+          python -m venv /tmp/umbral3-lightning
+          /tmp/umbral3-lightning/bin/python -m pip install --disable-pip-version-check 'Pillow==11.3.0' 'diffusers==0.37.1' 'transformers==4.57.6' 'huggingface-hub==0.35.1' 'optimum==2.3.0' 'optimum-intel==2.2.0' 'openvino==2026.4.0'
+          /tmp/umbral3-lightning/bin/python -m pip check
+      - name: Generate six physically supernatural private 28-Nov morning stills
+        if: steps.rescue.outputs.generate == 'true'
+        run: /tmp/umbral3-lightning/bin/python -u -m scripts.umbral3_lightning_scenes --anchor 2026-11-28 --index 0 --output "$RUNNER_TEMP/umbral3-rescue"
+      - name: Assemble and store separate UNAPPROVED V3.1 Reel without publishing
+        if: steps.rescue.outputs.generate == 'true'
+        run: python -u -m scripts.umbral3_reserve_render --single --anchor 2026-11-28 --index 0 --prepared-dir "$RUNNER_TEMP/umbral3-rescue"
+      - name: Independently read back full V3.1 ZIP and its scenes
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_private_rescue --date 2026-11-28 --slot 09 --require-stored
+      - name: Qualify real rescued media using pinned CLIP; reject on poor horror
+        shell: bash
+        run: |
+          set -euo pipefail
+          export UMBRAL_CLIP_PYTHON="$(command -v python)"
+          /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa --mode certify --date 2026-11-28 --slot 09
+          /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa --mode check --date 2026-11-28 --slot 09
+      - name: Clean ephemeral six-shot media even if private QA fails
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/umbral3-rescue"
 
   daily-refill:
     if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && github.event_name == 'schedule' && vars.UMBRAL3_RESERVE_ENABLED != 'false' && github.event.schedule == '42 20 * * *'
@@ -1038,6 +1107,9 @@ jobs:
       - name: Verify existing private candidate or select exactly one missing D+7 slot
         id: gate
         run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --recover-backlog --slot ${{ matrix.slot }}
+      - name: Select the oldest previously generated but unscored private Reel
+        id: visualqueue
+        run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa --mode plan --slot ${{ matrix.slot }}
       - name: Reuse pinned Lightning weights when a candidate is missing
         if: steps.gate.outputs.generate == 'true'
         uses: actions/cache@v4
@@ -1045,7 +1117,7 @@ jobs:
           path: ${{ github.workspace }}/.cache/umbral3-lightning-model-cache/hub
           key: umbral3-lightning-347b21e571d7b8a716af83f64d68c5c028c51c56-v1
       - uses: ./.github/actions/setup-render
-        if: steps.gate.outputs.generate == 'true'
+        if: steps.gate.outputs.generate == 'true' || steps.visualqueue.outputs.needs_qa == 'true'
         with:
           models: 'true'
       - name: Install pinned 2-step SDXL Lightning CPU environment
@@ -1064,14 +1136,16 @@ jobs:
         if: steps.gate.outputs.generate == 'true'
         run: /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_refill_gate --index "${{ steps.gate.outputs.index }}" --anchor "${{ steps.gate.outputs.anchor }}"
       - name: Install automatic-QA image metrics into OIDC-only reader
-        if: steps.gate.outputs.generate == 'true'
+        if: steps.gate.outputs.generate == 'true' || steps.visualqueue.outputs.needs_qa == 'true'
         run: /tmp/umbral3-hf-storage/bin/python -m pip install --disable-pip-version-check 'numpy==1.26.4'
-      - name: Independently assess all six frames with pinned public CLIP
-        if: steps.gate.outputs.generate == 'true'
+      - name: Independently assess OLDEST missing private QA, including prior rejected slots
+        if: steps.gate.outputs.generate == 'true' || steps.visualqueue.outputs.needs_qa == 'true'
         continue-on-error: true
         shell: bash
         env:
           UMBRAL3_AUTO_QA_ENABLED: ${{ vars.UMBRAL3_AUTO_QA_ENABLED }}
+          OLDEST_UNSCORED: ${{ steps.visualqueue.outputs.qa_date }}
+          NEW_TARGET: ${{ steps.gate.outputs.anchor }}
         run: |
           set -euo pipefail
           if [ "${UMBRAL3_AUTO_QA_ENABLED:-}" = 'false' ]; then
@@ -1079,7 +1153,8 @@ jobs:
             exit 0
           fi
           export UMBRAL_CLIP_PYTHON="$(command -v python)"
-          DAY="$(date -d "${{ steps.gate.outputs.anchor }}" +%F)"
+          DAY="${OLDEST_UNSCORED:-$NEW_TARGET}"
+          test -n "$DAY"
           /tmp/umbral3-hf-storage/bin/python -u -m scripts.umbral3_machine_qa \
              --mode certify --date "$DAY" --slot "${{ matrix.slot }}"
 

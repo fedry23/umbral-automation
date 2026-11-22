@@ -57,10 +57,10 @@ def read_auto_policy(root=ROOT, override=None):
         raise RuntimeError("Missing separate machine-QA policy")
     data=json.loads(path.read_text(encoding="utf-8"))
     keys={"version","kind","enabled","authorized_by","authorized_at",
-          "start_date","backend","model","revision","quality_policy",
+          "start_date","backend","recovery_backend","model","revision","quality_policy",
           "fallback","requires_private_sha_certificate","human_review",
           "emergency_stop","notes"}
-    from scripts.umbral3_machine_qa import BACKEND,MODEL,REVISION,POLICY
+    from scripts.umbral3_machine_qa import BACKEND,RECOVERY_BACKEND,MODEL,REVISION,POLICY
     if (not isinstance(data,dict) or set(data)!=keys
             or data["version"]!=1
             or data["kind"]!="umbral3-consented-machine-visual-qa"
@@ -69,6 +69,7 @@ def read_auto_policy(root=ROOT, override=None):
             or data["authorized_at"]!="2026-11-22"
             or data["start_date"]!="2026-11-28"
             or data["backend"]!=BACKEND
+            or data["recovery_backend"]!=RECOVERY_BACKEND
             or data["model"]!=MODEL or data["revision"]!=REVISION
             or data["quality_policy"]!=POLICY
             or data["fallback"]!="legacy-backup"
