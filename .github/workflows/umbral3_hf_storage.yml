@@ -669,8 +669,15 @@ jobs:
                 *) echo '::error::Unknown V3.1 schedule'; exit 1 ;;
               esac ;;
             workflow_run)
-              # Trust only the already gated successful official 09 render.
+              # An on-time midnight render may finish 6+ hours before 09:00.
+              # Never hold a 240-minute GitHub runner or durable Meta intent
+              # through that gap. Scheduled primaries remain independent.
               [ "${{ github.event.workflow_run.name }}" = 'UMBRAL - Generación 09:00' ] || exit 1
+              if [[ "$(TZ=Europe/Madrid date +%H%M)" < "0700" ]]; then
+                echo '::notice::Early morning render: official timed V3.1 scheduler handles publication'
+                echo 'eligible=false' >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
               slot=09 ;;
             push)
               # Single, owner-requested recovery. Never republish on a future day.
