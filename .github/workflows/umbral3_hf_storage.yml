@@ -996,7 +996,11 @@ jobs:
           MORNING: ${{ steps.auto_morning.outcome }}
           EVENING: ${{ steps.auto_evening.outcome }}
         run: |
-          test "$MORNING" = success && test "$EVENING" = success
+          set -euo pipefail
+          if [ "$MORNING" != success ] || [ "$EVENING" != success ]; then
+            echo "::error::Private visual QA failed: morning=$MORNING evening=$EVENING"
+            exit 1
+          fi
           echo 'UMBRAL3_TWO_PRIVATE_AUTO_QA_CERTIFICATES=verified'
 
   daily-refill:
