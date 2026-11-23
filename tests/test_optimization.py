@@ -48,14 +48,14 @@ class OptimizationsTests(unittest.TestCase):
             with patch("scripts.wait_public_video.urllib.request.urlopen", return_value=Remote()):
                 self.assertFalse(check_remote(path, "https://example.com/video.mp4"))
 
-    def test_intent_is_durable_before_wait_and_single_post(self):
+    def test_intent_is_durable_after_wait_and_before_single_post(self):
         with tempfile.TemporaryDirectory() as tmp:
             out=Path(tmp)
             (out/'prepared.json').write_text(json.dumps({'date':'2026-11-17','status':'prepared','container':'abc'}))
             events=[]
             with patch.object(publisher,'OUT',out), patch.object(publisher,'intent_path',return_value=out/'absent.json'), patch.object(publisher,'already_published',side_effect=lambda *a:(events.append('meta-read') or None)) as reader, patch.object(publisher,'now_local',return_value=dt.datetime(2026,11,17,20,30,tzinfo=publisher.TZ)), patch.object(publisher,'persist_intent',side_effect=lambda *a:events.append('persist')), patch.object(publisher,'wait_until_target',side_effect=lambda *a:events.append('wait')), patch.object(publisher,'api',side_effect=lambda *a:(events.append('post') or {'id':'123'})) as api, patch.object(publisher,'record_verified',side_effect=lambda *a:events.append('verify')):
                 publisher.publish('2026-11-17')
-                self.assertEqual(events,['meta-read','persist','wait','meta-read','post','verify'])
+                self.assertEqual(events,['meta-read','wait','persist','meta-read','post','verify'])
                 self.assertEqual(reader.call_count,2)
                 api.assert_called_once_with('POST',f'{publisher.ACCOUNT}/media_publish',{'creation_id':'abc'})
 
