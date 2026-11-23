@@ -15,6 +15,32 @@ TZ = ZoneInfo("Europe/Madrid")
 
 
 class RolloutTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        """Snapshot the 21-Nov review board before 22-Nov live receipts existed.
+
+        Policy tests must never change meaning as real Reels are published.
+        Keep immutable reviews and stories; isolate only publication state.
+        """
+        cls._archive = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(cls._archive.cleanup)
+        snapshot = Path(cls._archive.name)
+        for filename in ("stories.json", "stories_morning.json"):
+            shutil.copy2(ROOT / filename, snapshot / filename)
+        docs = snapshot / "docs"
+        docs.mkdir()
+        for filename in ("umbral3-owner-visual-signoff-2026-11-21.json",
+                         "umbral3-production-rollout.json", "umbral3-automatic-qa.json"):
+            shutil.copy2(ROOT / "docs" / filename, docs / filename)
+        shutil.copytree(ROOT / "docs" / "visual_approvals", docs / "visual_approvals")
+        published = docs / "published"
+        published.mkdir()
+        (docs / "pending").mkdir()
+        for receipt in (ROOT / "docs" / "published").glob("*.json"):
+            if receipt.stem[:10] <= "2026-11-21":
+                shutil.copy2(receipt, published / receipt.name)
+        cls.history = snapshot
+
     def now(self, day):
         return dt.datetime.fromisoformat(day + "T07:00:00").replace(tzinfo=TZ)
 
@@ -22,7 +48,7 @@ class RolloutTests(unittest.TestCase):
         for day, slot in (("2026-11-22", "09"), ("2026-11-22", "21"),
                           ("2026-11-25", "09"), ("2026-11-27", "21")):
             with self.subTest(day=day, slot=slot):
-                self.assertTrue(eligible(day,slot,ROOT,self.now(day),override=""))
+                self.assertTrue(eligible(day,slot,self.history,self.now(day),override=""))
                 self.assertFalse(eligible(day,slot,ROOT,self.now("2026-11-21"),override=""))
                 self.assertFalse(eligible(day,slot,ROOT,self.now(day),override="false"))
 
@@ -56,10 +82,10 @@ class RolloutTests(unittest.TestCase):
         ):
             day="2026-11-22"
             with self.subTest(slot=slot):
-                self.assertFalse(route_legacy(day,slot,"schedule",primary,ROOT,self.now(day),override=""))
-                self.assertFalse(route_legacy(day,slot,"push","",ROOT,self.now(day),override=""))
+                self.assertFalse(route_legacy(day,slot,"schedule",primary,self.history,self.now(day),override=""))
+                self.assertFalse(route_legacy(day,slot,"push","",self.history,self.now(day),override=""))
                 for cron in backup:
-                    self.assertTrue(route_legacy(day,slot,"schedule",cron,ROOT,self.now(day),override=""))
+                    self.assertTrue(route_legacy(day,slot,"schedule",cron,self.history,self.now(day),override=""))
 
     def test_legacy_primary_recovers_if_release_file_is_missing_or_bad(self):
         with tempfile.TemporaryDirectory() as tmp:
