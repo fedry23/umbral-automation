@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-23",
+  "target_external_accounts": 30,
+  "existing_catalog": "learning/competitors/catalog-2026-11-18.json",
+  "existing_catalog_candidates": 30,
+  "existing_historical_public_post_records": 9,
+  "external_accounts_directly_verified_this_run": 0,
+  "external_posts_directly_inspected_this_run": 0,
+  "platforms_attempted_this_run": [],
+  "reason": "No new authenticated/public direct clip inspection completed; historic third-party records are not new direct audits.",
+  "first_party": {
+    "source": "learning/windsor-snapshot-2026-11-23.json",
+    "observed_media": 18,
+    "reach_sum": 611,
+    "reach_weighted_skip": 0.6798,
+    "reach_weighted_watch_seconds": 9.951,
+    "views_sum": 947,
+    "likes_sum": 76,
+    "observation_age_verified": false
+  },
+  "technical": {
+    "current_policy": "experiment",
+    "experiment": "music-balance-v1",
+    "render_validation_existing_runs": [
+      44392693254,
+      44393394564
+    ],
+    "existing_runs_conclusion": "success",
+    "latest_evidence_run": 45088201514,
+    "eligible_observations": 0,
+    "decision": "hold",
+    "note": "Do not change existing experiment policy while production is active or uncertain; decision hold means no promotion, not rewriting policy to hold."
+  },
+  "next": "Inspect actual external clips when accessible; preserve URLs and measurements separately; obtain 7-day verified first-party snapshots with official receipt matching."
+}
