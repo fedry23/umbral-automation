@@ -69,33 +69,6 @@ jobs:
           persist-credentials: true
           ref: main
 
-      - name: Preparar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Instalar ffprobe
-        run: |
-          if ! command -v ffprobe >/dev/null 2>&1 || ! command -v ffmpeg >/dev/null 2>&1; then
-            sudo apt-get update -qq
-            sudo apt-get install -y ffmpeg
-          fi
-          python -m pip install --disable-pip-version-check Pillow==11.3.0 numpy==1.26.4
-
-      - name: Comprobar credenciales sin mostrarlas
-        env:
-          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-        run: |
-          if [ -z "$IG_ACCESS_TOKEN" ]; then
-            echo "::error::Falta GitHub Actions Secret IG_ACCESS_TOKEN; publicación no habilitada"
-            exit 1
-          fi
-
-      - name: Reconciliar intentos pendientes (solo lectura Meta)
-        env:
-          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-        run: python scripts/reconcile_publications.py
-
       - name: Comprobar día, hora y duplicados
         id: guard
         shell: bash
@@ -108,11 +81,42 @@ jobs:
             echo "UMBRAL ya tiene recibo para $DAY, no duplicar"
           elif [[ "$HHMM" < "1700" ]]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "::warning::Antes de las 17:00 Europe/Madrid; esperar a la ventana de publicación"
+            echo "::notice::Antes de las 17:00 Europe/Madrid; omitir lanzamiento prematuro"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
             echo "Generación comprobable y publicación preparada antes de las 21:00"
           fi
+
+      - name: Preparar Python
+        if: steps.guard.outputs.skip == 'false'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar ffprobe
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          if ! command -v ffprobe >/dev/null 2>&1 || ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y ffmpeg
+          fi
+          python -m pip install --disable-pip-version-check Pillow==11.3.0 numpy==1.26.4
+
+      - name: Comprobar credenciales sin mostrarlas
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$IG_ACCESS_TOKEN" ]; then
+            echo "::error::Falta GitHub Actions Secret IG_ACCESS_TOKEN; publicación no habilitada"
+            exit 1
+          fi
+
+      - name: Reconciliar intentos pendientes (solo lectura Meta)
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python scripts/reconcile_publications.py
 
       - name: Recuperar y verificar Reel generado de madrugada
         id: stage
