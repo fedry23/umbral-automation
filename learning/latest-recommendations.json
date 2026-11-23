@@ -1,26 +1,51 @@
 {
-  "version": 1,
-  "date": "2026-11-18",
+  "version": 2,
+  "date": "2026-11-23",
   "status": "advisory",
-  "source": "learning/baseline-2026-11-18.json",
-  "sample_size": 8,
-  "reach_sum": 268,
-  "reach_weighted_skip": 0.6691,
-  "reach_weighted_watch_seconds": 11.316,
+  "source": "learning/windsor-snapshot-2026-11-23.json",
+  "source_snapshot_sha": "5076784900d4165ee96154b89ac4655c288549a8",
+  "sample_size": 18,
+  "reach_sum": 611,
+  "reach_weighted_skip": 0.6798,
+  "reach_weighted_watch_seconds": 9.951,
   "external_evidence": [],
+  "external_catalog": "learning/competitors/catalog-2026-11-18.json",
+  "external_accounts_catalogued": 30,
+  "external_accounts_newly_verified_this_run": 0,
+  "external_clips_directly_inspected_this_run": 0,
   "recommendations": [
     {
       "priority": "opening_hook",
-      "instruction": "Comenzar con una anomalía concreta e intrigante en la primera frase; evitar exposición genérica.",
+      "instruction": "Mantener un arranque original con anomalía concreta en los primeros tres segundos; evaluar más adelante en un único experimento editorial, no durante el experimento técnico activo.",
       "scope": "editorial",
-      "confidence": "low"
+      "confidence": "low",
+      "evidence": "18 publicaciones propias; tasa ponderada de salto 0.6798; sin inspección audiovisual causal"
+    },
+    {
+      "priority": "technical_evidence",
+      "instruction": "Mantener un único experimento music-balance-v1; no promover ni modificar la mezcla sin observaciones oficiales a edades comparables y controles de calidad verificados.",
+      "scope": "technical",
+      "confidence": "high",
+      "evidence": "learning/technical-policy.json en mode=experiment; workflow 45088201514 informó cero observaciones elegibles"
     }
   ],
   "experiment": {
+    "editorial": "deferred_during_active_technical_experiment",
+    "technical": "music-balance-v1",
     "control": 0.8,
     "challenger": 0.2,
     "minimum_posts_per_arm": 10,
     "minimum_reach_per_arm": 500
   },
-  "automatic_renderer_changes": false
+  "technical_policy_observed": {
+    "mode": "experiment",
+    "experiment": "music-balance-v1",
+    "sha": "dd740dd46d194da0feb03fcd5099e9865542fc84"
+  },
+  "automatic_renderer_changes": false,
+  "limitations": [
+    "Windsor data_fetched_at is connector fetch time, not verified metric measurement age.",
+    "No new external clips were watched in this run.",
+    "No audiovisual technical-quality conclusions from popularity metrics."
+  ]
 }
