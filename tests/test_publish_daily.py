@@ -139,6 +139,45 @@ class PublicationTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 list(publisher.owned_media())
 
+    def test_no_persistent_intent_if_wait_is_cancelled_before_release(self):
+        # A GitHub schedule delayed into the next civil day must never leave
+        # tomorrow's slot blocked when the job is cancelled during the wait.
+        day = "2026-11-23"
+        early = dt.datetime(2026, 11, 23, 0, 41, tzinfo=ZoneInfo("Europe/Madrid"))
+        with tempfile.TemporaryDirectory() as temporary:
+            out = Path(temporary)
+            (out / "prepared.json").write_text(json.dumps({
+                "date": day, "status": "prepared", "container": "not-posted",
+            }))
+            with patch.object(publisher, "OUT", out), \
+                    patch.object(publisher, "now_local", return_value=early), \
+                    patch.object(publisher, "already_published", return_value=None), \
+                    patch.object(publisher, "intent_path", return_value=out / "pending.json"), \
+                    patch.object(publisher, "wait_until_target", side_effect=RuntimeError("cancelled")), \
+                    patch.object(publisher, "persist_intent") as persisted:
+                with self.assertRaisesRegex(RuntimeError, "cancelled"):
+                    publisher.publish(day)
+                persisted.assert_not_called()
+                self.assertFalse((out / "pending.json").exists())
+
+    def test_official_workflows_gate_early_events_before_reconciliation(self):
+        import yaml
+        for workflow in ("publish_morning.yml", "publish_daily.yml"):
+            with self.subTest(workflow=workflow):
+                parsed = yaml.load((BASE / ".github/workflows" / workflow).read_text(),
+                                   Loader=yaml.BaseLoader)
+                steps = parsed["jobs"]["publicar"]["steps"]
+                names = [step.get("name", "") for step in steps]
+                guard = names.index("Comprobar día, hora y duplicados")
+                reconcile = names.index("Reconciliar intentos pendientes (solo lectura Meta)")
+                self.assertLess(guard, reconcile)
+                for name in ("Preparar Python", "Instalar ffprobe",
+                             "Comprobar credenciales sin mostrarlas",
+                             "Reconciliar intentos pendientes (solo lectura Meta)"):
+                    step = steps[names.index(name)]
+                    self.assertLess(guard, names.index(name))
+                    self.assertEqual(step["if"], "steps.guard.outputs.skip == 'false'")
+
     def test_workflow_requires_explicit_activation_and_has_backup(self):
         import yaml
         yml = yaml.load((BASE / ".github/workflows/publish_daily.yml").read_text(), Loader=yaml.BaseLoader)

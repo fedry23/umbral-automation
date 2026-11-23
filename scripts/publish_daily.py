@@ -272,14 +272,16 @@ def publish(day):
     else:
         if intent_path(day).exists():
             raise RuntimeError("Publicación previa incierta: bloqueo persistente, NO reintentar")
-        # Network/git work is completed BEFORE the scheduled publication time.
-        persist_intent(day, data)
+        # Never leave a persistent publish intent while merely waiting for the
+        # release hour. A delayed/cancelled scheduler must be harmless.
+        # The shared publisher lock protects the wait; the durable intent is
+        # committed immediately before the irreversible Meta publication call.
         if now_local() < target_time(day):
             wait_until_target(day)
         if now_local().date().isoformat() != day:
             raise RuntimeError("Expired date before POST; do not publish")
-        # The first inventory read happened BEFORE persisting the durable intent
-        # (potentially minutes before the actual publication time). Reconcile
+        persist_intent(day, data)
+        # The initial Meta read happened before the persistent intent. Reconcile
         # once again immediately before the irreversible Meta write, while the
         # shared workflow lock and durable intent are still held.
         # Incomplete/ambiguous Meta reads must fail closed, never cause a POST.
