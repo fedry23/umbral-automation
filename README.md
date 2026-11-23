@@ -30,9 +30,13 @@ pasada sigue descargando; un cache miss no afecta la corrección. Las pruebas
 rápidas usan solo cuatro dependencias; la generación completa prueba los modelos
 reales. No se reduce la calidad para obtener velocidad.
 
-**Publicación:** el registro preventivo se sube antes de esperar a las 21:00,
-para no añadir operaciones git en el instante de publicación. Ante un fallo de
-ese registro no se envía ningún POST. Las lecturas de Meta pueden reintentarse
+**Publicación:** los workflows comprueban primero la ventana local
+(05:00 para la sesión de mañana y 17:00 para la nocturna). Tras preparar el
+contenedor se espera a la hora objetivo **sin dejar un intento persistido**.
+Después de la espera y de verificar la fecha, el registro preventivo se guarda
+en GitHub justo antes del POST irreversible; si ese registro falla, no se
+publica nada. Se vuelve a consultar Meta inmediatamente antes del POST para
+detectar duplicados. Las lecturas de Meta pueden reintentarse
 hasta tres veces ante errores transitorios; las escrituras jamás se repiten a
 ciegas. El token viaja como Bearer y se elimina de mensajes de error. El SHA-256
 de Pages se calcula en bloques de 1 MiB, sin cargar todo el MP4; los archivos ya
