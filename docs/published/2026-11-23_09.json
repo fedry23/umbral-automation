@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-23",
+  "title": "El carrete sin revelar",
+  "episode_number": 20,
+  "instagram_media_id": "17889220713502716",
+  "published_at": "2026-11-23T08:07:24+0000",
+  "verification": "published_media_read_back",
+  "cover_url_sent": "https://fedry23.github.io/umbral-automation/reels/2026-11-23_09.jpg",
+  "slot": "09",
+  "technical_profile": {
+    "experiment": "music-balance-v1",
+    "arm": "control",
+    "music_gain": 1.0
+  },
+  "duration_seconds": 69.88341666666666,
+  "editorial_protocol": "fixed-v1",
+  "permalink": "https://www.instagram.com/reel/DgE6bnrToCG/",
+  "cover_verification": {
+    "matched": true,
+    "mean_pixel_error": 0.0,
+    "method": "center-crop resize mean absolute RGB error <18/255"
+  }
+}
