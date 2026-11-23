@@ -1,0 +1,1 @@
+2026-11-23T06:22:47+01:00 | respaldo preventivo matinal 09:00 | ejecutar solo publicador oficial con reconciliación, bloqueo y deduplicación
