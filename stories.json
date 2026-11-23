@@ -936,5 +936,97 @@
         }
       ]
     }
+  },
+  {
+    "title": "El asiento vacío",
+    "hook": "El asiento del fondo aparecía húmedo al terminar cada ruta.",
+    "narration": "El asiento del fondo aparecía húmedo al terminar cada ruta. Soy conductor nocturno y aquella semana hacía el último servicio, sin pasajeros desde la estación. Limpié el asiento antes de salir. En la primera parada apareció una mancha de agua. Revisé techo y ventanas: estaban secos. Parecían dos piernas juntas. En la segunda parada, la mancha llegó al borde. Pensé que alguna tubería perdía líquido. Coloqué una bolsa de plástico sobre el cojín y continué. Al final de la línea, la bolsa estaba seca por arriba. Debajo había dos huellas mojadas. El asiento se empapaba cada vez que me detenía. Decidí regresar sin parar. Pasé de largo todas las marquesinas. Por el espejo vi desaparecer lentamente la humedad. Al alcanzar la estación, el asiento estaba seco. Apagué el motor y abrí las puertas. Escuché un goteo detrás. En el último asiento aparecieron dos marcas separadas, como si alguien acabara de levantarse.",
+    "caption": "El asiento vacío. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Wide shot of a wet patch on the rear seat of an empty night bus. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering.",
+      "Close-up of a wet patch shaped like two legs on blue upholstery. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering.",
+      "Medium shot of a plastic bag covering a blue rear bus seat. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering.",
+      "Close-up of two wet impressions beneath a transparent plastic bag. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering.",
+      "Rearview mirror shot of a completely dry blue rear bus seat. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering.",
+      "Close-up of two separated wet impressions on the rear bus seat. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+    ],
+    "publish_date": "2026-11-30",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "dark blue rear bus seat",
+        "anchor1": "transparent plastic bag",
+        "anchor2": "driver rearview mirror"
+      },
+      "shots": [
+        {
+          "narration": "El asiento del fondo aparecía húmedo al terminar cada ruta. Soy conductor nocturno y aquella semana hacía el último servicio, sin pasajeros desde la estación.",
+          "action": "Wide shot of a wet patch on the rear seat of an empty night bus",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Wide shot of a wet patch on the rear seat of an empty night bus. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Limpié el asiento antes de salir. En la primera parada apareció una mancha de agua. Revisé techo y ventanas: estaban secos. Parecían dos piernas juntas.",
+          "action": "Close-up of a wet patch shaped like two legs on blue upholstery",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of a wet patch shaped like two legs on blue upholstery. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "En la segunda parada, la mancha llegó al borde. Pensé que alguna tubería perdía líquido. Coloqué una bolsa de plástico sobre el cojín y continué.",
+          "action": "Medium shot of a plastic bag covering a blue rear bus seat",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Medium shot of a plastic bag covering a blue rear bus seat. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Al final de la línea, la bolsa estaba seca por arriba. Debajo había dos huellas mojadas. El asiento se empapaba cada vez que me detenía.",
+          "action": "Close-up of two wet impressions beneath a transparent plastic bag",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of two wet impressions beneath a transparent plastic bag. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Decidí regresar sin parar. Pasé de largo todas las marquesinas. Por el espejo vi desaparecer lentamente la humedad. Al alcanzar la estación, el asiento estaba seco.",
+          "action": "Rearview mirror shot of a completely dry blue rear bus seat",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Rearview mirror shot of a completely dry blue rear bus seat. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+        },
+        {
+          "narration": "Apagué el motor y abrí las puertas. Escuché un goteo detrás. En el último asiento aparecieron dos marcas separadas, como si alguien acabara de levantarse.",
+          "action": "Close-up of two separated wet impressions on the rear bus seat",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of two separated wet impressions on the rear bus seat. Empty Spanish night bus, dark blue seats, pale cabin lights, dry windows. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+        }
+      ]
+    }
   }
 ]
