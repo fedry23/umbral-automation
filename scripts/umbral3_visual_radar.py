@@ -12,7 +12,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from scripts.storyboard import validate_storyboard
 
@@ -85,6 +85,30 @@ def _url(value, platform=None):
     return value
 
 
+def _media_identity(url, platform):
+    """Normalize a PUBLIC post, rejecting channel pages and tracking variants."""
+    p = urlsplit(_url(url, platform))
+    path = p.path.strip("/").split("/")
+    if platform == "YouTube":
+        if p.hostname and p.hostname.endswith("youtu.be") and path and path[0]:
+            return "youtube:" + path[0]
+        if path[:1] == ["watch"]:
+            video = parse_qs(p.query).get("v", [""])[0]
+            if video:
+                return "youtube:" + video
+        if len(path) >= 2 and path[0] == "shorts" and path[1]:
+            return "youtube:" + path[1]
+    elif platform == "Instagram":
+        if len(path) >= 2 and path[0] in ("reel", "p") and path[1]:
+            return "instagram:" + path[1]
+    elif platform == "TikTok":
+        if "video" in path:
+            index = path.index("video")
+            if len(path) > index + 1 and path[index + 1].isdigit():
+                return "tiktok:" + path[index + 1]
+    raise ValueError("A direct public media link is required")
+
+
 def _id(handle, platform):
     if not isinstance(handle, str) or not 1 <= len(handle) <= 70:
         raise ValueError("Invalid creator handle")
@@ -151,7 +175,10 @@ def research_plan(today, pool, reviews, count=7):
         if not isinstance(row, dict):
             continue
         try:
+            if row.get("review_type") != "direct_frames_inspected":
+                continue
             key = _id(row.get("creator"), row.get("platform"))
+            _media_identity(row.get("media_url"), row.get("platform"))
             when = _date(row.get("inspected_on"))
         except (ValueError, TypeError):
             continue
@@ -214,7 +241,7 @@ def verified_reviews(rows, today, own_followers, max_age_days=90):
             continue
         try:
             _id(row["creator"], row["platform"])
-            _url(row["media_url"], row["platform"])
+            _media_identity(row["media_url"], row["platform"])
             inspected = _date(row["inspected_on"])
             follower_date = _date(row["followers_observed_on"])
             followers = row["followers_count"]
@@ -229,6 +256,7 @@ def verified_reviews(rows, today, own_followers, max_age_days=90):
                     or not isinstance(timestamps, list) or len(timestamps) < 2
                     or any(type(t) not in (int, float) or not 0 <= t < 3600 for t in timestamps)
                     or not isinstance(tags, dict) or set(tags) != set(FEATURES)
+                    or not any(tags.values())
                     or any(not isinstance(v, list) or len(v) > 3 or
                            any(tag not in FEATURES[cat] for tag in v)
                            for cat, v in tags.items())):
@@ -239,7 +267,7 @@ def verified_reviews(rows, today, own_followers, max_age_days=90):
     # Repeated exports of one post are one observation, not many votes.
     unique = {}
     for row in valid:
-        key = row["platform"] + "|" + row["media_url"]
+        key = _media_identity(row["media_url"], row["platform"])
         if key not in unique or row["inspected_on"] > unique[key]["inspected_on"]:
             unique[key] = row
     return list(unique.values())
@@ -248,7 +276,7 @@ def verified_reviews(rows, today, own_followers, max_age_days=90):
 def learn(rows, today, own_followers, min_creators=3, min_posts=6):
     """Return an exploratory PRIVATE A/B style hypothesis, never a live approval."""
     eligible = verified_reviews(rows, today, own_followers)
-    creators = {_id(r["creator"], r["platform"]) for r in eligible}
+    creators = {r["creator"].casefold() for r in eligible}
     output = {
         "version": 1, "generated_for": _date(today).isoformat(),
         "status": "insufficient_direct_visual_evidence", "inspected_posts": len(eligible),
@@ -263,11 +291,11 @@ def learn(rows, today, own_followers, min_creators=3, min_posts=6):
     for r in eligible:
         if r["visible_craft_score"] < 3:
             continue
-        creator = _id(r["creator"], r["platform"])
+        creator = r["creator"].casefold()
         for cat, tags in r["features"].items():
             for tag in set(tags):
                 votes[cat][tag].add(creator)
-                media[cat][tag].add(r["media_url"])
+                media[cat][tag].add(_media_identity(r["media_url"], r["platform"]))
     motifs = {}
     for cat in FEATURES:
         supported = [
@@ -314,9 +342,15 @@ def compose_private_prompts(story, style, tokenizer):
         action = shot["action"].strip(" .")
         if not action or len(action) > 350:
             raise ValueError("Invalid original action")
-        mandatory = "Photoreal cinematic supernatural horror photograph, portrait. " + action + ". " + ", ".join(continuity) + "."
+        camera = shot["camera"].strip(" .")
+        mandatory = ("Photoreal cinematic supernatural horror photograph, portrait. "
+                     + action + ". " + camera + " camera. " + ", ".join(continuity) + ".")
         suffix = " No text, no logo."
-        extras = [chosen[cat][i % len(chosen[cat])] for cat in FEATURES if chosen[cat]]
+        extras = [
+            chosen[cat][i % len(chosen[cat])] for cat in FEATURES if chosen[cat]
+            and not (cat == "composition" and any(
+                kind in camera.casefold() for kind in ("close", "wide", "low", "detail", "medium")))
+        ]
         # Only trim learned STYLE, never the original action/anchors.
         while True:
             prompt = mandatory + (" " + "; ".join(extras) + "." if extras else "") + suffix

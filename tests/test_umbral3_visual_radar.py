@@ -91,6 +91,15 @@ class VisualRadarTests(unittest.TestCase):
         self.assertEqual(len(eligible),3)
         self.assertEqual(len({x["media_url"] for x in eligible}),3)
         self.assertEqual(radar.learn(rows,DATE,22)["status"],"insufficient_direct_visual_evidence")
+    def test_media_url_is_canonicalized_and_tracking_cannot_fake_votes(self):
+        self.assertEqual(
+            radar._media_identity("https://www.youtube.com/watch?v=abc&si=one","YouTube"),
+            radar._media_identity("https://youtu.be/abc?si=two","YouTube"))
+        rows=[review("a","same&si=one"),review("a","same&si=two")]
+        self.assertEqual(len(radar.verified_reviews(rows,DATE,22)),1)
+        with self.assertRaises(ValueError):
+            radar._media_identity("https://www.youtube.com/@creator","YouTube")
+
     def test_source_injection_not_allowed(self):
         with self.assertRaises(ValueError):
             radar._url("http://www.youtube.com/watch?v=123","YouTube")
