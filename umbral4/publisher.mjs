@@ -56,15 +56,15 @@ async function tick(store,meta,nowIso) {
   if(!validEpisode(e)||e.number!==ledger.lastNumber+1) return "INVALID_EPISODE";
   if(now<Date.parse(e.dueAt)) return "NOT_DUE";
   if(!["READY","SCHEDULED","RETRYABLE_ERROR"].includes(e.state)) return "BLOCKED_NOT_READY";
-  if(!e.containerId||!Number.isFinite(Date.parse(e.containerExpiresAt))||Date.parse(e.containerExpiresAt)<=now) return "CONTAINER_NOT_READY";
-  // No generation, no model download, no audio repair, no waiting for render.
-  if(!await meta.checkReady(e)) return "CONTAINER_NOT_READY";
-  // A verified existing publication is reconciled without a new POST.
+  // Reconcile before checking expiry: a published container is not FINISHED.
   const found=await meta.findReceipt(e);
   if(found) {
     if(!validReceipt(e,found)||rows.some(x=>x.state==="PUBLISHED"&&x.receipt?.mediaId===found.mediaId)) return "BLOCKED_UNCONFIRMED";
     return await replace(snap,e,{state:"PUBLISHED",receipt:found})?"PUBLISHED":"CONFLICT";
   }
+  if(!e.containerId||!Number.isFinite(Date.parse(e.containerExpiresAt))||Date.parse(e.containerExpiresAt)<=now) return "CONTAINER_NOT_READY";
+  // No generation, no model download, no audio repair, no waiting for render.
+  if(!await meta.checkReady(e)) return "CONTAINER_NOT_READY";
   // Persist irreversible intent before touching Meta; only the CAS winner may POST.
   if(!await replace(snap,e,{state:"PUBLISHING",intentAt:new Date(now).toISOString()})) return "CONFLICT";
   let mediaId;
