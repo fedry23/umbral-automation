@@ -1,0 +1,30 @@
+name: UMBRAL 3 - visual radar isolated gate
+on:
+  push:
+    branches: [integration/umbral3-visual-radar]
+    paths:
+      - 'scripts/umbral3_visual_radar.py'
+      - 'tests/test_umbral3_visual_radar.py'
+      - 'learning/visual-radar/**'
+      - '.github/workflows/umbral3_visual_radar.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  radar:
+    if: github.ref == 'refs/heads/integration/umbral3-visual-radar'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Unit regression with no media, secrets or models
+        run: python -m unittest discover -s tests -p test_umbral3_visual_radar.py -v
+      - name: Build first rotating research plan and advisory
+        run: |
+          python -m scripts.umbral3_visual_radar --mode plan --today 2026-11-24
+          python -m scripts.umbral3_visual_radar --mode learn --today 2026-11-24
