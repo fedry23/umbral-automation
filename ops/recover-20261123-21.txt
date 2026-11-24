@@ -1,2 +1,3 @@
 Owner-authorized recovery 2026-11-24: publish only missed official evening Reel 2026-11-23; reconcile Meta and preserve duplicate guards.
 Recovery uses original artifact if valid; otherwise regenerate the same dated story with the next confirmed episode number.
+Owner specifically requests release before 09:00; pause the waiting morning run only if safe and restart it after the recovery.
