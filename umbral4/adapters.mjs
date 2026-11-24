@@ -29,6 +29,12 @@ function metaAdapter({token,account,version="v25.0",fetcher=fetch}){
   return v.status_code;
  }
  return {
+  async containerStatus(e){return status(e);},
+  async createContainer(e){
+   if(e.hostingVerified!==true||!e.videoUrl||!e.coverUrl||!e.caption)throw Error("Missing verified hosting");
+   const d=await request(account+"/media",{media_type:"REELS",video_url:e.videoUrl,cover_url:e.coverUrl,caption:e.caption,share_to_feed:"true"},"POST");
+   if(typeof d.id!=="string"||!/^\d+$/.test(d.id))throw Error("Uncertain container creation");return d.id;
+  },
   async checkReady(e){return e.hostingVerified===true&&e.qaPassed===true&&(await status(e))==="FINISHED";},
   async findReceipt(e,expectedId){
    let after,seen=new Set();
