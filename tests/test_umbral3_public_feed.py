@@ -51,7 +51,7 @@ class FeedTests(unittest.TestCase):
         self.assertEqual(unavailable["fallback"],"existing_weekly_web_research")
         self.assertEqual(len(unavailable["unavailable"]),1)
     def test_atom_id_fallback_with_matching_channel(self):
-        xml=XML.replace(("<yt:channelId>"+CHANNEL+"</yt:channelId>"),("<id>yt:channel:"+CHANNEL+"</id>"),1)
+        xml=XML.replace(("<yt:channelId>"+CHANNEL+"</yt:channelId>").encode(),("<id>yt:channel:"+CHANNEL+"</id>").encode(),1)
         self.assertEqual(len(feed.parse_feed(xml,CHANNEL,"2026-11-24")),1)
 
     def test_discovered_direct_channel_added_without_count_limit(self):
