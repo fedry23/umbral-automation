@@ -85,8 +85,11 @@ class EpisodeIntegration(unittest.TestCase):
         import yaml
         for name in ("publish_daily.yml", "publish_morning.yml"):
             flow = yaml.load((Path(".github/workflows") / name).read_text(), Loader=yaml.BaseLoader)
-            self.assertEqual(flow["concurrency"]["group"], "umbral-instagram-official")
-            self.assertEqual(flow["concurrency"]["cancel-in-progress"], "false")
+            lock = flow["jobs"]["publicar"]["concurrency"]
+            self.assertEqual(lock["group"], "umbral-instagram-official")
+            self.assertEqual(lock["cancel-in-progress"], "false")
+            self.assertEqual(lock["queue"], "max")
+            self.assertNotIn("concurrency", flow["jobs"]["rollout"])
             self.assertIn("refs/heads/main", flow["jobs"]["publicar"]["if"])
 
 

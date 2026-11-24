@@ -65,3 +65,25 @@ class PublicationReliabilityTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError,"OVERDUE"):
                     watchdog(self.time("2026-11-24",10,13),Path(folder))
                 run.assert_not_called()
+
+    def test_workflow_fallback_and_watchdog_keep_one_real_publisher(self):
+        import yaml
+        base=Path(__file__).resolve().parents[1]/".github/workflows"
+        load=lambda name: yaml.load((base/name).read_text(),Loader=yaml.BaseLoader)
+        live=load("umbral3_hf_storage.yml")
+        fallback=live["jobs"]["live-fallback"]
+        self.assertIn("needs.live-owner-approved-release.result != 'success'",fallback["if"])
+        self.assertIn("needs.live-routing.outputs.slot",fallback["if"])
+        self.assertIn("gh workflow run",str(fallback["steps"]))
+        self.assertNotIn("IG_ACCESS_TOKEN",str(fallback))
+        for name in ("publish_daily.yml","publish_morning.yml"):
+            flow=load(name)
+            self.assertIn("recovery_day",flow["on"]["workflow_dispatch"]["inputs"])
+            job=flow["jobs"]["publicar"]
+            self.assertEqual(job["concurrency"]["group"],"umbral-instagram-official")
+            self.assertEqual(job["concurrency"]["queue"],"max")
+            self.assertIn("needs.rollout.outputs.date",str(job["steps"]))
+        watch=load("publication_watchdog.yml")
+        self.assertNotIn("IG_ACCESS_TOKEN",str(watch))
+        self.assertEqual(watch["permissions"]["actions"],"write")
+        self.assertIn("13,43 7-9,19-21 * * *",[s["cron"] for s in watch["on"]["schedule"]])

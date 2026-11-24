@@ -28,7 +28,8 @@ class D7IsolationTests(unittest.TestCase):
                 (ROOT / ".github/workflows" / workflow).read_text(encoding="utf-8"),
                 Loader=yaml.BaseLoader,
             )
-            self.assertEqual(fallback["concurrency"]["group"], "umbral-instagram-official")
+            self.assertEqual(fallback["jobs"]["publicar"]["concurrency"]["group"], "umbral-instagram-official")
+            self.assertEqual(fallback["jobs"]["publicar"]["concurrency"]["queue"], "max")
 
     def test_one_off_actual_refill_is_private_and_never_uses_meta_credentials(self):
         job = self.workflow["jobs"]["integration-nextweek-refill-smoke"]
