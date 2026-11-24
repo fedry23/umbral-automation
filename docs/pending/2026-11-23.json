@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-23",
+  "container": "17939280882185965",
+  "status": "publish_intent",
+  "episode_number": 21,
+  "slot": "21",
+  "title": "El paquete sin remitente",
+  "technical_profile": {
+    "experiment": "music-balance-v1",
+    "arm": "music-minus-1.4db",
+    "music_gain": 0.85
+  },
+  "duration_seconds": 71.95925,
+  "editorial_protocol": "fixed-v1",
+  "cover_url": "https://fedry23.github.io/umbral-automation/reels/2026-11-23.jpg"
+}
