@@ -14,6 +14,12 @@ on:
     paths:
       - 'ops/publish-morning-kick.txt'
   workflow_dispatch:
+    inputs:
+      recovery_day:
+        description: 'Explicit civil date for safe official recovery; blank never publishes'
+        type: string
+        required: false
+        default: ''
   workflow_call:
   # Recover from a missed scheduler by reacting to a verified daily render.
   workflow_run:
@@ -26,10 +32,6 @@ permissions:
   actions: read
   pages: write
 
-concurrency:
-  group: umbral-instagram-official
-  cancel-in-progress: false
-
 jobs:
   rollout:
     # Fail closed to the legacy publisher if V3.1 art is unreviewed/expired.
@@ -38,6 +40,7 @@ jobs:
       contents: read
     outputs:
       legacy: ${{ steps.route.outputs.legacy }}
+      date: ${{ steps.route.outputs.date }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,14 +51,33 @@ jobs:
         env:
           UMBRAL3_ROLLOUT_OVERRIDE: ${{ vars.UMBRAL3_LIVE_ENABLED }}
           UMBRAL3_AUTO_QA_ENABLED: ${{ vars.UMBRAL3_AUTO_QA_ENABLED }}
+          RECOVERY_DAY: ${{ inputs.recovery_day }}
         run: |
+          DAY="$(TZ=Europe/Madrid date +%F)"
+          echo "date=$DAY" >> "$GITHUB_OUTPUT"
+          if ! python -m scripts.publication_reliability --mode window --date "$DAY" --slot 09; then
+            echo "legacy=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            if [ -n "$RECOVERY_DAY" ] && [ "$RECOVERY_DAY" = "$DAY" ]; then
+              echo "legacy=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "legacy=false" >> "$GITHUB_OUTPUT"
+            fi
+            exit 0
+          fi
           python -m scripts.umbral3_rollout --mode legacy --slot 09 --event '${{ github.event_name }}' --schedule '${{ github.event.schedule }}'
 
   publicar:
     needs: rollout
     # Publicación programada autorizada. La tarea antigua de ChatGPT está desactivada.
     # Bloqueo manual de emergencia: UMBRAL_META_PUBLISH_ENABLED=false en Variables.
-    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_call' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push') && github.event.workflow_run.head_repository.full_name == github.repository)) && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && needs.rollout.outputs.legacy == 'true' }}
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_call' || (github.event_name == 'workflow_dispatch' && inputs.recovery_day != '') || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push') && github.event.workflow_run.head_repository.full_name == github.repository)) && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && needs.rollout.outputs.legacy == 'true' }}
+    concurrency:
+      group: umbral-instagram-official
+      cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 240
     env:
@@ -77,6 +99,11 @@ jobs:
           DAY="$(TZ=Europe/Madrid date +%F)"
           HHMM="$(TZ=Europe/Madrid date +%H%M)"
           echo "date=$DAY" >> "$GITHUB_OUTPUT"
+          if [ "$DAY" != "${{ needs.rollout.outputs.date }}" ] || ! python -m scripts.publication_reliability --mode window --date "$DAY" --slot 09; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Expired civil slot; no publication from a stale queued run"
+            exit 0
+          fi
           if [ -f "docs/published/${DAY}_09.json" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "UMBRAL ya tiene recibo para $DAY, no duplicar"

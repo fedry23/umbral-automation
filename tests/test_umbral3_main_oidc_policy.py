@@ -11,7 +11,7 @@ class OIDCIdentityIntegrationTests(unittest.TestCase):
                     Loader=yaml.BaseLoader)
         self.assertEqual(w["permissions"],{"contents":"read"})
         self.assertIn("main",w["on"]["push"]["branches"])
-        self.assertEqual(w["on"]["push"]["paths"],["ops/umbral3-storage-kick.txt"])
+        self.assertEqual(w["on"]["push"]["paths"],["ops/umbral3-storage-kick.txt", "ops/publish-kick.txt", "ops/publish-morning-kick.txt"])
         job=w["jobs"]["production-oidc-probe"]
         self.assertIn("refs/heads/main",job["if"])
         self.assertIn("fedry23/umbral-automation",job["if"])

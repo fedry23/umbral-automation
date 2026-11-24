@@ -54,7 +54,8 @@ class OwnerLiveWorkflowTests(unittest.TestCase):
                 self.assertIn("needs.rollout.outputs.legacy == 'true'",guard)
                 self.assertEqual(f["jobs"]["publicar"]["needs"],"rollout")
                 self.assertIn("scripts.umbral3_rollout --mode legacy",f["jobs"]["rollout"]["steps"][-1]["run"])
-                self.assertIn("umbral-instagram-official",f["concurrency"]["group"])
+                self.assertIn("umbral-instagram-official",f["jobs"]["publicar"]["concurrency"]["group"])
+                self.assertEqual(f["jobs"]["publicar"]["concurrency"]["queue"],"max")
                 for cron in backup:
                     self.assertIn(cron,[x["cron"] for x in f["on"]["schedule"]])
                     self.assertNotIn("IG_ACCESS_TOKEN", f["jobs"]["rollout"]["steps"][-1].get("env", {}))

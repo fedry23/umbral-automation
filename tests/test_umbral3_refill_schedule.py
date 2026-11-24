@@ -35,7 +35,7 @@ class RefillScheduleTests(unittest.TestCase):
     def test_private_full_batch_uses_existing_storage_kick_without_main_oidc_expansion(self):
         flow=yaml.load((ROOT/".github/workflows/umbral3_hf_storage.yml").read_text(),
                        Loader=yaml.BaseLoader)
-        self.assertEqual(flow["on"]["push"]["paths"],["ops/umbral3-storage-kick.txt"])
+        self.assertEqual(flow["on"]["push"]["paths"],["ops/umbral3-storage-kick.txt", "ops/publish-kick.txt", "ops/publish-morning-kick.txt"])
         self.assertIn("UMBRAL lightning private full",
                       flow["jobs"]["lightning-batch"]["if"])
         self.assertIn("refs/heads/integration/umbral-3",

@@ -801,12 +801,12 @@
     "narration": "El timbre del taller sonó aunque llevaba diez años desconectado. Fui a recoger las herramientas de mi padre antes de entregar las llaves del local. El timbre estaba sobre la puerta, cubierto de polvo. Sonó cuando pasé bajo él. Al retroceder, calló. Crucé con una silla: silencio. Me acerqué con la caja de herramientas. Repicó tres veces. La dejé en el suelo y crucé sin ella. No sonó. Avisaba cuando sacaba herramientas. Mi padre prohibía llevárselas a casa. Abrí la caja: seis llaves inglesas marcadas con sus iniciales. Las conté y dejé una sobre el banco. Crucé con las otras cinco. Sonó otra vez. Regresé y fui dejando cada herramienta hasta que solo quedó el estuche vacío. Volví a cruzar. El timbre sonó. Palpé el forro y encontré una tuerca oxidada cosida en una esquina. La dejé sobre el banco. Crucé. Esta vez hubo silencio.",
     "caption": "El timbre del taller. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
     "scenes": [
-      "Wide shot of a dusty brass bell above an old workshop doorway. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering.",
-      "Close-up of a wooden chair beneath a dusty brass bell. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering.",
-      "Medium shot of a battered metal toolbox on a concrete workshop floor. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering.",
-      "Close-up of six steel wrenches inside an open toolbox. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering.",
-      "Medium shot of an empty toolbox crossing a workshop threshold. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering.",
-      "Extreme close-up of a rusty nut on a wooden workbench. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+      "Wide shot of a dusty brass bell above an old workshop doorway, cinematic realistic horror, vertical frame, no text",
+      "Close-up of a wooden chair beneath a dusty brass bell, cinematic realistic horror, vertical frame, no text",
+      "Medium shot of a battered grey metal toolbox on a concrete workshop floor, cinematic realistic horror, vertical frame, no text",
+      "Close-up of six steel wrenches inside an open grey metal toolbox, cinematic realistic horror, vertical frame, no text",
+      "Medium shot of an empty grey metal toolbox crossing a workshop threshold, cinematic realistic horror, vertical frame, no text",
+      "Extreme close-up of a rusty nut on a wooden workbench, cinematic realistic horror, vertical frame, no text"
     ],
     "publish_date": "2026-11-30",
     "editorial_protocol": "fixed-v1",
@@ -823,66 +823,54 @@
           "action": "Wide shot of a dusty brass bell above an old workshop doorway",
           "camera": "medium",
           "references": [
-            "anchor0",
-            "anchor1",
-            "anchor2"
+            "anchor0"
           ],
-          "prompt": "Wide shot of a dusty brass bell above an old workshop doorway. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+          "prompt": "Wide shot of a dusty brass bell above an old workshop doorway, cinematic realistic horror, vertical frame, no text"
         },
         {
           "narration": "El timbre estaba sobre la puerta, cubierto de polvo. Sonó cuando pasé bajo él. Al retroceder, calló. Crucé con una silla: silencio.",
           "action": "Close-up of a wooden chair beneath a dusty brass bell",
           "camera": "detail",
           "references": [
-            "anchor0",
-            "anchor1",
-            "anchor2"
+            "anchor0"
           ],
-          "prompt": "Close-up of a wooden chair beneath a dusty brass bell. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+          "prompt": "Close-up of a wooden chair beneath a dusty brass bell, cinematic realistic horror, vertical frame, no text"
         },
         {
           "narration": "Me acerqué con la caja de herramientas. Repicó tres veces. La dejé en el suelo y crucé sin ella. No sonó. Avisaba cuando sacaba herramientas.",
-          "action": "Medium shot of a battered metal toolbox on a concrete workshop floor",
+          "action": "Medium shot of a battered grey metal toolbox on a concrete workshop floor",
           "camera": "medium",
           "references": [
-            "anchor0",
-            "anchor1",
-            "anchor2"
+            "anchor1"
           ],
-          "prompt": "Medium shot of a battered metal toolbox on a concrete workshop floor. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+          "prompt": "Medium shot of a battered grey metal toolbox on a concrete workshop floor, cinematic realistic horror, vertical frame, no text"
         },
         {
           "narration": "Mi padre prohibía llevárselas a casa. Abrí la caja: seis llaves inglesas marcadas con sus iniciales. Las conté y dejé una sobre el banco.",
-          "action": "Close-up of six steel wrenches inside an open toolbox",
+          "action": "Close-up of six steel wrenches inside an open grey metal toolbox",
           "camera": "detail",
           "references": [
-            "anchor0",
-            "anchor1",
-            "anchor2"
+            "anchor1"
           ],
-          "prompt": "Close-up of six steel wrenches inside an open toolbox. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+          "prompt": "Close-up of six steel wrenches inside an open grey metal toolbox, cinematic realistic horror, vertical frame, no text"
         },
         {
           "narration": "Crucé con las otras cinco. Sonó otra vez. Regresé y fui dejando cada herramienta hasta que solo quedó el estuche vacío. Volví a cruzar.",
-          "action": "Medium shot of an empty toolbox crossing a workshop threshold",
+          "action": "Medium shot of an empty grey metal toolbox crossing a workshop threshold",
           "camera": "medium",
           "references": [
-            "anchor0",
-            "anchor1",
-            "anchor2"
+            "anchor1"
           ],
-          "prompt": "Medium shot of an empty toolbox crossing a workshop threshold. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+          "prompt": "Medium shot of an empty grey metal toolbox crossing a workshop threshold, cinematic realistic horror, vertical frame, no text"
         },
         {
           "narration": "El timbre sonó. Palpé el forro y encontré una tuerca oxidada cosida en una esquina. La dejé sobre el banco. Crucé. Esta vez hubo silencio.",
           "action": "Extreme close-up of a rusty nut on a wooden workbench",
           "camera": "detail",
           "references": [
-            "anchor0",
-            "anchor1",
             "anchor2"
           ],
-          "prompt": "Extreme close-up of a rusty nut on a wooden workbench. Old Spanish workshop, blue steel door, concrete floor, cold fluorescent lighting. Vertical 9:16 photorealistic cinematic horror, natural perspective, consistent lighting and objects, single visible action, no text, no lettering."
+          "prompt": "Extreme close-up of a rusty nut on a wooden workbench, cinematic realistic horror, vertical frame, no text"
         }
       ]
     }

@@ -48,7 +48,7 @@ class MissedMorningScheduleRecoveryTests(unittest.TestCase):
             "scripts/publish_daily.py publish",
         ):
             self.assertIn(critical, steps)
-        slot_step = next(s["run"] for s in publisher["steps"] if s.get("name") == "Select the EXACT scheduled civil slot")
+        slot_step = self.config["jobs"]["live-routing"]["steps"][-1]["run"]
         self.assertIn("[ \"$(TZ=Europe/Madrid date +%F)\" = '2026-11-22' ]", slot_step)
 
         # Critical: shell must expand real date/slot variables, not literal
@@ -74,7 +74,7 @@ class MissedMorningScheduleRecoveryTests(unittest.TestCase):
         workflow = self.config
         self.assertIn("42 20 * * *", [s["cron"] for s in workflow["on"]["schedule"]])
         self.assertEqual(workflow["permissions"], {"contents": "read"})
-        self.assertEqual(workflow["on"]["push"]["paths"], ["ops/umbral3-storage-kick.txt"])
+        self.assertEqual(workflow["on"]["push"]["paths"], ["ops/umbral3-storage-kick.txt", "ops/publish-kick.txt", "ops/publish-morning-kick.txt"])
         self.assertEqual(workflow["jobs"]["daily-refill"]["permissions"],
                          {"contents": "read", "id-token": "write"})
 

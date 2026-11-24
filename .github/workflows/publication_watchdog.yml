@@ -1,0 +1,26 @@
+name: UMBRAL - Control de publicación y recuperación
+on:
+  schedule:
+    - cron: '13,43 7-9,19-21 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: umbral-publication-watchdog
+  cancel-in-progress: false
+  queue: max
+jobs:
+  verify:
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Verify confirmed receipt and safely request missing dated publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -m scripts.publication_reliability --mode watchdog
