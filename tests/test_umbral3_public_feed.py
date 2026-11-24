@@ -47,7 +47,13 @@ class FeedTests(unittest.TestCase):
             raise OSError("denied")
         unavailable=feed.scan({"accounts":[]},discovered,"2026-11-24",downloader=fail)
         self.assertEqual(unavailable["scanned"],0)
+        self.assertEqual(unavailable["collector_status"],"degraded_external_feed")
+        self.assertEqual(unavailable["fallback"],"existing_weekly_web_research")
         self.assertEqual(len(unavailable["unavailable"]),1)
+    def test_atom_id_fallback_with_matching_channel(self):
+        xml=XML.replace(("<yt:channelId>"+CHANNEL+"</yt:channelId>"),("<id>yt:channel:"+CHANNEL+"</id>"),1)
+        self.assertEqual(len(feed.parse_feed(xml,CHANNEL,"2026-11-24")),1)
+
     def test_discovered_direct_channel_added_without_count_limit(self):
         root=Path(__file__).resolve().parents[1]
         catalog=json.loads((root/"learning/competitors/catalog-2026-11-18.json").read_text())

@@ -55,7 +55,13 @@ def parse_feed(payload, expected_channel_id, today, max_age_days=60):
         raise ValueError("Invalid channel")
     today=dt.date.fromisoformat(today)
     root=ET.fromstring(payload)
-    if root.tag!=ATOM+"feed" or root.findtext(YT+"channelId")!=expected_channel_id:
+    if root.tag!=ATOM+"feed":
+        raise ValueError("YouTube feed returned non-Atom content")
+    owner=root.findtext(YT+"channelId")
+    # Some valid Atom exports retain the channel in <id> only.
+    if owner is None and root.findtext(ATOM+"id")=="yt:channel:"+expected_channel_id:
+        owner=expected_channel_id
+    if owner!=expected_channel_id:
         raise ValueError("YouTube feed channel identity mismatch")
     seen=set()
     result=[]
@@ -113,8 +119,15 @@ def scan(catalog, discovered, today, limit=8, downloader=None):
                 [{**x,"creator":channel["creator"],"channel_id":channel["channel_id"]}
                  for x in items])
         except (ValueError,OSError,ET.ParseError,urllib.error.URLError) as exc:
+            # Only our own static exception messages and HTTP status appear.
+            # Never emit remote response bodies, feeds or auth material.
+            detail=(str(exc) if type(exc) is ValueError
+                    else ("HTTP "+str(exc.code) if isinstance(exc,urllib.error.HTTPError)
+                          else type(exc).__name__))
             result["unavailable"].append({"channel_id":channel["channel_id"],
-                                          "reason":type(exc).__name__})
+                                          "reason":detail})
+    result["collector_status"]="ok" if result["scanned"] else "degraded_external_feed"
+    result["fallback"]="existing_weekly_web_research" if not result["scanned"] else None
     result["newest_public_video_candidates"].sort(
         key=lambda x:(x["published_at"],x["video_id"]),reverse=True)
     return result

@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-24",
+  "status": "metadata_only_unwatched",
+  "note": "These are creator-attributed public links, NOT direct frame inspections. No audience size, style score or image prompt is inferred.",
+  "posts": [
+    {
+      "creator": "cultivision",
+      "platform": "YouTube",
+      "url": "https://www.youtube.com/watch?v=j7czWOVL2ZM",
+      "title": "All My Friends",
+      "source": "https://filmschoolsucks.substack.com/p/from-viral-reel-to-horror-short-a",
+      "frames_inspected": 0,
+      "verified_vertical": false
+    },
+    {
+      "creator": "co2pictures",
+      "platform": "YouTube",
+      "url": "https://www.youtube.com/watch?v=cxyVFhaWb88",
+      "title": "Don't Look Away",
+      "source": "https://glu.tv/creators/co2/",
+      "frames_inspected": 0,
+      "verified_vertical": false
+    },
+    {
+      "creator": "nickguk",
+      "platform": "Instagram",
+      "url": "https://www.instagram.com/p/DeTdt2dIsIY/",
+      "title": "Trick or Trend",
+      "source": "https://latentmatinee.com/films/trick-or-trend/",
+      "frames_inspected": 0,
+      "verified_vertical": true
+    }
+  ]
+}
