@@ -21,3 +21,10 @@ Primary scheduler candidate: Cloudflare Cron (UTC, civil slots Europe/Madrid). B
 
 ## Gates
 No production migration until actual reserve of 14 finalized videos, verified hashes, durable ledger integration, prepared container lifecycle, authenticated scheduler, historical import, rollback and no active/ambiguous legacy attempts. All critical integration tests must pass. Initial proposed tolerance +5 min, never early; late recovery counts as a miss in the 28-consecutive-publication acceptance test. No claims of a guaranteed third-party SLA.
+
+## 24 Nov second development session
+- Added ledger.mjs: civil calendar, immutable archival, atomic rollover, import of historical files, duplicate media/number checks. In the baseline 17 receipt files include 13 consecutively numbered official episodes 9–21, plus older/experimental receipts. Older receipts without verified readback are preserved but not upgraded to verified. Import is a snapshot only; fresh reconciliation and updated cutover date are required.
+- Added prepare.mjs: verified hosting attestation and early container creation, isolated from heavy generation. No automatic repeat of an uncertain creation.
+- Added worker.mjs and wrangler.toml: single Durable Object route for both scheduler and authenticated backup, with disabled default and no cron configured. Deployment and account access have NOT been established. Cloudflare free Worker CPU limits require an actual integration/load check; no quota or cost guarantees.
+- GitHub Actions integration run 45381168531 succeeded: actual historical snapshot, mocked transactional store and Meta, 28 simulated publications, rollover and restart. This is not the 28-live-publication acceptance test.
+- Next gates: authenticated provisioning/ingress, fresh historical reconciliation, byte-level hosting verifier, real Durable Object tests, immutable storage and final 14-video inventory, safe recovery of old ambiguous intents, long-history Meta pagination, independent scheduler access and production switch. No actual media was rendered by this session.
