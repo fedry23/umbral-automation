@@ -8,7 +8,61 @@ permissions:
   actions: read
   pages: write
 jobs:
+  prioritize:
+    if: github.repository == 'fedry23/umbral-automation' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+      actions: write
+    outputs:
+      paused: ${{ steps.pause.outputs.paused }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Safely release the morning wait, not an Instagram POST
+        id: pause
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(TZ=Europe/Madrid date +%F)" = 2026-11-24
+          if [[ "$(TZ=Europe/Madrid date +%H%M)" > "0810" ]]; then
+            echo "::notice::Too close to 09:00 to interrupt morning preparation"
+            exit 0
+          fi
+          test ! -e docs/published/2026-11-24_09.json
+          test ! -e docs/pending/2026-11-24_09.json
+          test ! -e docs/published/2026-11-23.json
+          test ! -e docs/pending/2026-11-23.json
+          morning=45318958600
+          old_recovery=45337672516
+          base="repos/$GITHUB_REPOSITORY/actions/runs"
+          test "$(gh api "$base/$morning" --jq .path)" = ".github/workflows/umbral3_hf_storage.yml"
+          test "$(gh api "$base/$morning" --jq .status)" = in_progress
+          gh api "$base/$morning/jobs" --jq '.jobs[] | select(.id == 138192632025 and .status == "in_progress") | .steps[] | select(.name == "Publish only at the official civil slot after final Meta readback" and .status == "in_progress") | .name' | grep -Fx "Publish only at the official civil slot after final Meta readback"
+          status="$(gh api "$base/$old_recovery" --jq .status)"
+          if [[ "$status" == pending || "$status" == queued ]]; then
+            gh api --method POST "$base/$old_recovery/cancel"
+          elif [[ "$status" != completed ]]; then
+            echo "::error::Existing recovery already running, do not interfere"
+            exit 1
+          fi
+          # At least 49 minutes before 09:00, no durable Meta intent; the
+          # running morning process is only waiting for its release hour.
+          gh api --method POST "$base/$morning/cancel"
+          echo "paused=true" >> "$GITHUB_OUTPUT"
+          for i in $(seq 1 36); do
+            if [[ "$(gh api "$base/$morning" --jq .status)" == completed ]]; then exit 0; fi
+            sleep 5
+          done
+          echo "::error::Morning cancellation not confirmed"
+          exit 1
   publicar:
+    needs: prioritize
     if: github.repository == 'fedry23/umbral-automation' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -192,3 +246,31 @@ jobs:
       - name: Aviso visible de fallo
         if: failure()
         run: echo '::error::UMBRAL fallo. Revisar pasos y recibo; no repetir publicaciones inciertas.'
+
+  restore-morning:
+    needs: [prioritize, publicar]
+    if: always() && needs.prioritize.outputs.paused == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Restart the exact morning workflow with fresh official numbering
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(TZ=Europe/Madrid date +%F)" = 2026-11-24
+          base="repos/$GITHUB_REPOSITORY/actions/runs/45318958600"
+          for i in $(seq 1 60); do
+            if [[ "$(gh api "$base" --jq .status)" == completed ]]; then
+              gh api --method POST "$base/rerun"
+              echo "Morning official workflow restarted; it checks Meta and late-binds the next episode number."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::Morning workflow did not reach a terminal state; restart not confirmed"
+          exit 1
