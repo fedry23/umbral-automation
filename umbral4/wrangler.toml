@@ -2,6 +2,7 @@ name = "umbral4-publisher"
 main = "worker.mjs"
 compatibility_date = "2026-11-24"
 workers_dev = false
+preview_urls = false
 
 [vars]
 UMBRAL4_MODE = "disabled"
