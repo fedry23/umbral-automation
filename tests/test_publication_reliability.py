@@ -4,11 +4,18 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from scripts.publication_reliability import in_window, due_slot, verified, watchdog, MADRID
+from scripts.publication_reliability import in_window, due_slot, verified, watchdog, MADRID, push_slot
 
 class PublicationReliabilityTests(unittest.TestCase):
     def time(self, date, hour, minute=0):
         return dt.datetime.fromisoformat(f"{date}T{hour:02}:{minute:02}:00").replace(tzinfo=MADRID)
+
+    def test_push_slot_comes_from_changed_paths_not_commit_message(self):
+        self.assertEqual(push_slot(["ops/publish-morning-kick.txt"]),"09")
+        self.assertEqual(push_slot(["ops/publish-kick.txt"]),"21")
+        self.assertEqual(push_slot(["ops/umbral3-storage-kick.txt"]),"none")
+        with self.assertRaisesRegex(ValueError,"Ambiguous"):
+            push_slot(["ops/publish-morning-kick.txt","ops/publish-kick.txt"])
 
     def test_civil_window_and_stale_queued_runs(self):
         for day in ("2026-11-24","2027-07-15"):

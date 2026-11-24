@@ -31,11 +31,10 @@ class MissedMorningScheduleRecoveryTests(unittest.TestCase):
             self.assertIn("refs/heads/main", gate)
 
     def test_one_time_recovery_reuses_existing_meta_safe_publisher(self):
-        for name in ("live-routing", "live-owner-approved-release"):
-            self.assertIn(
-                "github.event.head_commit.message == 'UMBRAL official catchup 2026-11-22 09'",
-                self.config["jobs"][name]["if"],
-            )
+        route = self.config["jobs"]["live-routing"]
+        self.assertIn("github.event_name == 'push'", route["if"])
+        self.assertIn("github.event.head_commit.message == 'UMBRAL official catchup 2026-11-22 09'", route["steps"][-1]["run"])
+        self.assertIn("scripts.publication_reliability --mode push-slot", route["steps"][-1]["run"])
         publisher = self.config["jobs"]["live-owner-approved-release"]
         self.assertEqual(publisher["concurrency"]["group"], "umbral-instagram-official")
         steps = str(publisher["steps"])

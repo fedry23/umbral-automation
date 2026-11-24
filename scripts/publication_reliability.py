@@ -51,6 +51,24 @@ def verified(path, day, slot):
 def gh_json(path):
     return json.loads(subprocess.check_output(["gh","api",path], text=True))
 
+def push_slot(filenames):
+    paths = set(filenames)
+    morning = "ops/publish-morning-kick.txt" in paths
+    evening = "ops/publish-kick.txt" in paths
+    if morning and evening:
+        raise ValueError("Ambiguous push: two official slots")
+    return "09" if morning else "21" if evening else "none"
+
+def event_push_slot():
+    event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
+    before, after = event["before"], event["after"]
+    import re
+    if not all(re.fullmatch("[a-f0-9]{40}", x) for x in (before,after)) or before == "0"*40:
+        raise ValueError("Untrusted push commit range")
+    repo = os.environ["GITHUB_REPOSITORY"]
+    result = gh_json(f"repos/{repo}/compare/{before}...{after}")
+    return push_slot(f["filename"] for f in result["files"])
+
 def active_publisher(repo, slot, day):
     workflow = WORKFLOWS[slot]
     prefix = f"repos/{repo}/actions"
@@ -99,7 +117,7 @@ def watchdog(now=None, root=Path(".")):
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument("--mode",choices=("window","watchdog"),required=True)
+    p.add_argument("--mode",choices=("window","watchdog","push-slot"),required=True)
     p.add_argument("--date")
     p.add_argument("--slot",choices=tuple(WORKFLOWS))
     a=p.parse_args()
@@ -108,6 +126,8 @@ def main():
             p.error("date and slot required")
         if not in_window(a.date,a.slot):
             raise SystemExit(1)
+    elif a.mode == "push-slot":
+        print(event_push_slot())
     else:
         watchdog()
 

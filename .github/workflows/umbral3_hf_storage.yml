@@ -58,7 +58,7 @@ permissions:
 concurrency:
   # Long private CPU refills must never queue or block an official 09/21 Reel.
   # The official job still shares umbral-instagram-official with both legacy publishers.
-  group: ${{ ((github.event_name == 'schedule' && github.event.schedule != '42 20 * * *') || github.event_name == 'workflow_run' || (github.event_name == 'push' && (github.event.head_commit.message == 'UMBRAL official catchup 2026-11-22 09' || (contains(github.event.head_commit.modified, 'ops/publish-kick.txt') || contains(github.event.head_commit.added, 'ops/publish-kick.txt') || contains(github.event.head_commit.modified, 'ops/publish-morning-kick.txt') || contains(github.event.head_commit.added, 'ops/publish-morning-kick.txt'))))) && 'umbral3-official-schedule' || 'umbral3-private-bucket' }}
+  group: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && format('umbral3-main-push-{0}', github.run_id)) || ((github.event_name == 'schedule' && github.event.schedule != '42 20 * * *') || github.event_name == 'workflow_run' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && 'umbral3-official-schedule' || 'umbral3-private-bucket' }}
   cancel-in-progress: false
   queue: max
 jobs:
@@ -634,7 +634,7 @@ jobs:
     # Owner-reviewed until 27 Nov; from 28 Nov check separate private SHA
     # machine QA certificate using a workflow-scoped OIDC token (no Meta).
 
-    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && ((github.event_name == 'schedule' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')) || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'UMBRAL - Generación 09:00' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push')) || (github.event_name == 'push' && (github.event.head_commit.message == 'UMBRAL official catchup 2026-11-22 09' || (contains(github.event.head_commit.modified, 'ops/publish-kick.txt') || contains(github.event.head_commit.added, 'ops/publish-kick.txt') || contains(github.event.head_commit.modified, 'ops/publish-morning-kick.txt') || contains(github.event.head_commit.added, 'ops/publish-morning-kick.txt')))))
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && ((github.event_name == 'schedule' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')) || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'UMBRAL - Generación 09:00' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push')) || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -662,6 +662,7 @@ jobs:
           UMBRAL3_ROLLOUT_OVERRIDE: ${{ vars.UMBRAL3_LIVE_ENABLED }}
           UMBRAL3_AUTO_QA_ENABLED: ${{ vars.UMBRAL3_AUTO_QA_ENABLED }}
           HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           case "$GITHUB_EVENT_NAME" in
@@ -687,10 +688,14 @@ jobs:
               if [[ "${{ github.event.head_commit.message == 'UMBRAL official catchup 2026-11-22 09' }}" == 'true' ]]; then
                 [ "$(TZ=Europe/Madrid date +%F)" = '2026-11-22' ] || exit 1
                 slot=09
-              elif [[ "${{ contains(github.event.head_commit.modified, 'ops/publish-morning-kick.txt') || contains(github.event.head_commit.added, 'ops/publish-morning-kick.txt') }}" == 'true' ]]; then
-                slot=09
               else
-                slot=21
+                # Actions push payload can omit modified/added file lists.
+                # Inspect actual event commits using the authenticated compare API.
+                slot="$(python -m scripts.publication_reliability --mode push-slot)"
+                if [ "$slot" = none ]; then
+                  echo "eligible=false" >> "$GITHUB_OUTPUT"
+                  exit 0
+                fi
               fi ;;
             *) exit 1 ;;
           esac
@@ -708,7 +713,7 @@ jobs:
     # OFF by default. Main OIDC uses THIS trusted-publisher workflow filename.
     # The older official workflows keep the same Meta lock and provide late
     # fallback at their distinct backup cron slots when this route is enabled.
-    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && needs.live-routing.outputs.eligible == 'true' && vars.UMBRAL3_LIVE_ENABLED != 'false' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && ((github.event_name == 'schedule' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')) || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'UMBRAL - Generación 09:00' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push')) || (github.event_name == 'push' && (github.event.head_commit.message == 'UMBRAL official catchup 2026-11-22 09' || (contains(github.event.head_commit.modified, 'ops/publish-kick.txt') || contains(github.event.head_commit.added, 'ops/publish-kick.txt') || contains(github.event.head_commit.modified, 'ops/publish-morning-kick.txt') || contains(github.event.head_commit.added, 'ops/publish-morning-kick.txt')))))
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/main' && needs.live-routing.outputs.eligible == 'true' && vars.UMBRAL3_LIVE_ENABLED != 'false' && vars.UMBRAL_META_PUBLISH_ENABLED != 'false' && ((github.event_name == 'schedule' && (github.event.schedule == '17 5 * * *' || github.event.schedule == '17 6 * * *' || github.event.schedule == '17 17 * * *' || github.event.schedule == '17 18 * * *')) || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'UMBRAL - Generación 09:00' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && (github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'push')) || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
     runs-on: ubuntu-latest
     timeout-minutes: 240
     concurrency:
