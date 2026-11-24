@@ -71,7 +71,21 @@ function checkCalendar(ledger){
 function archiveStore(storage){
  const MAX=100000;
  return {
+  async archived(key){return storage.get("receipt:"+key);},
   async read(){const s=await storage.get("ledger4");if(!s)throw Error("Not initialized");checkCalendar(s.value);return s;},
+  async initialize(files,pending,first){
+   const imported=importHistory(files,pending,first);
+   return storage.transaction(async tx=>{
+    if(await tx.get("ledger4"))throw Error("Already initialized");
+    for(const h of imported.records){
+     await tx.put("historical:"+h.name,h);
+     await tx.put("media:"+h.row.instagram_media_id,h.key||h.name);
+     if(h.row.episode_number)await tx.put("number:"+h.row.episode_number,h.key||h.name);
+    }
+    await tx.put("ledger4",{version:0,value:imported.ledger});
+    return imported.ledger;
+   });
+  },
   async cas(version,value){
    return storage.transaction(async tx=>{
     const s=await tx.get("ledger4");if(!s||s.version!==version)return false;
