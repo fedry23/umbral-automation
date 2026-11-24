@@ -1,0 +1,19 @@
+name = "umbral4-publisher"
+main = "worker.mjs"
+compatibility_date = "2026-11-24"
+workers_dev = false
+
+[vars]
+UMBRAL4_MODE = "disabled"
+
+[durable_objects]
+bindings = [{ name = "ACCOUNT", class_name = "Account" }]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Account"]
+
+# Candidate cadence: civil-time selection happens inside the account object.
+# Deployment and cron remain disabled pending safe cutover.
+[triggers]
+crons = []
