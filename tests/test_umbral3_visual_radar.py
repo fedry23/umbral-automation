@@ -44,7 +44,12 @@ class VisualRadarTests(unittest.TestCase):
         p2=radar.research_plan("2026-12-02",pool,[],7)
         self.assertNotEqual(p["discovery_queries"],p2["discovery_queries"])
         first=p["review_candidates"][0]
-        recently=[dict(creator=first["creator"],platform=first["platform"],inspected_on=DATE)]
+        direct_urls={"YouTube":"https://www.youtube.com/watch?v=reviewed1",
+                     "Instagram":"https://www.instagram.com/reel/reviewed1/",
+                     "TikTok":"https://www.tiktok.com/@reviewer/video/1234567890"}
+        recently=[dict(creator=first["creator"],platform=first["platform"],
+                       inspected_on=DATE,review_type="direct_frames_inspected",
+                       media_url=direct_urls[first["platform"]])]
         p3=radar.research_plan(DATE,pool,recently,7)
         self.assertNotIn((first["creator"],first["platform"]),
                          [(x["creator"],x["platform"]) for x in p3["review_candidates"]])
