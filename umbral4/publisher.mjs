@@ -36,7 +36,10 @@ async function tick(store,meta,nowIso) {
   }
   async function confirm(key,expectedId) {
     const s=await store.read(), e=s.value.episodes.find(x=>x.key===key);
-    if(!e) throw Error("Missing intent");
+    if(!e) {
+      if(store.archived && (await store.archived(key))?.state==="PUBLISHED") return "PUBLISHED";
+      throw Error("Missing intent");
+    }
     if(e.state==="PUBLISHED") return "PUBLISHED";
     if(!["PUBLISHING","AMBIGUOUS"].includes(e.state)||e.number!==s.value.lastNumber+1) throw Error("Invalid intent");
     let receipt;
@@ -53,9 +56,10 @@ async function tick(store,meta,nowIso) {
   }
   const e=rows.find(x=>x.state!=="PUBLISHED");
   if(!e) return "EMPTY";
-  if(!validEpisode(e)||e.number!==ledger.lastNumber+1) return "INVALID_EPISODE";
+  if(!Number.isFinite(Date.parse(e.dueAt))||e.number!==ledger.lastNumber+1) return "INVALID_EPISODE";
   if(now<Date.parse(e.dueAt)) return "NOT_DUE";
   if(!["READY","SCHEDULED","RETRYABLE_ERROR"].includes(e.state)) return "BLOCKED_NOT_READY";
+  if(!validEpisode(e)) return "INVALID_EPISODE";
   // Reconcile before checking expiry: a published container is not FINISHED.
   const found=await meta.findReceipt(e);
   if(found) {
@@ -71,7 +75,7 @@ async function tick(store,meta,nowIso) {
   try {mediaId=await meta.publishOnce(e);} catch {return "BLOCKED_UNCONFIRMED";}
   if(typeof mediaId!=="string"||!/^\d+$/.test(mediaId)) return "BLOCKED_UNCONFIRMED";
   const s=await store.read(), pending=s.value.episodes.find(x=>x.key===e.key);
-  if(pending?.state==="PUBLISHED") return "PUBLISHED";
+  if(pending?.state==="PUBLISHED" || (!pending && store.archived && (await store.archived(e.key))?.state==="PUBLISHED")) return "PUBLISHED";
   if(!pending||!["PUBLISHING","AMBIGUOUS"].includes(pending.state)) throw Error("Lost durable intent");
   if(!await replace(s,pending,{expectedMediaId:mediaId})) return "CONFLICT";
   return confirm(e.key,mediaId);
