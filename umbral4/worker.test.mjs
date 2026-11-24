@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import worker,{Account,runCycle} from "./worker.mjs";
+const secret="a".repeat(40),calls=[];
+const env={UMBRAL4_MODE:"disabled",UMBRAL4_BACKUP_TOKEN:secret,ACCOUNT:{idFromName:n=>{assert.equal(n,"umbral-single-account");return n;},get:()=>({fetch:async(url,opt)=>{calls.push({url,opt});return new Response("ok");}})}};
+assert.equal((await worker.fetch(new Request("https://example.com/tick",{method:"POST"}),env)).status,401);
+assert.equal((await worker.fetch(new Request("https://example.com/tick",{method:"POST",headers:{Authorization:"Bearer wrong"}}),env)).status,401);
+await worker.scheduled({},env);assert.equal(calls.length,0);
+await worker.fetch(new Request("https://example.com/tick",{method:"POST",headers:{Authorization:"Bearer "+secret}}),env);
+await worker.scheduled({}, {...env,UMBRAL4_MODE:"live"});
+assert.equal(calls.length,2);assert.equal(calls[0].url,calls[1].url);
+const storage={get:async()=>undefined};
+const request=()=>new Request("https://internal/tick",{method:"POST"});
+assert.equal((await new Account({storage},env).fetch(request())).status,409);
+assert.equal((await new Account({storage},{...env,UMBRAL4_MODE:"live",IG_ACCOUNT:"123"}).fetch(request())).status,409);
+assert.equal((await new Account({storage},env).fetch(new Request("https://internal/status"))).status,503);
+console.log("Worker authorization, disabled mode, shared scheduler route and cutover guard passed.");
