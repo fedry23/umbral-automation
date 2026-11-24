@@ -75,7 +75,22 @@ jobs:
       - name: Recuperar y verificar Reel generado de madrugada
         id: stage
         if: steps.guard.outputs.skip == 'false'
+        continue-on-error: true
         run: python scripts/stage_daily_reel.py
+
+      - name: Verify exact pending story and current official episode number
+        if: steps.stage.outcome == 'failure'
+        run: python -c 'from scripts.episode_state import planned_episode; planned_episode("2026-11-23", "21")'
+      - name: Restore render models only if the old episode number is stale
+        if: steps.stage.outcome == 'failure'
+        uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Regenerate the same dated story with current verified number
+        if: steps.stage.outcome == 'failure'
+        run: |
+          rm -rf -- output staged
+          python scripts/stage_daily_reel.py --local-render
 
       - name: Validar formato Meta y autocorregir audio si hace falta
         if: steps.guard.outputs.skip == 'false'
