@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-24",
+  "container": "17939438745185965",
+  "status": "publish_intent",
+  "episode_number": 22,
+  "slot": "21",
+  "title": "La \u00faltima p\u00e1gina",
+  "technical_profile": {
+    "experiment": "music-balance-v1",
+    "arm": "control",
+    "music_gain": 1.0
+  },
+  "duration_seconds": 72.75679166666667,
+  "editorial_protocol": "fixed-v1",
+  "cover_url": "https://fedry23.github.io/umbral-automation/reels/2026-11-24.jpg"
+}
