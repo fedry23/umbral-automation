@@ -1,18 +1,27 @@
 name: UMBRAL 3 - visual radar isolated gate
 on:
   push:
-    branches: [integration/umbral3-visual-radar]
+    branches: [integration/umbral3-radar-feeds]
     paths:
       - 'scripts/umbral3_visual_radar.py'
+      - 'scripts/umbral3_public_feed.py'
       - 'tests/test_umbral3_visual_radar.py'
+      - 'tests/test_umbral3_public_feed.py'
       - 'learning/visual-radar/**'
       - '.github/workflows/umbral3_visual_radar.yml'
+  schedule:
+    # Monday before the existing 14:00 Europe/Madrid learning automation:
+    # 12:31 CET / 13:31 CEST. Metadata research only.
+    - cron: '31 11 * * 1'
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: umbral3-visual-radar-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   radar:
-    if: github.ref == 'refs/heads/integration/umbral3-visual-radar'
+    if: github.repository == 'fedry23/umbral-automation' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/integration/umbral3-radar-feeds')
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -22,9 +31,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Unit regression with no media, secrets or models
-        run: python -m unittest discover -s tests -p test_umbral3_visual_radar.py -v
-      - name: Build first rotating research plan and advisory
+      - name: Regression, no credentials and no media assets
         run: |
-          python -m scripts.umbral3_visual_radar --mode plan --today 2026-11-24
-          python -m scripts.umbral3_visual_radar --mode learn --today 2026-11-24
+          python -m unittest discover -s tests -p test_umbral3_visual_radar.py -v
+          python -m unittest discover -s tests -p test_umbral3_public_feed.py -v
+      - name: Rotating creator queries and gated learning advisory
+        env:
+          TODAY: ${{ github.event.repository.updated_at }}
+        run: |
+          DAY="$(TZ=Europe/Madrid date +%F)"
+          python -m scripts.umbral3_visual_radar --mode plan --today "$DAY"
+          python -m scripts.umbral3_visual_radar --mode learn --today "$DAY"
+      - name: Public YouTube feed discovery (metadata only)
+        run: |
+          DAY="$(TZ=Europe/Madrid date +%F)"
+          python -u -m scripts.umbral3_public_feed --today "$DAY" --limit 8
