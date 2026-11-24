@@ -1019,5 +1019,87 @@
         }
       ]
     }
+  },
+  {
+    "title": "El diente de yeso",
+    "hook": "El molde de yeso tenía un diente más que mi boca.",
+    "narration": "El molde de yeso tenía un diente más que mi boca. Trabajo fabricando prótesis y había utilizado mi propia dentadura para probar un material nuevo. Pensé que era una burbuja. Al examinar el molde bajo la lámpara, distinguí una pequeña muela perfectamente formada detrás de las demás. La limé hasta dejar la superficie lisa. En ese instante noté un hueco en la encía. Corrí al espejo: me faltaba una muela sana. Comprendí que quitar yeso del molde eliminaba dientes reales. Añadí una gota de pasta al hueco y esperé. La muela volvió a crecer. Guardé el molde en un cajón para destruirlo sin tocar los dientes. Antes de cerrarlo, vi que el yeso empezaba a formar otra hilera por debajo. Sentí presión bajo la lengua. Abrí la boca frente al espejo y descubrí una punta blanca atravesando la encía inferior. Desde entonces vigilo el molde cada noche. No deja de crecer.",
+    "caption": "El diente de yeso. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Close-up of an extra molar on a white plaster dental cast, small tiled dental laboratory, on a stainless steel bench, cool fluorescent lighting, precise realistic dental anatomy, dark corners and clinical unease, cinematic horror, vertical 9:16, no text",
+      "Macro shot of a tiny fully formed molar behind the regular teeth, white plaster dental cast, beneath an adjustable task lamp, matte chalk texture, dark blurred workbench, realistic macro photography, cold shadows and clinical atmosphere, cinematic horror, vertical 9:16, no text",
+      "Close-up of a metal file smoothing a white plaster dental cast, fine white dust on steel bench, gloved fingers holding the tool, cool task lighting, realistic dental laboratory detail, cinematic horror, vertical 9:16, no text",
+      "Detail shot of fresh plaster paste filling a gap in a white plaster dental cast, small spatula applying the material, stainless steel work surface, cold overhead light, realistic chalk texture, shallow focus, cinematic horror, vertical 9:16, no text",
+      "Close-up of a second row of teeth emerging underneath a white plaster dental cast, inside an open metal drawer, cold overhead light, unnatural but physically clear dental anatomy, dark background, realistic material texture, cinematic horror, vertical 9:16, no text",
+      "Medium shot of a man examining his open mouth in a wall mirror, man with shaved head in a grey sweater, small tiled dental laboratory, one small white tooth visible beneath the tongue, cold fluorescent light, anxious expression, realistic clinical setting, restrained body horror, cinematic horror, vertical 9:16, no text"
+    ],
+    "publish_date": "2026-12-01",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "man with shaved head in a grey sweater",
+        "anchor1": "white plaster dental cast",
+        "anchor2": "small tiled dental laboratory"
+      },
+      "shots": [
+        {
+          "narration": "El molde de yeso tenía un diente más que mi boca. Trabajo fabricando prótesis y había utilizado mi propia dentadura para probar un material nuevo.",
+          "action": "Close-up of an extra molar on a white plaster dental cast",
+          "camera": "detail",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of an extra molar on a white plaster dental cast, small tiled dental laboratory, on a stainless steel bench, cool fluorescent lighting, precise realistic dental anatomy, dark corners and clinical unease, cinematic horror, vertical 9:16, no text"
+        },
+        {
+          "narration": "Pensé que era una burbuja. Al examinar el molde bajo la lámpara, distinguí una pequeña muela perfectamente formada detrás de las demás.",
+          "action": "Macro shot of a tiny fully formed molar behind the regular teeth",
+          "camera": "detail",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Macro shot of a tiny fully formed molar behind the regular teeth, white plaster dental cast, beneath an adjustable task lamp, matte chalk texture, dark blurred workbench, realistic macro photography, cold shadows and clinical atmosphere, cinematic horror, vertical 9:16, no text"
+        },
+        {
+          "narration": "La limé hasta dejar la superficie lisa. En ese instante noté un hueco en la encía. Corrí al espejo: me faltaba una muela sana.",
+          "action": "Close-up of a metal file smoothing a white plaster dental cast",
+          "camera": "detail",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Close-up of a metal file smoothing a white plaster dental cast, fine white dust on steel bench, gloved fingers holding the tool, cool task lighting, realistic dental laboratory detail, cinematic horror, vertical 9:16, no text"
+        },
+        {
+          "narration": "Comprendí que quitar yeso del molde eliminaba dientes reales. Añadí una gota de pasta al hueco y esperé. La muela volvió a crecer.",
+          "action": "Detail shot of fresh plaster paste filling a gap in a white plaster dental cast",
+          "camera": "detail",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Detail shot of fresh plaster paste filling a gap in a white plaster dental cast, small spatula applying the material, stainless steel work surface, cold overhead light, realistic chalk texture, shallow focus, cinematic horror, vertical 9:16, no text"
+        },
+        {
+          "narration": "Guardé el molde en un cajón para destruirlo sin tocar los dientes. Antes de cerrarlo, vi que el yeso empezaba a formar otra hilera por debajo.",
+          "action": "Close-up of a second row of teeth emerging underneath a white plaster dental cast",
+          "camera": "detail",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Close-up of a second row of teeth emerging underneath a white plaster dental cast, inside an open metal drawer, cold overhead light, unnatural but physically clear dental anatomy, dark background, realistic material texture, cinematic horror, vertical 9:16, no text"
+        },
+        {
+          "narration": "Sentí presión bajo la lengua. Abrí la boca frente al espejo y descubrí una punta blanca atravesando la encía inferior. Desde entonces vigilo el molde cada noche. No deja de crecer.",
+          "action": "Medium shot of a man examining his open mouth in a wall mirror",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Medium shot of a man examining his open mouth in a wall mirror, man with shaved head in a grey sweater, small tiled dental laboratory, one small white tooth visible beneath the tongue, cold fluorescent light, anxious expression, realistic clinical setting, restrained body horror, cinematic horror, vertical 9:16, no text"
+        }
+      ]
+    }
   }
 ]
