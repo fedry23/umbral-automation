@@ -1,0 +1,1 @@
+Owner-authorized recovery 2026-11-24: publish only missed official evening Reel 2026-11-23; reconcile Meta and preserve duplicate guards.
