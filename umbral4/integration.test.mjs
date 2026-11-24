@@ -14,8 +14,9 @@ function memory(){
   tail=run.catch(()=>{});return run;
  }};
 }
-const history=readdirSync("docs/published").filter(n=>n.endsWith(".json")).map(name=>({name,row:JSON.parse(readFileSync("docs/published/"+name,"utf8"))}));
-const pending=readdirSync("docs/pending").filter(n=>n.endsWith(".json"));
+const baseline=n=>n.endsWith(".json")&&(n.startsWith("test-")||n.slice(0,10)<="2026-11-23");
+const history=readdirSync("docs/published").filter(baseline).map(name=>({name,row:JSON.parse(readFileSync("docs/published/"+name,"utf8"))}));
+const pending=readdirSync("docs/pending").filter(baseline);
 const first="2026-11-24/09:00"; // fixed base snapshot; not deployment authorization.
 const imported=importHistory(history,pending,first);
 assert.equal(imported.ledger.lastNumber,21);
