@@ -874,5 +874,89 @@
         }
       ]
     }
+  },
+  {
+    "title": "La cera negra",
+    "hook": "La vela negra proyectaba la sombra de una persona que no estaba allí.",
+    "narration": "La vela negra proyectaba la sombra de una persona que no estaba allí. Había entrado en la capilla del cementerio para encender una vela por mi madre. La llama apenas iluminaba el altar, pero aquella sombra se distinguía perfectamente en la pared. Tenía los brazos caídos y los hombros muy estrechos. Acercaba una flor a la llama cuando vi aparecer su silueta entre los dedos de la sombra. Retiré la flor, pero su silueta permaneció allí. Probé con mi mano. La sombra adquirió mis dedos y mi manga. Comprendí que aquella vela conservaba la silueta de cuanto acercaba al fuego. Quise apagarla soplando. Al inclinarme sobre la llama, vi que la figura de la pared adquiría mi perfil. Retrocedí y busqué un apagavelas. Aplasté la mecha con el apagavelas de metal. Encendí la linterna del móvil para salir. En la pared seguía mi silueta, inmóvil, con la flor entre los dedos. La sombra que debía acompañarme hasta la puerta había desaparecido.",
+    "caption": "La cera negra. Relato de ficción original de UMBRAL. #Umbral #Terror #RelatosDeTerror",
+    "scenes": [
+      "Wide shot of a human silhouette cast behind a burning black wax candle, narrow stone chapel, on a bare altar, empty pews, cold dusk through a small window, realistic candlelight and deep shadows, cinematic horror, vertical 9:16, no text",
+      "Close-up of the narrow shouldered silhouette on a chapel wall, narrow stone chapel, on rough pale masonry, empty altar edge, dim amber illumination, unsettling stillness, realistic texture and restrained composition, cinematic horror, vertical 9:16, no text",
+      "Close-up of a flower held beside a black wax candle, petals illuminated by the flame, worn stone altar, amber highlights, dark background, shallow depth of field, realistic botanical detail, cinematic horror, vertical 9:16, no text",
+      "Medium shot of a cardigan sleeve held near a black wax candle, woman with short brown hair in a navy cardigan, sleeve visible beside the flame, stone altar, low amber light, realistic fabric texture, restrained ominous atmosphere, cinematic horror, vertical 9:16, no text",
+      "Profile close-up of a woman leaning toward a black wax candle, woman with short brown hair in a navy cardigan, rough masonry behind the altar, warm flame light, dark edges, stark realistic contrast, cinematic horror, vertical 9:16, no text",
+      "Wide shot of a woman standing beside the chapel exit, woman with short brown hair in a navy cardigan, narrow stone chapel, a human silhouette holding a flower remains on the far wall, cold phone light, extinguished altar, dark empty pews, cinematic horror, vertical 9:16, no text"
+    ],
+    "publish_date": "2026-12-01",
+    "editorial_protocol": "fixed-v1",
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "woman with short brown hair in a navy cardigan",
+        "anchor1": "black wax candle",
+        "anchor2": "narrow stone chapel"
+      },
+      "shots": [
+        {
+          "action": "Wide shot of a human silhouette cast behind a burning black wax candle",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "camera": "wide",
+          "narration": "La vela negra proyectaba la sombra de una persona que no estaba allí. Había entrado en la capilla del cementerio para encender una vela por mi madre.",
+          "prompt": "Wide shot of a human silhouette cast behind a burning black wax candle, narrow stone chapel, on a bare altar, empty pews, cold dusk through a small window, realistic candlelight and deep shadows, cinematic horror, vertical 9:16, no text"
+        },
+        {
+          "action": "Close-up of the narrow shouldered silhouette on a chapel wall",
+          "references": [
+            "anchor2"
+          ],
+          "camera": "detail",
+          "narration": "La llama apenas iluminaba el altar, pero aquella sombra se distinguía perfectamente en la pared. Tenía los brazos caídos y los hombros muy estrechos.",
+          "prompt": "Close-up of the narrow shouldered silhouette on a chapel wall, narrow stone chapel, on rough pale masonry, empty altar edge, dim amber illumination, unsettling stillness, realistic texture and restrained composition, cinematic horror, vertical 9:16, no text"
+        },
+        {
+          "action": "Close-up of a flower held beside a black wax candle",
+          "references": [
+            "anchor1"
+          ],
+          "camera": "detail",
+          "narration": "Acercaba una flor a la llama cuando vi aparecer su silueta entre los dedos de la sombra. Retiré la flor, pero su silueta permaneció allí.",
+          "prompt": "Close-up of a flower held beside a black wax candle, petals illuminated by the flame, worn stone altar, amber highlights, dark background, shallow depth of field, realistic botanical detail, cinematic horror, vertical 9:16, no text"
+        },
+        {
+          "action": "Medium shot of a cardigan sleeve held near a black wax candle",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "camera": "detail",
+          "narration": "Probé con mi mano. La sombra adquirió mis dedos y mi manga. Comprendí que aquella vela conservaba la silueta de cuanto acercaba al fuego.",
+          "prompt": "Medium shot of a cardigan sleeve held near a black wax candle, woman with short brown hair in a navy cardigan, sleeve visible beside the flame, stone altar, low amber light, realistic fabric texture, restrained ominous atmosphere, cinematic horror, vertical 9:16, no text"
+        },
+        {
+          "action": "Profile close-up of a woman leaning toward a black wax candle",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "camera": "detail",
+          "narration": "Quise apagarla soplando. Al inclinarme sobre la llama, vi que la figura de la pared adquiría mi perfil. Retrocedí y busqué un apagavelas.",
+          "prompt": "Profile close-up of a woman leaning toward a black wax candle, woman with short brown hair in a navy cardigan, rough masonry behind the altar, warm flame light, dark edges, stark realistic contrast, cinematic horror, vertical 9:16, no text"
+        },
+        {
+          "action": "Wide shot of a woman standing beside the chapel exit",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "camera": "wide",
+          "narration": "Aplasté la mecha con el apagavelas de metal. Encendí la linterna del móvil para salir. En la pared seguía mi silueta, inmóvil, con la flor entre los dedos. La sombra que debía acompañarme hasta la puerta había desaparecido.",
+          "prompt": "Wide shot of a woman standing beside the chapel exit, woman with short brown hair in a navy cardigan, narrow stone chapel, a human silhouette holding a flower remains on the far wall, cold phone light, extinguished altar, dark empty pews, cinematic horror, vertical 9:16, no text"
+        }
+      ]
+    }
   }
 ]
