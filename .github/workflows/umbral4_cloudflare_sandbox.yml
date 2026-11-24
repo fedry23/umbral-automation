@@ -1,0 +1,95 @@
+name: UMBRAL 4 Cloudflare sandbox connection and deployment
+on:
+  push:
+    branches: [integration/umbral-4]
+    paths: ['.github/workflows/umbral4_cloudflare_sandbox.yml']
+permissions:
+  contents: read
+concurrency:
+  group: umbral4-cloudflare-sandbox
+  cancel-in-progress: false
+jobs:
+  sandbox:
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-4'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run offline gates before using Cloudflare credentials
+        run: |
+          node umbral4/publisher.test.mjs
+          node umbral4/integration.test.mjs
+          node umbral4/worker.test.mjs
+          python - <<'PY'
+          import tomllib
+          with open('umbral4/wrangler.toml','rb') as f: c=tomllib.load(f)
+          assert c['vars']['UMBRAL4_MODE']=='disabled'
+          assert c['workers_dev'] is False and c['preview_urls'] is False
+          assert c['triggers']['crons']==[]
+          assert not c.get('routes') and not c.get('route')
+          assert c['migrations'][0]['new_sqlite_classes']==['Account']
+          print('Sandbox configuration validated: no public route, no cron, no live Meta')
+          PY
+      - name: Install pinned Wrangler without Cloudflare credentials
+        run: npm install --prefix /tmp/umbral4-wrangler --no-audit --no-fund --ignore-scripts wrangler@4.50.0
+      - name: Verify credentials and require fresh isolated sandbox name
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python - <<'PY'
+          import os,re,json,urllib.request,urllib.error
+          token=os.environ.get('CLOUDFLARE_API_TOKEN','')
+          account=os.environ.get('CLOUDFLARE_ACCOUNT_ID','')
+          if not token or not re.fullmatch('[a-fA-F0-9]{32}',account):
+              raise SystemExit('Missing Cloudflare credentials or invalid account ID format')
+          def get(path):
+              req=urllib.request.Request('https://api.cloudflare.com/client/v4'+path,headers={'Authorization':'Bearer '+token})
+              try:
+                  with urllib.request.urlopen(req,timeout=30) as res: data=json.load(res)
+              except urllib.error.HTTPError as exc:
+                  raise SystemExit('Cloudflare API HTTP '+str(exc.code))
+              if not data.get('success'): raise SystemExit('Cloudflare API rejected request')
+              return data['result']
+          assert get('/user/tokens/verify')['status']=='active'
+          scripts=get('/accounts/'+account+'/workers/scripts')
+          if any(s.get('id')=='umbral4-publisher-sandbox' for s in scripts):
+              raise SystemExit('Sandbox name already exists: refuse to overwrite without separate verification')
+          print('Cloudflare token active; account Workers API accessible; isolated name available')
+          PY
+      - name: Deploy disabled isolated SQLite worker
+        working-directory: umbral4
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: /tmp/umbral4-wrangler/node_modules/.bin/wrangler deploy --config wrangler.toml --name umbral4-publisher-sandbox
+      - name: Read back deployed sandbox settings and verify safety
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python - <<'PY'
+          import os,json,urllib.request
+          base='https://api.cloudflare.com/client/v4/accounts/'+os.environ['CLOUDFLARE_ACCOUNT_ID']+'/workers/scripts/umbral4-publisher-sandbox'
+          def read(suffix):
+              req=urllib.request.Request(base+suffix,headers={'Authorization':'Bearer '+os.environ['CLOUDFLARE_API_TOKEN']})
+              with urllib.request.urlopen(req,timeout=30) as res: data=json.load(res)
+              assert data.get('success'), 'Readback failed'
+              return data['result']
+          settings=read('/settings')
+          bindings=settings.get('bindings',[])
+          assert any(x.get('name')=='UMBRAL4_MODE' and x.get('text')=='disabled' for x in bindings), 'Disabled mode not confirmed'
+          assert any(x.get('name')=='ACCOUNT' and x.get('type')=='durable_object_namespace' for x in bindings), 'Durable Object binding missing'
+          assert not any(x.get('name') in ('IG_ACCESS_TOKEN','UMBRAL4_BACKUP_TOKEN') for x in bindings), 'Unexpected live secret'
+          schedules=read('/schedules')
+          assert not schedules.get('schedules',[]) if isinstance(schedules,dict) else not schedules
+          subdomain=read('/subdomain')
+          assert subdomain.get('enabled') is False, 'Public route unexpectedly enabled'
+          print('Cloudflare readback: disabled mode, Durable Object binding, zero cron, no Meta secret, public route disabled')
+          PY

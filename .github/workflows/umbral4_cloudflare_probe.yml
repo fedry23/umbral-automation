@@ -1,0 +1,123 @@
+name: UMBRAL 4 live cloud persistence and cron proof
+on:
+  push:
+    branches: [integration/umbral-4]
+    paths: ['.github/workflows/umbral4_cloudflare_probe.yml']
+permissions:
+  contents: read
+concurrency:
+  group: umbral4-cloudflare-probe
+  cancel-in-progress: false
+jobs:
+  proof:
+    if: github.repository == 'fedry23/umbral-automation' && github.ref == 'refs/heads/integration/umbral-4'
+    runs-on: ubuntu-latest
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Offline regression gates
+        run: |
+          node --check umbral4/cloudflare_probe.mjs
+          node umbral4/publisher.test.mjs
+          node umbral4/integration.test.mjs
+          node umbral4/worker.test.mjs
+          npm install --prefix /tmp/umbral4-wrangler --no-audit --no-fund --ignore-scripts wrangler@4.50.0
+      - name: Generate time-limited private test configuration
+        run: |
+          python - <<'PY'
+          import datetime as d,os
+          until=(d.datetime.now(d.timezone.utc)+d.timedelta(minutes=24)).isoformat()
+          name='umbral4-proof-'+os.environ['GITHUB_RUN_ID']
+          open('umbral4/probe-generated.toml','w').write(f'''
+          name = "{name}"
+          main = "cloudflare_probe.mjs"
+          compatibility_date = "2026-11-24"
+          workers_dev = false
+          preview_urls = false
+          [vars]
+          PROBE_UNTIL = "{until}"
+          [durable_objects]
+          bindings = [{{ name = "PROBE", class_name = "Probe" }}]
+          [[migrations]]
+          tag = "v1"
+          new_sqlite_classes = ["Probe"]
+          [triggers]
+          crons = ["* * * * *"]
+          ''')
+          PY
+      - name: Confirm fresh name and deploy isolated test
+        id: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          python - <<'PY'
+          import os,json,urllib.request
+          url='https://api.cloudflare.com/client/v4/accounts/'+os.environ['CLOUDFLARE_ACCOUNT_ID']+'/workers/scripts'
+          req=urllib.request.Request(url,headers={'Authorization':'Bearer '+os.environ['CLOUDFLARE_API_TOKEN']})
+          with urllib.request.urlopen(req,timeout=30) as res: data=json.load(res)
+          name='umbral4-proof-'+os.environ['GITHUB_RUN_ID']
+          assert data.get('success') and not any(s.get('id')==name for s in data['result'])
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write('fresh=true\n')
+          PY
+          cd umbral4
+          /tmp/umbral4-wrangler/node_modules/.bin/wrangler deploy --config probe-generated.toml
+      - name: Verify private worker and real durable evidence of two scheduled invocations
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python - <<'PY'
+          import os,json,time,urllib.request
+          base='https://api.cloudflare.com/client/v4/accounts/'+os.environ['CLOUDFLARE_ACCOUNT_ID']
+          name='umbral4-proof-'+os.environ['GITHUB_RUN_ID']
+          prefix='/workers/scripts/'+name
+          def api(path):
+              req=urllib.request.Request(base+path,headers={'Authorization':'Bearer '+os.environ['CLOUDFLARE_API_TOKEN']})
+              with urllib.request.urlopen(req,timeout=30) as res: data=json.load(res)
+              assert data.get('success')
+              return data['result']
+          settings=api(prefix+'/settings')
+          bindings=settings.get('bindings',[])
+          assert {x['name'] for x in bindings}=={'PROBE','PROBE_UNTIL'}
+          assert api(prefix+'/subdomain').get('enabled') is False
+          assert any(x['cron']=='* * * * *' for x in api(prefix+'/schedules')['schedules'])
+          ns=[x for x in api('/workers/durable_objects/namespaces') if x.get('script')==name and x.get('class')=='Probe']
+          assert len(ns)==1 and ns[0].get('use_sqlite') is True
+          deadline=time.monotonic()+19*60
+          while time.monotonic()<deadline:
+              objects=api('/workers/durable_objects/namespaces/'+ns[0]['id']+'/objects?limit=10')
+              stored=[x for x in objects if x.get('hasStoredData') is True]
+              if len(stored)==2:
+                  print('Verified two stored objects: transactional archive plus proof of two distinct real cron invocations.')
+                  break
+              assert len(stored)<2, 'Unexpected object count'
+              time.sleep(20)
+          else: raise SystemExit('No conclusive durable cron evidence before deadline')
+          PY
+      - name: Disable test cron, preserve private evidence
+        if: always() && steps.deploy.outputs.fresh == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python - <<'PY'
+          import os,json,urllib.request,urllib.error
+          url='https://api.cloudflare.com/client/v4/accounts/'+os.environ['CLOUDFLARE_ACCOUNT_ID']+'/workers/scripts/umbral4-proof-'+os.environ['GITHUB_RUN_ID']+'/schedules'
+          headers={'Authorization':'Bearer '+os.environ['CLOUDFLARE_API_TOKEN'],'Content-Type':'application/json'}
+          try:
+              with urllib.request.urlopen(urllib.request.Request(url,data=b'[]',headers=headers,method='PUT'),timeout=30) as res: data=json.load(res)
+          except urllib.error.HTTPError as exc:
+              if exc.code==404: print('No deployed test to clean up'); raise SystemExit(0)
+              raise
+          assert data.get('success')
+          with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=30) as res: result=json.load(res)
+          assert result.get('success') and not result['result']['schedules']
+          print('Test cron removed; private storage retained; runtime also self-expires.')
+          PY
