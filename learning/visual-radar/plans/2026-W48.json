@@ -1,0 +1,90 @@
+{
+  "discovery_queries": [
+    {
+      "kind": "find_new_original_creators_not_in_registry",
+      "platform": "YouTube",
+      "query": "vertical cinematic horror micro-short original filmmakers"
+    },
+    {
+      "kind": "find_new_original_creators_not_in_registry",
+      "platform": "Instagram",
+      "query": "paranormal horror independent filmmakers short reels"
+    },
+    {
+      "kind": "find_new_original_creators_not_in_registry",
+      "platform": "TikTok",
+      "query": "short horror film sound design visual atmosphere"
+    }
+  ],
+  "fixed_account_limit": false,
+  "generated_for": "2026-11-24",
+  "known_creators": 34,
+  "mode": "plan",
+  "newly_discovered_must_be_verified": true,
+  "note": "Research queue only; neither metadata nor followers are a visual-quality audit.",
+  "review_candidates": [
+    {
+      "account_follower_count_verified": false,
+      "creator": "acmofficial",
+      "kind": "inspect_original_media",
+      "last_inspected": null,
+      "platform": "YouTube",
+      "source": "https://theshortflix.com/creators/acmofficial"
+    },
+    {
+      "account_follower_count_verified": false,
+      "creator": "pridehablemosdeterror",
+      "kind": "inspect_original_media",
+      "last_inspected": null,
+      "platform": "YouTube",
+      "source": "https://channeldb.com/es/c/@doctorterror1/similar"
+    },
+    {
+      "account_follower_count_verified": false,
+      "creator": "nsparanormal",
+      "kind": "inspect_original_media",
+      "last_inspected": null,
+      "platform": "YouTube",
+      "source": "https://channeldb.com/es/c/@diloretohorror/similar"
+    },
+    {
+      "account_follower_count_verified": false,
+      "creator": "purodesmadre-q3d",
+      "kind": "inspect_original_media",
+      "last_inspected": null,
+      "platform": "YouTube",
+      "source": "https://channeldb.com/es/c/@doctorterror1/similar"
+    },
+    {
+      "account_follower_count_verified": false,
+      "creator": "its0259",
+      "kind": "inspect_original_media",
+      "last_inspected": null,
+      "platform": "Instagram",
+      "source": "https://linktr.ee/its0259"
+    },
+    {
+      "account_follower_count_verified": false,
+      "creator": "spangerlookrey",
+      "kind": "inspect_original_media",
+      "last_inspected": null,
+      "platform": "TikTok",
+      "source": "https://creatordb.app/creatorstats/spangerlookrey/"
+    },
+    {
+      "account_follower_count_verified": false,
+      "creator": "spangerlookrey",
+      "kind": "inspect_original_media",
+      "last_inspected": null,
+      "platform": "Instagram",
+      "source": "https://creatordb.app/creatorstats/spangerlookrey/"
+    }
+  ],
+  "version": 1,
+  "week": "2026-W48",
+  "generated_from": {
+    "github_run": 45340376482,
+    "sha": "7569c903b8540fd73c6f433597cf60dfc732cdd7",
+    "note": "Plan output from isolated successful CI; entries are research leads, NOT audited visual evidence."
+  }
+}
