@@ -126,6 +126,10 @@ def eligible(day, slot, root=ROOT, now=None, override=None):
 
 
 def route_legacy(day, slot, event, schedule, root=ROOT, now=None, override=None):
+    # External rescue after the intended hour must not yield to an absent cron.
+    clock = (now or dt.datetime.now(MADRID)).astimezone(MADRID)
+    if event == "push" and clock.date().isoformat() == day and clock.hour >= int(slot):
+        return True
     # Always allow early legacy backup, even while new publisher is active.
     if event == "schedule" and schedule in BACKUPS[slot]:
         return True

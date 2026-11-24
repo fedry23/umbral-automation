@@ -32,6 +32,15 @@ def now_local():
     return dt.datetime.now(TZ)
 
 
+def publication_date_allowed(day):
+    """Only the owner-requested night recovery may cross midnight."""
+    today = now_local().date().isoformat()
+    return today == day or (
+        SLOT == "21" and day == "2026-11-23" and today == "2026-11-24"
+        and os.getenv("UMBRAL_RECOVERY_DATE") == day
+    )
+
+
 def target_time(day):
     return dt.datetime.combine(dt.date.fromisoformat(day), dt.time(9 if SLOT == "09" else 21, 0), tzinfo=TZ)
 
@@ -189,11 +198,11 @@ def token_preflight():
 
 
 def prepare(day, video_url, cover_url=None):
-    if now_local().date().isoformat() != day:
+    if not publication_date_allowed(day):
         raise ValueError("La fecha programada no es la fecha local de hoy")
     # Reliability-first: a valid, dated Reel may be prepared late on the same day.
     # The caller still verifies story/date, Instagram state and durable intent.
-    if now_local().date().isoformat() != day:
+    if not publication_date_allowed(day):
         raise RuntimeError("La recuperación solo puede publicar el episodio de hoy")
     if not video_url.startswith("https://"):
         raise ValueError("Instagram requiere una URL HTTPS pública")
@@ -278,7 +287,7 @@ def publish(day):
         # committed immediately before the irreversible Meta publication call.
         if now_local() < target_time(day):
             wait_until_target(day)
-        if now_local().date().isoformat() != day:
+        if not publication_date_allowed(day):
             raise RuntimeError("Expired date before POST; do not publish")
         persist_intent(day, data)
         # The initial Meta read happened before the persistent intent. Reconcile
@@ -286,7 +295,7 @@ def publish(day):
         # shared workflow lock and durable intent are still held.
         # Incomplete/ambiguous Meta reads must fail closed, never cause a POST.
         published_at_release = already_published(day)
-        if now_local().date().isoformat() != day:
+        if not publication_date_allowed(day):
             raise RuntimeError("Expired date during final Meta reconciliation; do not publish")
         if published_at_release:
             print("Reel detectado en la comprobación final; no se publica otra vez")
@@ -361,7 +370,7 @@ def persist_intent(day, data):
     for key, value in render_metadata(day, story).items():
         if data.get(key) != value:
             raise ValueError("Prepared container metadata mismatch")
-    if now_local().date().isoformat() != day:
+    if not publication_date_allowed(day):
         raise RuntimeError("Expired publication date")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"date": day, "container": data["container"],

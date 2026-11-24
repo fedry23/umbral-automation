@@ -182,6 +182,11 @@ def extract_run_zip(raw, date):
 
 def main():
     date = local_day()
+    recovery = os.getenv("UMBRAL_RECOVERY_DATE")
+    if recovery:
+        if recovery != "2026-11-23" or date != "2026-11-24":
+            raise RuntimeError("Recovery authorization expired")
+        date = recovery
     if (Path("docs/published") / (date + ".json")).exists():
         print("UMBRAL: ya hay un recibo para esta fecha, no se publica dos veces")
         (OUT / "already_published").parent.mkdir(exist_ok=True)
