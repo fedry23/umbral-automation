@@ -1,0 +1,22 @@
+{
+  "source": "Windsor.ai Instagram",
+  "account": "17841465578937909",
+  "retrieved_at": "2026-11-25T20:21:05.957Z",
+  "measurement_time_verified": false,
+  "rows": [
+    {
+      "media_id": "18151164376483761",
+      "media_reach": 31,
+      "media_reel_skip_rate": 0.735,
+      "media_reel_avg_watch_time": 8080,
+      "media_permalink": "https://www.instagram.com/reel/Df5CwxsoySH/"
+    },
+    {
+      "media_id": "17945943738096746",
+      "media_reach": 23,
+      "media_reel_skip_rate": 0.692,
+      "media_reel_avg_watch_time": 7428,
+      "media_permalink": "https://www.instagram.com/reel/Df3wTC_h1m8/"
+    }
+  ]
+}
