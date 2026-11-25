@@ -1,1 +1,1 @@
-2026-11-24T10:15:00+01:00 | Recuperación oficial solicitada por el propietario para 2026-11-24 09:00. Reconciliar Meta, comprobar fecha y recibo, respetar bloqueo oficial; nunca publicar a ciegas.
+2026-11-25T08:23:32+01:00 | 08:20 preventive check | slot 09 | Respect official publication time, durable lock, reconciliation and deduplication.
