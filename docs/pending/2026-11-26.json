@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-26",
+  "container": "17940052551185965",
+  "status": "publish_intent",
+  "episode_number": 26,
+  "slot": "21",
+  "title": "La radio del s\u00f3tano",
+  "technical_profile": {
+    "experiment": "music-balance-v1",
+    "arm": "control",
+    "music_gain": 1.0
+  },
+  "duration_seconds": 71.00654166666666,
+  "editorial_protocol": "fixed-v1",
+  "cover_url": "https://fedry23.github.io/umbral-automation/reels/2026-11-26.jpg"
+}
