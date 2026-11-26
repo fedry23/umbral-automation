@@ -13,3 +13,5 @@
 2026-11-24T18:20:04+01:00 | respaldo preventivo oficial 21:00; La última página; reconciliar, bloqueo compartido, no publicar antes de hora
 
 2026-11-25T18:24+01:00 | respaldo preventivo oficial 21:00; El taxi de la otra acera; reconciliar, bloqueo compartido, regenerar si procede, no publicar antes de hora
+
+2026-11-26 | comprobación preventiva 18:20, slot oficial 21:00; La radio del sótano; reconciliar, bloqueo compartido, regenerar si procede, no publicar antes de hora
