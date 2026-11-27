@@ -1,5 +1,14 @@
 # UMBRAL
 
+## Cinematic 5.0 — política editorial vigente desde el 28/11/2026
+
+El propietario autorizó evaluar el formato con publicaciones reales, sin renderizar los tres pilotos por separado. Mantener los controles técnicos automáticos, las horas 09:00 y 21:00 Europe/Madrid, la numeración, las credenciales y la deduplicación. No publicar material que falle las comprobaciones técnicas.
+
+Para cada futuro relato oficial, conservar la versión larga original en stories.json o stories_morning.json como respaldo, y añadir simultáneamente un corte cinematográfico original en cinematic5/scheduled.json con clave AAAA-MM-DD_09 o AAAA-MM-DD_21 y título idéntico al de la historia larga. Usar el contrato de scripts/cinematic5.py: format cinematic-5, episode_number 0 (se asigna el número oficial durante el render), gancho como primera frase de hasta diez palabras, 55–85 palabras, 3–8 escenas y storyboard con narración íntegra particionada, referencias de continuidad, localización, iluminación, emoción, encuadre, vestuario, personajes y objetos. Prompts concisos que no superen los límites de los modelos; portada de la primera escena; descripción específica sin marcas editoriales internas en el cuerpo. No reutilizar historias publicadas. Preparar con antelación ambos formatos. El render oficial intenta el nuevo corte y recurre al original si falla. No afirmar que se publicó Cinematic 5 sin revisar el archivo o recibo efectivo.
+
+Los ocho primeros cortes (28/11–01/12) están registrados. Ampliar el índice al preparar nuevas fechas; si falta un corte o no coincide el título, se conserva el formato anterior, no se inventa una historia. El módulo cinematic5_learning.py compara observaciones a 24, 72 y 168 horas, por franja y brazo, con datos suficientes; registrar métricas reales sin confundir recomendaciones con cambios automáticos. Mantener marcas de deduplicación existentes hasta validar su sustitución en todas las rutas. No introducir nuevos horarios, servicios de pago ni automatizaciones paralelas.
+
+
 ## Estado técnico y operación (revisión 17/11/2026)
 
 | Componente | Responsabilidad |
