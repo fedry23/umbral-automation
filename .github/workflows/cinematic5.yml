@@ -1,0 +1,58 @@
+name: Cinematic 5 preview checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/cinematic5.py'
+      - 'cinematic5/**'
+      - 'tests/test_cinematic5.py'
+      - '.github/workflows/cinematic5.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checks:
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'integration/cinematic-5')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'false'
+      - run: python -m compileall -q scripts tests
+      - run: python -m unittest discover -s tests -v
+  previews:
+    needs: checks
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'integration/cinematic-5')
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        pilot: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-render
+        with:
+          models: 'true'
+      - name: Render isolated pilot
+        run: python -m scripts.cinematic5 cinematic5/pilots.json preview --index ${{ matrix.pilot }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cinematic5-pilot-${{ matrix.pilot }}
+          path: |
+            preview/preview.mp4
+            preview/review.json
+            preview/image_quality_report.json
+            preview/scene_*.png
+            preview/voice.wav
+            preview/subtitles.ass
+          if-no-files-found: warn
+          retention-days: 7
