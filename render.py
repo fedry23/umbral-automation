@@ -518,6 +518,19 @@ def render_story_media(story, out, date, filename, *, active_profile=None, reser
         raise ValueError('Invalid output filename')
     if 'episode_number' not in story:
         raise ValueError('La historia seleccionada no tiene número de episodio fijo')
+    # Explicit dated editorial cuts only; never change the publishing clock or episode.
+    if active_profile is not None and story.get('publish_date') == str(date) and reserve_store is None and prepared_images is None:
+        try:
+            from scripts.cinematic5 import scheduled_variant, render_scheduled
+            from scripts.technical_learning import parameters_for
+            slot = '09' if filename.endswith('_09.mp4') else '21'
+            variant = scheduled_variant(story, str(date), slot)
+            if variant is not None:
+                return render_scheduled(story, variant, out, date, filename,
+                                        music_gain=parameters_for(active_profile)['music_gain'])
+        except Exception as exc:
+            # No partial experimental artifact is published. Preserve the existing daily route.
+            print(f'::warning::Cinematic 5 fallback to original format ({type(exc).__name__})', flush=True)
     storyboard = None
     if 'storyboard' in story:
         from scripts.storyboard import validate_storyboard
