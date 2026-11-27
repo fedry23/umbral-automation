@@ -8,11 +8,11 @@
     "caption": "Si una huella aparece sola en un cristal, no la borres. ¿A quién se lo contarías? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
     "image_seed_base": 51000,
     "scenes": [
-      "Medium shot of a handprint emerging in condensation on a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a cloth wiping one damp handprint from a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Low angle of descending wet handprints on a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a small damp handprint forming on a square metal floor drain, square metal floor drain, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Extreme close-up of five pale fingers curling around a square metal floor drain, square metal floor drain, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+      "Medium shot of a handprint emerging in condensation on a fogged laundromat front window, red wool blanket, empty laundromat, cold blue fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Wide shot of an empty laundromat with a red wool blanket on a bench and a fogged laundromat front window, empty laundromat, cold blue fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Low angle of descending wet handprints on a fogged laundromat front window, red wool blanket, empty laundromat, cold blue fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Low close-up of a damp handprint on a square metal floor drain, red wool blanket, empty laundromat, cold blue fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Extreme close-up of five pale fingers curling around a square metal floor drain, red wool blanket, empty laundromat, cold blue fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text"
     ],
     "storyboard": {
       "version": 1,
@@ -30,9 +30,9 @@
             "anchor0",
             "anchor2"
           ],
-          "prompt": "Medium shot of a handprint emerging in condensation on a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El cristal empañado",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Medium shot of a handprint emerging in condensation on a fogged laundromat front window, red wool blanket, empty laundromat, cold blue fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty laundromat",
+          "lighting": "cold blue fluorescent light",
           "emotion": "suspense",
           "framing": "medium",
           "wardrobe": "consistent with original storyboard",
@@ -41,15 +41,15 @@
         },
         {
           "narration": "Había vuelto a la lavandería por mi manta. Las máquinas estaban apagadas.",
-          "action": "Close-up of a cloth wiping one damp handprint from a fogged laundromat front window",
+          "action": "Wide shot of an empty laundromat with a red wool blanket on a bench and a fogged laundromat front window",
           "camera": "detail",
           "references": [
             "anchor0",
             "anchor2"
           ],
-          "prompt": "Close-up of a cloth wiping one damp handprint from a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El cristal empañado",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Wide shot of an empty laundromat with a red wool blanket on a bench and a fogged laundromat front window, empty laundromat, cold blue fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty laundromat",
+          "lighting": "cold blue fluorescent light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -64,9 +64,9 @@
             "anchor0",
             "anchor2"
           ],
-          "prompt": "Low angle of descending wet handprints on a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El cristal empañado",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Low angle of descending wet handprints on a fogged laundromat front window, red wool blanket, empty laundromat, cold blue fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty laundromat",
+          "lighting": "cold blue fluorescent light",
           "emotion": "suspense",
           "framing": "wide",
           "wardrobe": "consistent with original storyboard",
@@ -75,15 +75,15 @@
         },
         {
           "narration": "La última apareció sobre el desagüe. Salí y cerré con llave.",
-          "action": "Close-up of a small damp handprint forming on a square metal floor drain",
+          "action": "Low close-up of a damp handprint on a square metal floor drain",
           "camera": "close-up",
           "references": [
             "anchor1",
             "anchor2"
           ],
-          "prompt": "Close-up of a small damp handprint forming on a square metal floor drain, square metal floor drain, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El cristal empañado",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Low close-up of a damp handprint on a square metal floor drain, red wool blanket, empty laundromat, cold blue fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty laundromat",
+          "lighting": "cold blue fluorescent light",
           "emotion": "suspense",
           "framing": "close-up",
           "wardrobe": "consistent with original storyboard",
@@ -98,9 +98,9 @@
             "anchor1",
             "anchor2"
           ],
-          "prompt": "Extreme close-up of five pale fingers curling around a square metal floor drain, square metal floor drain, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El cristal empañado",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Extreme close-up of five pale fingers curling around a square metal floor drain, red wool blanket, empty laundromat, cold blue fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty laundromat",
+          "lighting": "cold blue fluorescent light",
           "emotion": "dread",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -119,11 +119,11 @@
     "caption": "El último tren no siempre se lleva a todos los pasajeros. ¿Entrarías? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
     "image_seed_base": 52000,
     "scenes": [
-      "Wide shot of a grey emergency platform door opening beside an empty underground platform, grey emergency platform door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a rubber door wedge beneath a grey emergency platform door beside a yellow cleaning bucket, grey emergency platform door, yellow cleaning bucket, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Low angle of a rubber door wedge sliding away from a grey emergency platform door, grey emergency platform door, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of several rubber door wedges scattered on a wet concrete service corridor floor, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Wide shot of a yellow cleaning bucket beneath water dripping from an open grey emergency platform door, grey emergency platform door, yellow cleaning bucket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+      "Wide shot of a grey emergency platform door opening beside an empty underground platform, empty metro station, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of a rubber door wedge beneath a grey emergency platform door beside a yellow cleaning bucket, empty metro station, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Low angle of a rubber door wedge sliding away from a grey emergency platform door, empty metro station, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of several rubber door wedges scattered on a wet concrete service corridor floor, empty metro station, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Wide shot of a yellow cleaning bucket beneath water dripping from an open grey emergency platform door, empty metro station, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text"
     ],
     "storyboard": {
       "version": 1,
@@ -140,9 +140,9 @@
           "references": [
             "anchor0"
           ],
-          "prompt": "Wide shot of a grey emergency platform door opening beside an empty underground platform, grey emergency platform door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La puerta del andén",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Wide shot of a grey emergency platform door opening beside an empty underground platform, empty metro station, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty metro station",
+          "lighting": "cold fluorescent light",
           "emotion": "suspense",
           "framing": "medium",
           "wardrobe": "consistent with original storyboard",
@@ -158,9 +158,9 @@
             "anchor1",
             "anchor2"
           ],
-          "prompt": "Close-up of a rubber door wedge beneath a grey emergency platform door beside a yellow cleaning bucket, grey emergency platform door, yellow cleaning bucket, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La puerta del andén",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of a rubber door wedge beneath a grey emergency platform door beside a yellow cleaning bucket, empty metro station, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty metro station",
+          "lighting": "cold fluorescent light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -175,9 +175,9 @@
             "anchor0",
             "anchor2"
           ],
-          "prompt": "Low angle of a rubber door wedge sliding away from a grey emergency platform door, grey emergency platform door, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La puerta del andén",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Low angle of a rubber door wedge sliding away from a grey emergency platform door, empty metro station, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty metro station",
+          "lighting": "cold fluorescent light",
           "emotion": "suspense",
           "framing": "close-up",
           "wardrobe": "consistent with original storyboard",
@@ -191,9 +191,9 @@
           "references": [
             "anchor2"
           ],
-          "prompt": "Close-up of several rubber door wedges scattered on a wet concrete service corridor floor, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La puerta del andén",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of several rubber door wedges scattered on a wet concrete service corridor floor, empty metro station, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty metro station",
+          "lighting": "cold fluorescent light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -208,9 +208,9 @@
             "anchor0",
             "anchor1"
           ],
-          "prompt": "Wide shot of a yellow cleaning bucket beneath water dripping from an open grey emergency platform door, grey emergency platform door, yellow cleaning bucket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La puerta del andén",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Wide shot of a yellow cleaning bucket beneath water dripping from an open grey emergency platform door, empty metro station, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty metro station",
+          "lighting": "cold fluorescent light",
           "emotion": "dread",
           "framing": "wide",
           "wardrobe": "consistent with original storyboard",
@@ -229,11 +229,11 @@
     "caption": "La última parada no es para todos. ¿Te sentarías al fondo? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
     "image_seed_base": 53000,
     "scenes": [
-      "Wide shot of a wet patch on a dark blue rear bus seat in an empty night bus, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a wet patch shaped like two legs on a dark blue rear bus seat, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of two wet impressions beneath a transparent plastic bag on a dark blue rear bus seat, dark blue rear bus seat, transparent plastic bag, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "View in the driver rearview mirror of a completely dry dark blue rear bus seat, dark blue rear bus seat, driver rearview mirror, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of two separated wet impressions on a dark blue rear bus seat, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+      "Wide shot of a wet patch on a dark blue rear bus seat in an empty night bus, empty night bus, dim interior light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of a wet patch shaped like two legs on a dark blue rear bus seat, empty night bus, dim interior light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of two wet impressions beneath a transparent plastic bag on a dark blue rear bus seat, empty night bus, dim interior light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "View in the driver rearview mirror of a completely dry dark blue rear bus seat, empty night bus, dim interior light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of two separated wet impressions on a dark blue rear bus seat, empty night bus, dim interior light, photorealistic horror film still, visible subject, natural shadows, no text"
     ],
     "storyboard": {
       "version": 1,
@@ -250,9 +250,9 @@
           "references": [
             "anchor0"
           ],
-          "prompt": "Wide shot of a wet patch on a dark blue rear bus seat in an empty night bus, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El asiento vacío",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Wide shot of a wet patch on a dark blue rear bus seat in an empty night bus, empty night bus, dim interior light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty night bus",
+          "lighting": "dim interior light",
           "emotion": "suspense",
           "framing": "medium",
           "wardrobe": "consistent with original storyboard",
@@ -266,9 +266,9 @@
           "references": [
             "anchor0"
           ],
-          "prompt": "Close-up of a wet patch shaped like two legs on a dark blue rear bus seat, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El asiento vacío",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of a wet patch shaped like two legs on a dark blue rear bus seat, empty night bus, dim interior light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty night bus",
+          "lighting": "dim interior light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -283,9 +283,9 @@
             "anchor0",
             "anchor1"
           ],
-          "prompt": "Close-up of two wet impressions beneath a transparent plastic bag on a dark blue rear bus seat, dark blue rear bus seat, transparent plastic bag, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El asiento vacío",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of two wet impressions beneath a transparent plastic bag on a dark blue rear bus seat, empty night bus, dim interior light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty night bus",
+          "lighting": "dim interior light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -300,9 +300,9 @@
             "anchor0",
             "anchor2"
           ],
-          "prompt": "View in the driver rearview mirror of a completely dry dark blue rear bus seat, dark blue rear bus seat, driver rearview mirror, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El asiento vacío",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "View in the driver rearview mirror of a completely dry dark blue rear bus seat, empty night bus, dim interior light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty night bus",
+          "lighting": "dim interior light",
           "emotion": "suspense",
           "framing": "medium",
           "wardrobe": "consistent with original storyboard",
@@ -316,9 +316,9 @@
           "references": [
             "anchor0"
           ],
-          "prompt": "Close-up of two separated wet impressions on a dark blue rear bus seat, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El asiento vacío",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of two separated wet impressions on a dark blue rear bus seat, empty night bus, dim interior light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty night bus",
+          "lighting": "dim interior light",
           "emotion": "dread",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -337,11 +337,11 @@
     "caption": "Un molde no debería poder cambiar tu cuerpo. ¿Lo destruirías? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
     "image_seed_base": 54000,
     "scenes": [
-      "Close-up of an extra molar on a white plaster dental cast, white plaster dental cast, small tiled dental laboratory, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Macro shot of a tiny fully formed molar behind the regular teeth, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a metal file smoothing a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Detail shot of fresh plaster paste filling a gap in a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a second row of teeth emerging underneath a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+      "Close-up of an extra molar on a white plaster dental cast, small tiled dental laboratory, dental laboratory, cold task light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Macro shot of a tiny fully formed molar behind the regular teeth, white plaster dental cast, dental laboratory, cold task light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of a metal file smoothing a white plaster dental cast, dental laboratory, cold task light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Detail shot of fresh plaster paste filling a gap in a white plaster dental cast, dental laboratory, cold task light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of a second row of teeth emerging underneath a white plaster dental cast, dental laboratory, cold task light, photorealistic horror film still, visible subject, natural shadows, no text"
     ],
     "storyboard": {
       "version": 1,
@@ -358,9 +358,9 @@
             "anchor1",
             "anchor2"
           ],
-          "prompt": "Close-up of an extra molar on a white plaster dental cast, white plaster dental cast, small tiled dental laboratory, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El diente de yeso",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of an extra molar on a white plaster dental cast, small tiled dental laboratory, dental laboratory, cold task light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "dental laboratory",
+          "lighting": "cold task light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -374,9 +374,9 @@
           "references": [
             "anchor1"
           ],
-          "prompt": "Macro shot of a tiny fully formed molar behind the regular teeth, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El diente de yeso",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Macro shot of a tiny fully formed molar behind the regular teeth, white plaster dental cast, dental laboratory, cold task light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "dental laboratory",
+          "lighting": "cold task light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -390,9 +390,9 @@
           "references": [
             "anchor1"
           ],
-          "prompt": "Close-up of a metal file smoothing a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El diente de yeso",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of a metal file smoothing a white plaster dental cast, dental laboratory, cold task light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "dental laboratory",
+          "lighting": "cold task light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -406,9 +406,9 @@
           "references": [
             "anchor1"
           ],
-          "prompt": "Detail shot of fresh plaster paste filling a gap in a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El diente de yeso",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Detail shot of fresh plaster paste filling a gap in a white plaster dental cast, dental laboratory, cold task light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "dental laboratory",
+          "lighting": "cold task light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -422,9 +422,9 @@
           "references": [
             "anchor1"
           ],
-          "prompt": "Close-up of a second row of teeth emerging underneath a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El diente de yeso",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of a second row of teeth emerging underneath a white plaster dental cast, dental laboratory, cold task light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "dental laboratory",
+          "lighting": "cold task light",
           "emotion": "dread",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -443,11 +443,11 @@
     "caption": "No todas las señales advierten de un peligro. Algunas lo persiguen. ¿La tocarías? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
     "image_seed_base": 55000,
     "scenes": [
-      "Wide shot of yellow floor warning tape lying near a closed brown office door, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a hand placing yellow floor warning tape beside a cracked grey corridor tile, yellow floor warning tape, cracked grey corridor tile, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Medium shot of yellow floor warning tape advancing across grey corridor tiles, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Floor-level shot of yellow floor warning tape sliding beneath a closed office door, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Extreme close-up of yellow floor warning tape tightening around black work shoes, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+      "Floor-level view of yellow floor warning tape extending toward a closed brown office door, office corridor, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of yellow floor warning tape beside a cracked grey corridor tile, office corridor, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Medium shot of yellow floor warning tape advancing across grey corridor tiles, office corridor, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Floor-level shot of yellow floor warning tape sliding beneath a closed office door, office corridor, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Extreme close-up of yellow floor warning tape tightening around black work shoes, office corridor, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text"
     ],
     "storyboard": {
       "version": 1,
@@ -458,14 +458,14 @@
       "shots": [
         {
           "narration": "La cinta amarilla avanzaba hacia mi despacho.",
-          "action": "Wide shot of yellow floor warning tape lying near a closed brown office door",
+          "action": "Floor-level view of yellow floor warning tape extending toward a closed brown office door",
           "camera": "medium",
           "references": [
             "anchor0"
           ],
-          "prompt": "Wide shot of yellow floor warning tape lying near a closed brown office door, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La cinta amarilla",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Floor-level view of yellow floor warning tape extending toward a closed brown office door, office corridor, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "office corridor",
+          "lighting": "cold fluorescent light",
           "emotion": "suspense",
           "framing": "medium",
           "wardrobe": "consistent with original storyboard",
@@ -474,15 +474,15 @@
         },
         {
           "narration": "La había puesto sobre una baldosa rota. La devolví a su sitio y le hice una foto.",
-          "action": "Close-up of a hand placing yellow floor warning tape beside a cracked grey corridor tile",
+          "action": "Close-up of yellow floor warning tape beside a cracked grey corridor tile",
           "camera": "detail",
           "references": [
             "anchor0",
             "anchor1"
           ],
-          "prompt": "Close-up of a hand placing yellow floor warning tape beside a cracked grey corridor tile, yellow floor warning tape, cracked grey corridor tile, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La cinta amarilla",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of yellow floor warning tape beside a cracked grey corridor tile, office corridor, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "office corridor",
+          "lighting": "cold fluorescent light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -496,9 +496,9 @@
           "references": [
             "anchor0"
           ],
-          "prompt": "Medium shot of yellow floor warning tape advancing across grey corridor tiles, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La cinta amarilla",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Medium shot of yellow floor warning tape advancing across grey corridor tiles, office corridor, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "office corridor",
+          "lighting": "cold fluorescent light",
           "emotion": "suspense",
           "framing": "medium",
           "wardrobe": "consistent with original storyboard",
@@ -512,9 +512,9 @@
           "references": [
             "anchor0"
           ],
-          "prompt": "Floor-level shot of yellow floor warning tape sliding beneath a closed office door, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La cinta amarilla",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Floor-level shot of yellow floor warning tape sliding beneath a closed office door, office corridor, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "office corridor",
+          "lighting": "cold fluorescent light",
           "emotion": "suspense",
           "framing": "close-up",
           "wardrobe": "consistent with original storyboard",
@@ -528,9 +528,9 @@
           "references": [
             "anchor0"
           ],
-          "prompt": "Extreme close-up of yellow floor warning tape tightening around black work shoes, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La cinta amarilla",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Extreme close-up of yellow floor warning tape tightening around black work shoes, office corridor, cold fluorescent light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "office corridor",
+          "lighting": "cold fluorescent light",
           "emotion": "dread",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -549,11 +549,11 @@
     "caption": "Hay puertas que es mejor no abrir. ¿Y si tu llave no fuera la verdadera? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
     "image_seed_base": 56000,
     "scenes": [
-      "Medium shot of a red metal key ring beside a locked dark wooden archive door, red metal key ring, dark wooden archive door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a red metal key ring approaching the lock of a dark wooden archive door, red metal key ring, dark wooden archive door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a brass key turning inside a red metal key ring, red metal key ring, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a black security glove turning a brass key in a dark wooden archive door, dark wooden archive door, black security glove, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Extreme close-up of a toothless key held by a black security glove beside a dark wooden archive door, dark wooden archive door, black security glove, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+      "Close-up of a brass key in a dark wooden archive door, red metal key ring hanging from the lock, empty museum corridor, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of a red metal key ring approaching the lock of a dark wooden archive door, empty museum corridor, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of a brass key turning inside a red metal key ring, empty museum corridor, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of a black security glove turning a brass key in a dark wooden archive door, empty museum corridor, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of a toothless key in a black security glove beside a dark wooden archive door, empty museum corridor, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text"
     ],
     "storyboard": {
       "version": 1,
@@ -565,15 +565,15 @@
       "shots": [
         {
           "narration": "Alguien giró mi llave desde el otro lado.",
-          "action": "Medium shot of a red metal key ring beside a locked dark wooden archive door",
+          "action": "Close-up of a brass key in a dark wooden archive door, red metal key ring hanging from the lock",
           "camera": "medium",
           "references": [
             "anchor0",
             "anchor1"
           ],
-          "prompt": "Medium shot of a red metal key ring beside a locked dark wooden archive door, red metal key ring, dark wooden archive door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La llave gemela",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of a brass key in a dark wooden archive door, red metal key ring hanging from the lock, empty museum corridor, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty museum corridor",
+          "lighting": "dim amber light",
           "emotion": "suspense",
           "framing": "medium",
           "wardrobe": "consistent with original storyboard",
@@ -588,9 +588,9 @@
             "anchor0",
             "anchor1"
           ],
-          "prompt": "Close-up of a red metal key ring approaching the lock of a dark wooden archive door, red metal key ring, dark wooden archive door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La llave gemela",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of a red metal key ring approaching the lock of a dark wooden archive door, empty museum corridor, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty museum corridor",
+          "lighting": "dim amber light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -604,9 +604,9 @@
           "references": [
             "anchor0"
           ],
-          "prompt": "Close-up of a brass key turning inside a red metal key ring, red metal key ring, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La llave gemela",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of a brass key turning inside a red metal key ring, empty museum corridor, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty museum corridor",
+          "lighting": "dim amber light",
           "emotion": "suspense",
           "framing": "close-up",
           "wardrobe": "consistent with original storyboard",
@@ -621,9 +621,9 @@
             "anchor1",
             "anchor2"
           ],
-          "prompt": "Close-up of a black security glove turning a brass key in a dark wooden archive door, dark wooden archive door, black security glove, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La llave gemela",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of a black security glove turning a brass key in a dark wooden archive door, empty museum corridor, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty museum corridor",
+          "lighting": "dim amber light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -632,15 +632,15 @@
         },
         {
           "narration": "Mi chaqueta colgaba dentro, con mi llavero en el bolsillo. Miré mi mano: la llave que sujetaba no tenía dientes.",
-          "action": "Extreme close-up of a toothless key held by a black security glove beside a dark wooden archive door",
+          "action": "Close-up of a toothless key in a black security glove beside a dark wooden archive door",
           "camera": "wide",
           "references": [
             "anchor1",
             "anchor2"
           ],
-          "prompt": "Extreme close-up of a toothless key held by a black security glove beside a dark wooden archive door, dark wooden archive door, black security glove, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La llave gemela",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of a toothless key in a black security glove beside a dark wooden archive door, empty museum corridor, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "empty museum corridor",
+          "lighting": "dim amber light",
           "emotion": "dread",
           "framing": "wide",
           "wardrobe": "consistent with original storyboard",
@@ -659,11 +659,11 @@
     "caption": "Su padre dejó una última advertencia, incluso después de morir. #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
     "image_seed_base": 57000,
     "scenes": [
-      "Wide shot of a dusty brass bell above an old workshop doorway, dusty brass bell, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a wooden chair beneath a dusty brass bell, dusty brass bell, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Medium shot of a battered grey metal toolbox on a concrete workshop floor, grey metal toolbox, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Medium shot of an empty grey metal toolbox crossing a workshop threshold, grey metal toolbox, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Extreme close-up of a rusty nut on a wooden workbench, wooden workbench, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+      "Wide shot of a dusty brass bell above an old workshop doorway, old workshop, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Wide shot of an abandoned workshop, dusty brass bell above the door and tools on the workbench, old workshop, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Medium shot of a battered grey metal toolbox on a concrete workshop floor, old workshop, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Medium shot of an empty grey metal toolbox crossing a workshop threshold, old workshop, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Extreme close-up of a rusty nut on a wooden workbench, old workshop, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text"
     ],
     "storyboard": {
       "version": 1,
@@ -680,9 +680,9 @@
           "references": [
             "anchor0"
           ],
-          "prompt": "Wide shot of a dusty brass bell above an old workshop doorway, dusty brass bell, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El timbre del taller",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Wide shot of a dusty brass bell above an old workshop doorway, old workshop, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "old workshop",
+          "lighting": "dim amber light",
           "emotion": "suspense",
           "framing": "medium",
           "wardrobe": "consistent with original storyboard",
@@ -691,14 +691,14 @@
         },
         {
           "narration": "Había vuelto al taller de mi padre para recoger sus herramientas.",
-          "action": "Close-up of a wooden chair beneath a dusty brass bell",
+          "action": "Wide shot of an abandoned workshop, dusty brass bell above the door and tools on the workbench",
           "camera": "detail",
           "references": [
             "anchor0"
           ],
-          "prompt": "Close-up of a wooden chair beneath a dusty brass bell, dusty brass bell, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El timbre del taller",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Wide shot of an abandoned workshop, dusty brass bell above the door and tools on the workbench, old workshop, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "old workshop",
+          "lighting": "dim amber light",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -712,9 +712,9 @@
           "references": [
             "anchor1"
           ],
-          "prompt": "Medium shot of a battered grey metal toolbox on a concrete workshop floor, grey metal toolbox, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El timbre del taller",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Medium shot of a battered grey metal toolbox on a concrete workshop floor, old workshop, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "old workshop",
+          "lighting": "dim amber light",
           "emotion": "suspense",
           "framing": "medium",
           "wardrobe": "consistent with original storyboard",
@@ -728,9 +728,9 @@
           "references": [
             "anchor1"
           ],
-          "prompt": "Medium shot of an empty grey metal toolbox crossing a workshop threshold, grey metal toolbox, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El timbre del taller",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Medium shot of an empty grey metal toolbox crossing a workshop threshold, old workshop, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "old workshop",
+          "lighting": "dim amber light",
           "emotion": "suspense",
           "framing": "medium",
           "wardrobe": "consistent with original storyboard",
@@ -744,9 +744,9 @@
           "references": [
             "anchor2"
           ],
-          "prompt": "Extreme close-up of a rusty nut on a wooden workbench, wooden workbench, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "El timbre del taller",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Extreme close-up of a rusty nut on a wooden workbench, old workshop, dim amber light, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "old workshop",
+          "lighting": "dim amber light",
           "emotion": "dread",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -765,11 +765,11 @@
     "caption": "Una vela puede iluminar algo que no debería estar ahí. #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
     "image_seed_base": 58000,
     "scenes": [
-      "Wide shot of a human silhouette cast behind a burning black wax candle, black wax candle, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of the narrow shouldered silhouette on a chapel wall, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Close-up of a flower held beside a black wax candle, black wax candle, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Profile close-up of a woman leaning toward a black wax candle, woman with short brown hair in a navy cardigan, black wax candle, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-      "Wide shot of a woman standing beside the chapel exit, woman with short brown hair in a navy cardigan, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+      "Wide shot of a human silhouette cast behind a burning black wax candle, narrow stone chapel, stone chapel, low candlelight, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Wide shot of empty pews and a narrow stone chapel lit by a distant candle, stone chapel, low candlelight, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Close-up of a flower held beside a black wax candle, stone chapel, low candlelight, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Profile close-up of a woman leaning toward a black wax candle, woman with short brown hair in a navy cardigan, stone chapel, low candlelight, photorealistic horror film still, visible subject, natural shadows, no text",
+      "Wide shot of a woman with short brown hair in a navy cardigan beside a narrow stone chapel exit, her silhouette remains on the wall, stone chapel, low candlelight, photorealistic horror film still, visible subject, natural shadows, no text"
     ],
     "storyboard": {
       "version": 1,
@@ -787,9 +787,9 @@
           ],
           "camera": "wide",
           "narration": "La vela proyectaba una sombra que no existía.",
-          "prompt": "Wide shot of a human silhouette cast behind a burning black wax candle, black wax candle, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La cera negra",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Wide shot of a human silhouette cast behind a burning black wax candle, narrow stone chapel, stone chapel, low candlelight, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "stone chapel",
+          "lighting": "low candlelight",
           "emotion": "suspense",
           "framing": "wide",
           "wardrobe": "consistent with original storyboard",
@@ -797,15 +797,15 @@
           "objects": "black wax candle, narrow stone chapel"
         },
         {
-          "action": "Close-up of the narrow shouldered silhouette on a chapel wall",
+          "action": "Wide shot of empty pews and a narrow stone chapel lit by a distant candle",
           "references": [
             "anchor2"
           ],
           "camera": "detail",
           "narration": "Había entrado en la capilla del cementerio para recordar a mi madre.",
-          "prompt": "Close-up of the narrow shouldered silhouette on a chapel wall, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La cera negra",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Wide shot of empty pews and a narrow stone chapel lit by a distant candle, stone chapel, low candlelight, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "stone chapel",
+          "lighting": "low candlelight",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -819,9 +819,9 @@
           ],
           "camera": "detail",
           "narration": "Acercaba una flor a la llama cuando su silueta apareció en la pared. No desapareció al retirarla.",
-          "prompt": "Close-up of a flower held beside a black wax candle, black wax candle, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La cera negra",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Close-up of a flower held beside a black wax candle, stone chapel, low candlelight, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "stone chapel",
+          "lighting": "low candlelight",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -836,9 +836,9 @@
           ],
           "camera": "detail",
           "narration": "Me incliné para apagar la vela. La sombra adquirió mi perfil.",
-          "prompt": "Profile close-up of a woman leaning toward a black wax candle, woman with short brown hair in a navy cardigan, black wax candle, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La cera negra",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Profile close-up of a woman leaning toward a black wax candle, woman with short brown hair in a navy cardigan, stone chapel, low candlelight, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "stone chapel",
+          "lighting": "low candlelight",
           "emotion": "suspense",
           "framing": "detail",
           "wardrobe": "consistent with original storyboard",
@@ -846,16 +846,16 @@
           "objects": "woman with short brown hair in a navy cardigan, black wax candle"
         },
         {
-          "action": "Wide shot of a woman standing beside the chapel exit",
+          "action": "Wide shot of a woman with short brown hair in a navy cardigan beside a narrow stone chapel exit, her silhouette remains on the wall",
           "references": [
             "anchor0",
             "anchor2"
           ],
           "camera": "wide",
           "narration": "Apagué la llama. Mi silueta seguía en la pared, sosteniendo la flor. Yo ya no proyectaba sombra.",
-          "prompt": "Wide shot of a woman standing beside the chapel exit, woman with short brown hair in a navy cardigan, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
-          "location": "La cera negra",
-          "lighting": "motivated low-key practical lighting",
+          "prompt": "Wide shot of a woman with short brown hair in a navy cardigan beside a narrow stone chapel exit, her silhouette remains on the wall, stone chapel, low candlelight, photorealistic horror film still, visible subject, natural shadows, no text",
+          "location": "stone chapel",
+          "lighting": "low candlelight",
           "emotion": "dread",
           "framing": "wide",
           "wardrobe": "consistent with original storyboard",
