@@ -52,7 +52,7 @@ def render_preview(story, out):
     import os
     import shutil
     import soundfile as sf
-    from PIL import Image, ImageOps, ImageDraw, ImageFont
+    from PIL import Image, ImageOps
     from audio_engine import generate_narration
     from music_engine import generate_ambient_score
     from render import phrases, write_subtitles, generate_images
@@ -85,16 +85,10 @@ def render_preview(story, out):
     if len(report) != len(shots) or any(row.get("selected_candidate") is None for row in report):
         raise ValueError("Semantic candidate missing")
     # Encode shot clips independently: a stable duration and natural, reset zoom.
-    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 46)
     clips = []
     for i, image in enumerate(images):
         with Image.open(image) as src:
             frame = ImageOps.fit(src.convert("RGB"), (1080,1920))
-        draw = ImageDraw.Draw(frame)
-        if i == 0:
-            draw.text((65,230), story["title"], font=font, fill="white", stroke_width=2, stroke_fill="black")
-        if i == len(images)-1:
-            draw.text((65,150), "UMBRAL", font=font, fill="white", stroke_width=2, stroke_fill="black")
         frame_path = out/f"frame_{i:02}.jpg"
         frame.save(frame_path,quality=95)
         clip = out/f"shot_{i:02}.mp4"
@@ -105,10 +99,15 @@ def render_preview(story, out):
                         "-crf","20","-pix_fmt","yuv420p",str(clip)],check=True)
         clips.append(clip)
     (out/"clips.txt").write_text("".join(f"file '{p.name}'\n" for p in clips))
+    # Separate text file avoids filter injection from episode titles.
+    (out/"title.txt").write_text(story["title"],encoding="utf-8")
+    font = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    overlay = (f"drawtext=fontfile={font}:textfile=title.txt:expansion=none:fontsize=46:fontcolor=white:borderw=2:x=65:y=230:enable=\'lt(t,2)\',"
+               f"drawtext=fontfile={font}:text=UMBRAL:fontsize=46:fontcolor=white:borderw=2:x=65:y=150:enable=\'gte(t,{duration-1.5:.3f})\'")
     target = out/"preview.mp4"
     subprocess.run(["ffmpeg","-v","error","-y","-f","concat","-safe","1","-i","clips.txt",
                     "-i","voice.wav","-i","music.wav","-filter_complex",
-                    "[0:v]ass=subtitles.ass[v];[1:a][2:a]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.92[a]",
+                    f"[0:v]{overlay},ass=subtitles.ass[v];[1:a][2:a]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.92[a]",
                     "-map","[v]","-map","[a]","-t",str(duration),"-c:v","libx264","-threads","2",
                     "-preset","veryfast","-crf","20","-pix_fmt","yuv420p","-c:a","aac","-b:a","160k",
                     "-ar","48000","-movflags","+faststart",target.name],cwd=out,check=True)
@@ -128,8 +127,12 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("story",type=Path)
     parser.add_argument("output",type=Path)
+    parser.add_argument("--index",type=int,choices=(0,1,2),default=None)
     args=parser.parse_args()
-    render_preview(json.loads(args.story.read_text()),args.output)
+    story=json.loads(args.story.read_text())
+    if args.index is not None:
+        story=story[args.index]
+    render_preview(story,args.output)
 
 
 if __name__=="__main__":
