@@ -1,0 +1,9 @@
+# UMBRAL — instrucciones de producción
+
+- Trabajar únicamente en este repositorio. Antes de editar, leer README.md, este archivo y cinematic5/README.md. Consultar main y no reabrir ramas antiguas sin comprobar divergencia.
+- Horarios de publicación: 09:00 y 21:00 Europe/Madrid. Usar los workflows existentes y el bloqueo oficial de cuenta; no añadir otro publicador, no duplicar POST, no eliminar recibos ni intentos pendientes. No tocar credenciales.
+- Cinematic 5.0 es el formato editorial preferente. Cada fecha y franja futura requiere relato original de respaldo en stories.json o stories_morning.json y corte cinematográfico correspondiente en cinematic5/scheduled.json. Deben compartir exactamente el título y no reutilizar historias ya publicadas.
+- Preparar siempre ambas versiones con antelación; ampliar el índice cuando se añadan nuevas fechas. El archivo cinematic5/policy.json es el único interruptor editorial de Cinematic 5. Los módulos de selección, render y staging consultan ese interruptor. Mantener el sistema 3.1 como alternativa para fechas no cubiertas.
+- El propietario autorizó validar creativamente mediante publicaciones reales, sin generar pilotos privados adicionales. Mantener las comprobaciones técnicas integradas y no aprobar contenido defectuoso.
+- Revisar los recibos reales: render_format cinematic-5 identifica el formato nuevo; ausencia del campo significa formato no confirmado como Cinematic 5. No mezclar cohortes de duración/formato distintos. Usar métricas reales de antigüedad equivalente; no promocionar cambios con muestras insuficientes.
+- Presupuesto 0 €, no crear automatizaciones adicionales. Documentar avances verificables y limitaciones.
