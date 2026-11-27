@@ -1,0 +1,314 @@
+[
+  {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "La mirilla",
+    "hook": "La mirilla mostraba el interior de mi casa.",
+    "narration": "La mirilla mostraba el interior de mi casa. Habían llamado tres veces y yo estaba solo. Acerqué el ojo al cristal. Vi mi salón, con la televisión encendida y mi abrigo sobre el sofá. Desde el sofá, alguien con mi voz me pidió que no abriera. Entonces sonó el timbre otra vez. Pero esta vez, venía del interior de mi pecho.",
+    "caption": "Si alguien llama desde dentro, ¿abrirías la puerta? 🚪 #UmbralTerror #TerrorPsicologico",
+    "image_seed_base": 51000,
+    "scenes": [
+      "Close-up green apartment door with brass peephole, warm hallway light, ominous film photograph.",
+      "Green apartment door seen from dim Spanish hallway, brass peephole, tense cinematic medium shot.",
+      "Living room beyond green apartment door, television glow on abandoned dark coat, realistic night interior.",
+      "Green apartment door half open, dark living room and empty couch, blue television light, unsettling realistic film.",
+      "Green apartment door with brass peephole in oppressive dark hallway, isolated sharp light, extreme close-up."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "location": "green apartment door"
+      },
+      "shots": [
+        {
+          "narration": "La mirilla mostraba el interior de mi casa.",
+          "action": "La mirilla mostraba el interior de mi casa.",
+          "camera": "close or medium",
+          "prompt": "Close-up green apartment door with brass peephole, warm hallway light, ominous film photograph.",
+          "references": [
+            "location"
+          ],
+          "location": "Spanish apartment",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "green apartment door"
+        },
+        {
+          "narration": "Habían llamado tres veces y yo estaba solo. Acerqué el ojo al cristal.",
+          "action": "Habían llamado tres veces y yo estaba solo. Acerqué el ojo al cristal.",
+          "camera": "wide",
+          "prompt": "Green apartment door seen from dim Spanish hallway, brass peephole, tense cinematic medium shot.",
+          "references": [
+            "location"
+          ],
+          "location": "Spanish apartment",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "wide",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "green apartment door"
+        },
+        {
+          "narration": "Vi mi salón, con la televisión encendida y mi abrigo sobre el sofá.",
+          "action": "Vi mi salón, con la televisión encendida y mi abrigo sobre el sofá.",
+          "camera": "close or medium",
+          "prompt": "Living room beyond green apartment door, television glow on abandoned dark coat, realistic night interior.",
+          "references": [
+            "location"
+          ],
+          "location": "Spanish apartment",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "green apartment door"
+        },
+        {
+          "narration": "Desde el sofá, alguien con mi voz me pidió que no abriera.",
+          "action": "Desde el sofá, alguien con mi voz me pidió que no abriera.",
+          "camera": "close or medium",
+          "prompt": "Green apartment door half open, dark living room and empty couch, blue television light, unsettling realistic film.",
+          "references": [
+            "location"
+          ],
+          "location": "Spanish apartment",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "green apartment door"
+        },
+        {
+          "narration": "Entonces sonó el timbre otra vez. Pero esta vez, venía del interior de mi pecho.",
+          "action": "Entonces sonó el timbre otra vez. Pero esta vez, venía del interior de mi pecho.",
+          "camera": "close or medium",
+          "prompt": "Green apartment door with brass peephole in oppressive dark hallway, isolated sharp light, extreme close-up.",
+          "references": [
+            "location"
+          ],
+          "location": "Spanish apartment",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "dread",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "green apartment door"
+        }
+      ]
+    }
+  },
+  {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "El interfono",
+    "hook": "Mi interfono sonó desde un piso inexistente.",
+    "narration": "Mi interfono sonó desde un piso inexistente. La voz de una mujer me pidió que bajara al portal. Dijo que estaba atrapada. Al llegar, encontré el portal cerrado y el suelo cubierto de agua. La mujer volvió a llamar. Esta vez reconocí la voz de mi madre. Mi madre estaba arriba, dormida. Entonces el interfono dijo: no la despiertes, todavía no sabe que soy yo.",
+    "caption": "¿Y si la persona que te pide ayuda fueras tú? #UmbralTerror #RelatosDeTerror",
+    "image_seed_base": 52000,
+    "scenes": [
+      "Close-up white wall intercom, tiny red indicator, dim Spanish apartment hallway, cinematic suspense.",
+      "White wall intercom beside an empty staircase, cold practical light, realistic horror still.",
+      "White wall intercom near locked glass entrance, shallow water reflecting ceiling light, wide cinematic shot.",
+      "White wall intercom in wet dark lobby, red indicator, claustrophobic close-up, realistic textures.",
+      "White wall intercom beside shadowed stairwell, door ajar above, eerie blue light, photographic dread."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "location": "white wall intercom"
+      },
+      "shots": [
+        {
+          "narration": "Mi interfono sonó desde un piso inexistente.",
+          "action": "Mi interfono sonó desde un piso inexistente.",
+          "camera": "close or medium",
+          "prompt": "Close-up white wall intercom, tiny red indicator, dim Spanish apartment hallway, cinematic suspense.",
+          "references": [
+            "location"
+          ],
+          "location": "Spanish apartment stairwell",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "white wall intercom"
+        },
+        {
+          "narration": "La voz de una mujer me pidió que bajara al portal. Dijo que estaba atrapada.",
+          "action": "La voz de una mujer me pidió que bajara al portal. Dijo que estaba atrapada.",
+          "camera": "wide",
+          "prompt": "White wall intercom beside an empty staircase, cold practical light, realistic horror still.",
+          "references": [
+            "location"
+          ],
+          "location": "Spanish apartment stairwell",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "wide",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "white wall intercom"
+        },
+        {
+          "narration": "Al llegar, encontré el portal cerrado y el suelo cubierto de agua.",
+          "action": "Al llegar, encontré el portal cerrado y el suelo cubierto de agua.",
+          "camera": "close or medium",
+          "prompt": "White wall intercom near locked glass entrance, shallow water reflecting ceiling light, wide cinematic shot.",
+          "references": [
+            "location"
+          ],
+          "location": "Spanish apartment stairwell",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "white wall intercom"
+        },
+        {
+          "narration": "La mujer volvió a llamar. Esta vez reconocí la voz de mi madre.",
+          "action": "La mujer volvió a llamar. Esta vez reconocí la voz de mi madre.",
+          "camera": "close or medium",
+          "prompt": "White wall intercom in wet dark lobby, red indicator, claustrophobic close-up, realistic textures.",
+          "references": [
+            "location"
+          ],
+          "location": "Spanish apartment stairwell",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "white wall intercom"
+        },
+        {
+          "narration": "Mi madre estaba arriba, dormida. Entonces el interfono dijo: no la despiertes, todavía no sabe que soy yo.",
+          "action": "Mi madre estaba arriba, dormida. Entonces el interfono dijo: no la despiertes, todavía no sabe que soy yo.",
+          "camera": "close or medium",
+          "prompt": "White wall intercom beside shadowed stairwell, door ajar above, eerie blue light, photographic dread.",
+          "references": [
+            "location"
+          ],
+          "location": "Spanish apartment stairwell",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "dread",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "white wall intercom"
+        }
+      ]
+    }
+  },
+  {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "La habitación 14",
+    "hook": "La habitación vacía tenía mi historial médico.",
+    "narration": "La habitación vacía tenía mi historial médico. Estaba explorando un hospital cerrado desde hacía veinte años. Nadie había entrado conmigo. En la cama encontré una pulsera de paciente, todavía caliente. La máquina del fondo empezó a medir un pulso. Me llevé la mano al pecho. El monitor se quedó en silencio. Y desde la cama vacía escuché mi corazón seguir latiendo.",
+    "caption": "Hay habitaciones que nunca deberían volver a abrirse. #UmbralTerror #Microterror",
+    "image_seed_base": 53000,
+    "scenes": [
+      "Blue hospital door ajar, blank clipboard on bed beyond, cold fluorescent light, realistic cinematic shot.",
+      "Blue hospital door in dusty abandoned ward corridor, deserted, dim flashlight beam, wide film still.",
+      "Blue hospital door behind empty hospital bed, single white wristband on sheet, ominous close-up.",
+      "Blue hospital door beside old cardiac monitor glowing green, vacant bed, dark realistic ward.",
+      "Blue hospital door and empty bed in darkness, thin green monitor light, claustrophobic cinematic horror."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "location": "blue hospital door"
+      },
+      "shots": [
+        {
+          "narration": "La habitación vacía tenía mi historial médico.",
+          "action": "La habitación vacía tenía mi historial médico.",
+          "camera": "close or medium",
+          "prompt": "Blue hospital door ajar, blank clipboard on bed beyond, cold fluorescent light, realistic cinematic shot.",
+          "references": [
+            "location"
+          ],
+          "location": "abandoned hospital",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "blue hospital door"
+        },
+        {
+          "narration": "Estaba explorando un hospital cerrado desde hacía veinte años. Nadie había entrado conmigo.",
+          "action": "Estaba explorando un hospital cerrado desde hacía veinte años. Nadie había entrado conmigo.",
+          "camera": "wide",
+          "prompt": "Blue hospital door in dusty abandoned ward corridor, deserted, dim flashlight beam, wide film still.",
+          "references": [
+            "location"
+          ],
+          "location": "abandoned hospital",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "wide",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "blue hospital door"
+        },
+        {
+          "narration": "En la cama encontré una pulsera de paciente, todavía caliente.",
+          "action": "En la cama encontré una pulsera de paciente, todavía caliente.",
+          "camera": "close or medium",
+          "prompt": "Blue hospital door behind empty hospital bed, single white wristband on sheet, ominous close-up.",
+          "references": [
+            "location"
+          ],
+          "location": "abandoned hospital",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "blue hospital door"
+        },
+        {
+          "narration": "La máquina del fondo empezó a medir un pulso. Me llevé la mano al pecho.",
+          "action": "La máquina del fondo empezó a medir un pulso. Me llevé la mano al pecho.",
+          "camera": "close or medium",
+          "prompt": "Blue hospital door beside old cardiac monitor glowing green, vacant bed, dark realistic ward.",
+          "references": [
+            "location"
+          ],
+          "location": "abandoned hospital",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "suspense",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "blue hospital door"
+        },
+        {
+          "narration": "El monitor se quedó en silencio. Y desde la cama vacía escuché mi corazón seguir latiendo.",
+          "action": "El monitor se quedó en silencio. Y desde la cama vacía escuché mi corazón seguir latiendo.",
+          "camera": "close or medium",
+          "prompt": "Blue hospital door and empty bed in darkness, thin green monitor light, claustrophobic cinematic horror.",
+          "references": [
+            "location"
+          ],
+          "location": "abandoned hospital",
+          "lighting": "motivated practical low-key lighting",
+          "emotion": "dread",
+          "framing": "tight",
+          "wardrobe": "no visible person",
+          "characters": "offscreen first-person narrator",
+          "objects": "blue hospital door"
+        }
+      ]
+    }
+  }
+]

@@ -27,8 +27,8 @@ def verify(path, allow_audio_fix=True):
         raise ValueError('Meta requiere pista de vídeo y de audio')
     if video.get('codec_name') != 'h264' or video.get('pix_fmt') != 'yuv420p':
         raise ValueError('Meta requiere vídeo H.264 yuv420p')
-    if (video.get('width'), video.get('height')) != (720, 1280):
-        raise ValueError('Resolución inesperada; se exige 720×1280 (9:16)')
+    if (video.get('width'), video.get('height')) not in ((720, 1280), (1080, 1920)):
+        raise ValueError('Resolución inesperada; se exige 720×1280 o 1080×1920 (9:16)')
     n, d = map(int, video.get('avg_frame_rate', '0/1').split('/'))
     if not d or not 23 <= n / d <= 60:
         raise ValueError('Los Reels deben tener 23–60 fps')
@@ -55,7 +55,7 @@ def verify(path, allow_audio_fix=True):
             tmp.replace(path)
         finally:
             tmp.unlink(missing_ok=True)
-    print('META_COMPATIBLE: H.264 720×1280 yuv420p, AAC 48 kHz, FPS válido y MP4 comprobado')
+    print('META_COMPATIBLE: H.264 9:16 yuv420p, AAC 48 kHz, FPS válido y MP4 comprobado')
     return True
 
 

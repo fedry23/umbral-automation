@@ -1,0 +1,868 @@
+{
+  "2026-11-28_21": {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "El cristal empañado",
+    "hook": "Una mano apareció en el cristal empañado.",
+    "narration": "Una mano apareció en el cristal empañado. Había vuelto a la lavandería por mi manta. Las máquinas estaban apagadas. Limpié la huella. Reapareció más abajo. Cada vez que la borraba, descendía hacia el suelo. La última apareció sobre el desagüe. Salí y cerré con llave. Desde la calle vi cinco dedos blancos cerrarse alrededor de los barrotes de la rejilla.",
+    "caption": "Si una huella aparece sola en un cristal, no la borres. ¿A quién se lo contarías? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
+    "image_seed_base": 51000,
+    "scenes": [
+      "Medium shot of a handprint emerging in condensation on a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a cloth wiping one damp handprint from a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Low angle of descending wet handprints on a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a small damp handprint forming on a square metal floor drain, square metal floor drain, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Extreme close-up of five pale fingers curling around a square metal floor drain, square metal floor drain, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "fogged laundromat front window",
+        "anchor2": "red wool blanket",
+        "anchor1": "square metal floor drain"
+      },
+      "shots": [
+        {
+          "narration": "Una mano apareció en el cristal empañado.",
+          "action": "Medium shot of a handprint emerging in condensation on a fogged laundromat front window",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Medium shot of a handprint emerging in condensation on a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El cristal empañado",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "medium",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "fogged laundromat front window, red wool blanket"
+        },
+        {
+          "narration": "Había vuelto a la lavandería por mi manta. Las máquinas estaban apagadas.",
+          "action": "Close-up of a cloth wiping one damp handprint from a fogged laundromat front window",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Close-up of a cloth wiping one damp handprint from a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El cristal empañado",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "fogged laundromat front window, red wool blanket"
+        },
+        {
+          "narration": "Limpié la huella. Reapareció más abajo. Cada vez que la borraba, descendía hacia el suelo.",
+          "action": "Low angle of descending wet handprints on a fogged laundromat front window",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Low angle of descending wet handprints on a fogged laundromat front window, fogged laundromat front window, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El cristal empañado",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "wide",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "fogged laundromat front window, red wool blanket"
+        },
+        {
+          "narration": "La última apareció sobre el desagüe. Salí y cerré con llave.",
+          "action": "Close-up of a small damp handprint forming on a square metal floor drain",
+          "camera": "close-up",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of a small damp handprint forming on a square metal floor drain, square metal floor drain, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El cristal empañado",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "close-up",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "square metal floor drain, red wool blanket"
+        },
+        {
+          "narration": "Desde la calle vi cinco dedos blancos cerrarse alrededor de los barrotes de la rejilla.",
+          "action": "Extreme close-up of five pale fingers curling around a square metal floor drain",
+          "camera": "detail",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Extreme close-up of five pale fingers curling around a square metal floor drain, square metal floor drain, red wool blanket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El cristal empañado",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "dread",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "square metal floor drain, red wool blanket"
+        }
+      ]
+    }
+  },
+  "2026-11-29_21": {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "La puerta del andén",
+    "hook": "Cada tren abría un poco más aquella puerta.",
+    "narration": "Cada tren abría un poco más aquella puerta. Limpiaba una estación vacía. Puse una cuña bajo la salida de emergencia. El siguiente convoy arrastró la cuña sin mover ni un papel. Tras otro tren apareció un pasillo oscuro. Había agua y varias cuñas abandonadas dentro. Corrí hacia la escalera. Detrás de mí, el cubo empezó a llenarse con agua que salía del pasillo.",
+    "caption": "El último tren no siempre se lleva a todos los pasajeros. ¿Entrarías? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
+    "image_seed_base": 52000,
+    "scenes": [
+      "Wide shot of a grey emergency platform door opening beside an empty underground platform, grey emergency platform door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a rubber door wedge beneath a grey emergency platform door beside a yellow cleaning bucket, grey emergency platform door, yellow cleaning bucket, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Low angle of a rubber door wedge sliding away from a grey emergency platform door, grey emergency platform door, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of several rubber door wedges scattered on a wet concrete service corridor floor, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Wide shot of a yellow cleaning bucket beneath water dripping from an open grey emergency platform door, grey emergency platform door, yellow cleaning bucket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "grey emergency platform door",
+        "anchor1": "yellow cleaning bucket",
+        "anchor2": "rubber door wedge"
+      },
+      "shots": [
+        {
+          "narration": "Cada tren abría un poco más aquella puerta.",
+          "action": "Wide shot of a grey emergency platform door opening beside an empty underground platform",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Wide shot of a grey emergency platform door opening beside an empty underground platform, grey emergency platform door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La puerta del andén",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "medium",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "grey emergency platform door"
+        },
+        {
+          "narration": "Limpiaba una estación vacía. Puse una cuña bajo la salida de emergencia.",
+          "action": "Close-up of a rubber door wedge beneath a grey emergency platform door beside a yellow cleaning bucket",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of a rubber door wedge beneath a grey emergency platform door beside a yellow cleaning bucket, grey emergency platform door, yellow cleaning bucket, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La puerta del andén",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "grey emergency platform door, yellow cleaning bucket, rubber door wedge"
+        },
+        {
+          "narration": "El siguiente convoy arrastró la cuña sin mover ni un papel.",
+          "action": "Low angle of a rubber door wedge sliding away from a grey emergency platform door",
+          "camera": "close-up",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "Low angle of a rubber door wedge sliding away from a grey emergency platform door, grey emergency platform door, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La puerta del andén",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "close-up",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "grey emergency platform door, rubber door wedge"
+        },
+        {
+          "narration": "Tras otro tren apareció un pasillo oscuro. Había agua y varias cuñas abandonadas dentro.",
+          "action": "Close-up of several rubber door wedges scattered on a wet concrete service corridor floor",
+          "camera": "detail",
+          "references": [
+            "anchor2"
+          ],
+          "prompt": "Close-up of several rubber door wedges scattered on a wet concrete service corridor floor, rubber door wedge, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La puerta del andén",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "rubber door wedge"
+        },
+        {
+          "narration": "Corrí hacia la escalera. Detrás de mí, el cubo empezó a llenarse con agua que salía del pasillo.",
+          "action": "Wide shot of a yellow cleaning bucket beneath water dripping from an open grey emergency platform door",
+          "camera": "wide",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Wide shot of a yellow cleaning bucket beneath water dripping from an open grey emergency platform door, grey emergency platform door, yellow cleaning bucket, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La puerta del andén",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "dread",
+          "framing": "wide",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "grey emergency platform door, yellow cleaning bucket"
+        }
+      ]
+    }
+  },
+  "2026-11-30_21": {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "El asiento vacío",
+    "hook": "Mi autobús vacío llevaba un pasajero invisible.",
+    "narration": "Mi autobús vacío llevaba un pasajero invisible. Conducía el último servicio. En cada parada aparecía una mancha húmeda en el asiento del fondo. Cubrí el cojín con plástico. Arriba estaba seco; debajo había dos huellas mojadas. Regresé sin detenerme. Por el espejo vi desaparecer la humedad. Apagué el motor y abrí las puertas. Dos marcas nuevas aparecieron, como si alguien acabara de levantarse.",
+    "caption": "La última parada no es para todos. ¿Te sentarías al fondo? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
+    "image_seed_base": 53000,
+    "scenes": [
+      "Wide shot of a wet patch on a dark blue rear bus seat in an empty night bus, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a wet patch shaped like two legs on a dark blue rear bus seat, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of two wet impressions beneath a transparent plastic bag on a dark blue rear bus seat, dark blue rear bus seat, transparent plastic bag, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "View in the driver rearview mirror of a completely dry dark blue rear bus seat, dark blue rear bus seat, driver rearview mirror, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of two separated wet impressions on a dark blue rear bus seat, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "dark blue rear bus seat",
+        "anchor1": "transparent plastic bag",
+        "anchor2": "driver rearview mirror"
+      },
+      "shots": [
+        {
+          "narration": "Mi autobús vacío llevaba un pasajero invisible.",
+          "action": "Wide shot of a wet patch on a dark blue rear bus seat in an empty night bus",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Wide shot of a wet patch on a dark blue rear bus seat in an empty night bus, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El asiento vacío",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "medium",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "dark blue rear bus seat"
+        },
+        {
+          "narration": "Conducía el último servicio. En cada parada aparecía una mancha húmeda en el asiento del fondo.",
+          "action": "Close-up of a wet patch shaped like two legs on a dark blue rear bus seat",
+          "camera": "detail",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Close-up of a wet patch shaped like two legs on a dark blue rear bus seat, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El asiento vacío",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "dark blue rear bus seat"
+        },
+        {
+          "narration": "Cubrí el cojín con plástico. Arriba estaba seco; debajo había dos huellas mojadas.",
+          "action": "Close-up of two wet impressions beneath a transparent plastic bag on a dark blue rear bus seat",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Close-up of two wet impressions beneath a transparent plastic bag on a dark blue rear bus seat, dark blue rear bus seat, transparent plastic bag, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El asiento vacío",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "dark blue rear bus seat, transparent plastic bag"
+        },
+        {
+          "narration": "Regresé sin detenerme. Por el espejo vi desaparecer la humedad.",
+          "action": "View in the driver rearview mirror of a completely dry dark blue rear bus seat",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "prompt": "View in the driver rearview mirror of a completely dry dark blue rear bus seat, dark blue rear bus seat, driver rearview mirror, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El asiento vacío",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "medium",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "dark blue rear bus seat, driver rearview mirror"
+        },
+        {
+          "narration": "Apagué el motor y abrí las puertas. Dos marcas nuevas aparecieron, como si alguien acabara de levantarse.",
+          "action": "Close-up of two separated wet impressions on a dark blue rear bus seat",
+          "camera": "detail",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Close-up of two separated wet impressions on a dark blue rear bus seat, dark blue rear bus seat, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El asiento vacío",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "dread",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "dark blue rear bus seat"
+        }
+      ]
+    }
+  },
+  "2026-12-01_21": {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "El diente de yeso",
+    "hook": "Mi molde dental tenía una muela de más.",
+    "narration": "Mi molde dental tenía una muela de más. Trabajo fabricando prótesis. Había utilizado mi propia dentadura para probar un material nuevo. Limé la muela sobrante. Al mirarme al espejo, me faltaba un diente sano. Rellené el hueco con yeso y mi muela volvió a crecer. Guardé el molde. Entonces vi otra hilera de dientes formándose debajo. Sentí presión bajo la lengua.",
+    "caption": "Un molde no debería poder cambiar tu cuerpo. ¿Lo destruirías? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
+    "image_seed_base": 54000,
+    "scenes": [
+      "Close-up of an extra molar on a white plaster dental cast, white plaster dental cast, small tiled dental laboratory, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Macro shot of a tiny fully formed molar behind the regular teeth, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a metal file smoothing a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Detail shot of fresh plaster paste filling a gap in a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a second row of teeth emerging underneath a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor1": "white plaster dental cast",
+        "anchor2": "small tiled dental laboratory"
+      },
+      "shots": [
+        {
+          "narration": "Mi molde dental tenía una muela de más.",
+          "action": "Close-up of an extra molar on a white plaster dental cast",
+          "camera": "detail",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of an extra molar on a white plaster dental cast, white plaster dental cast, small tiled dental laboratory, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El diente de yeso",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "white plaster dental cast, small tiled dental laboratory"
+        },
+        {
+          "narration": "Trabajo fabricando prótesis. Había utilizado mi propia dentadura para probar un material nuevo.",
+          "action": "Macro shot of a tiny fully formed molar behind the regular teeth",
+          "camera": "detail",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Macro shot of a tiny fully formed molar behind the regular teeth, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El diente de yeso",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "white plaster dental cast"
+        },
+        {
+          "narration": "Limé la muela sobrante. Al mirarme al espejo, me faltaba un diente sano.",
+          "action": "Close-up of a metal file smoothing a white plaster dental cast",
+          "camera": "detail",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Close-up of a metal file smoothing a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El diente de yeso",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "white plaster dental cast"
+        },
+        {
+          "narration": "Rellené el hueco con yeso y mi muela volvió a crecer.",
+          "action": "Detail shot of fresh plaster paste filling a gap in a white plaster dental cast",
+          "camera": "detail",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Detail shot of fresh plaster paste filling a gap in a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El diente de yeso",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "white plaster dental cast"
+        },
+        {
+          "narration": "Guardé el molde. Entonces vi otra hilera de dientes formándose debajo. Sentí presión bajo la lengua.",
+          "action": "Close-up of a second row of teeth emerging underneath a white plaster dental cast",
+          "camera": "detail",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Close-up of a second row of teeth emerging underneath a white plaster dental cast, white plaster dental cast, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El diente de yeso",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "dread",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "white plaster dental cast"
+        }
+      ]
+    }
+  },
+  "2026-11-28_09": {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "La cinta amarilla",
+    "hook": "La cinta amarilla avanzaba hacia mi despacho.",
+    "narration": "La cinta amarilla avanzaba hacia mi despacho. La había puesto sobre una baldosa rota. La devolví a su sitio y le hice una foto. Un minuto después estaba más cerca. Siempre seguía a quien la había tocado. Me encerré en el despacho. Entonces oí un roce bajo la puerta. Miré mis pies. La cinta rodeaba mis tobillos. El reloj marcó otro minuto y empezó a tensarse.",
+    "caption": "No todas las señales advierten de un peligro. Algunas lo persiguen. ¿La tocarías? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
+    "image_seed_base": 55000,
+    "scenes": [
+      "Wide shot of yellow floor warning tape lying near a closed brown office door, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a hand placing yellow floor warning tape beside a cracked grey corridor tile, yellow floor warning tape, cracked grey corridor tile, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Medium shot of yellow floor warning tape advancing across grey corridor tiles, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Floor-level shot of yellow floor warning tape sliding beneath a closed office door, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Extreme close-up of yellow floor warning tape tightening around black work shoes, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "yellow floor warning tape",
+        "anchor1": "cracked grey corridor tile"
+      },
+      "shots": [
+        {
+          "narration": "La cinta amarilla avanzaba hacia mi despacho.",
+          "action": "Wide shot of yellow floor warning tape lying near a closed brown office door",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Wide shot of yellow floor warning tape lying near a closed brown office door, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La cinta amarilla",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "medium",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "yellow floor warning tape"
+        },
+        {
+          "narration": "La había puesto sobre una baldosa rota. La devolví a su sitio y le hice una foto.",
+          "action": "Close-up of a hand placing yellow floor warning tape beside a cracked grey corridor tile",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Close-up of a hand placing yellow floor warning tape beside a cracked grey corridor tile, yellow floor warning tape, cracked grey corridor tile, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La cinta amarilla",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "yellow floor warning tape, cracked grey corridor tile"
+        },
+        {
+          "narration": "Un minuto después estaba más cerca. Siempre seguía a quien la había tocado.",
+          "action": "Medium shot of yellow floor warning tape advancing across grey corridor tiles",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Medium shot of yellow floor warning tape advancing across grey corridor tiles, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La cinta amarilla",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "medium",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "yellow floor warning tape"
+        },
+        {
+          "narration": "Me encerré en el despacho. Entonces oí un roce bajo la puerta.",
+          "action": "Floor-level shot of yellow floor warning tape sliding beneath a closed office door",
+          "camera": "close-up",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Floor-level shot of yellow floor warning tape sliding beneath a closed office door, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La cinta amarilla",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "close-up",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "yellow floor warning tape"
+        },
+        {
+          "narration": "Miré mis pies. La cinta rodeaba mis tobillos. El reloj marcó otro minuto y empezó a tensarse.",
+          "action": "Extreme close-up of yellow floor warning tape tightening around black work shoes",
+          "camera": "detail",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Extreme close-up of yellow floor warning tape tightening around black work shoes, yellow floor warning tape, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La cinta amarilla",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "dread",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "yellow floor warning tape"
+        }
+      ]
+    }
+  },
+  "2026-11-29_09": {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "La llave gemela",
+    "hook": "Alguien giró mi llave desde el otro lado.",
+    "narration": "Alguien giró mi llave desde el otro lado. Vigilaba un museo. La puerta del archivo estaba cerrada y mi llave colgaba de una anilla roja. Al moverla oí cómo la cerradura repetía cada giro. Me puse un guante y abrí apenas un centímetro. Mi chaqueta colgaba dentro, con mi llavero en el bolsillo. Miré mi mano: la llave que sujetaba no tenía dientes.",
+    "caption": "Hay puertas que es mejor no abrir. ¿Y si tu llave no fuera la verdadera? #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
+    "image_seed_base": 56000,
+    "scenes": [
+      "Medium shot of a red metal key ring beside a locked dark wooden archive door, red metal key ring, dark wooden archive door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a red metal key ring approaching the lock of a dark wooden archive door, red metal key ring, dark wooden archive door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a brass key turning inside a red metal key ring, red metal key ring, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a black security glove turning a brass key in a dark wooden archive door, dark wooden archive door, black security glove, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Extreme close-up of a toothless key held by a black security glove beside a dark wooden archive door, dark wooden archive door, black security glove, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "red metal key ring",
+        "anchor1": "dark wooden archive door",
+        "anchor2": "black security glove"
+      },
+      "shots": [
+        {
+          "narration": "Alguien giró mi llave desde el otro lado.",
+          "action": "Medium shot of a red metal key ring beside a locked dark wooden archive door",
+          "camera": "medium",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Medium shot of a red metal key ring beside a locked dark wooden archive door, red metal key ring, dark wooden archive door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La llave gemela",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "medium",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "red metal key ring, dark wooden archive door"
+        },
+        {
+          "narration": "Vigilaba un museo. La puerta del archivo estaba cerrada y mi llave colgaba de una anilla roja.",
+          "action": "Close-up of a red metal key ring approaching the lock of a dark wooden archive door",
+          "camera": "detail",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "prompt": "Close-up of a red metal key ring approaching the lock of a dark wooden archive door, red metal key ring, dark wooden archive door, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La llave gemela",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "red metal key ring, dark wooden archive door"
+        },
+        {
+          "narration": "Al moverla oí cómo la cerradura repetía cada giro.",
+          "action": "Close-up of a brass key turning inside a red metal key ring",
+          "camera": "close-up",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Close-up of a brass key turning inside a red metal key ring, red metal key ring, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La llave gemela",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "close-up",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "red metal key ring"
+        },
+        {
+          "narration": "Me puse un guante y abrí apenas un centímetro.",
+          "action": "Close-up of a black security glove turning a brass key in a dark wooden archive door",
+          "camera": "detail",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Close-up of a black security glove turning a brass key in a dark wooden archive door, dark wooden archive door, black security glove, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La llave gemela",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "dark wooden archive door, black security glove"
+        },
+        {
+          "narration": "Mi chaqueta colgaba dentro, con mi llavero en el bolsillo. Miré mi mano: la llave que sujetaba no tenía dientes.",
+          "action": "Extreme close-up of a toothless key held by a black security glove beside a dark wooden archive door",
+          "camera": "wide",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "prompt": "Extreme close-up of a toothless key held by a black security glove beside a dark wooden archive door, dark wooden archive door, black security glove, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La llave gemela",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "dread",
+          "framing": "wide",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "dark wooden archive door, black security glove"
+        }
+      ]
+    }
+  },
+  "2026-11-30_09": {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "El timbre del taller",
+    "hook": "El timbre desconectado sonó cuando intenté salir.",
+    "narration": "El timbre desconectado sonó cuando intenté salir. Había vuelto al taller de mi padre para recoger sus herramientas. Crucé con una silla. Silencio. Crucé con la caja de herramientas y repicó tres veces. Dejé las llaves inglesas sobre el banco. Incluso con la caja vacía volvió a sonar. Encontré una tuerca cosida al forro. La dejé junto al timbre. Por fin me permitió salir.",
+    "caption": "Su padre dejó una última advertencia, incluso después de morir. #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
+    "image_seed_base": 57000,
+    "scenes": [
+      "Wide shot of a dusty brass bell above an old workshop doorway, dusty brass bell, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a wooden chair beneath a dusty brass bell, dusty brass bell, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Medium shot of a battered grey metal toolbox on a concrete workshop floor, grey metal toolbox, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Medium shot of an empty grey metal toolbox crossing a workshop threshold, grey metal toolbox, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Extreme close-up of a rusty nut on a wooden workbench, wooden workbench, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor0": "dusty brass bell",
+        "anchor1": "grey metal toolbox",
+        "anchor2": "wooden workbench"
+      },
+      "shots": [
+        {
+          "narration": "El timbre desconectado sonó cuando intenté salir.",
+          "action": "Wide shot of a dusty brass bell above an old workshop doorway",
+          "camera": "medium",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Wide shot of a dusty brass bell above an old workshop doorway, dusty brass bell, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El timbre del taller",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "medium",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "dusty brass bell"
+        },
+        {
+          "narration": "Había vuelto al taller de mi padre para recoger sus herramientas.",
+          "action": "Close-up of a wooden chair beneath a dusty brass bell",
+          "camera": "detail",
+          "references": [
+            "anchor0"
+          ],
+          "prompt": "Close-up of a wooden chair beneath a dusty brass bell, dusty brass bell, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El timbre del taller",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "dusty brass bell"
+        },
+        {
+          "narration": "Crucé con una silla. Silencio. Crucé con la caja de herramientas y repicó tres veces.",
+          "action": "Medium shot of a battered grey metal toolbox on a concrete workshop floor",
+          "camera": "medium",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Medium shot of a battered grey metal toolbox on a concrete workshop floor, grey metal toolbox, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El timbre del taller",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "medium",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "grey metal toolbox"
+        },
+        {
+          "narration": "Dejé las llaves inglesas sobre el banco. Incluso con la caja vacía volvió a sonar.",
+          "action": "Medium shot of an empty grey metal toolbox crossing a workshop threshold",
+          "camera": "medium",
+          "references": [
+            "anchor1"
+          ],
+          "prompt": "Medium shot of an empty grey metal toolbox crossing a workshop threshold, grey metal toolbox, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El timbre del taller",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "medium",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "grey metal toolbox"
+        },
+        {
+          "narration": "Encontré una tuerca cosida al forro. La dejé junto al timbre. Por fin me permitió salir.",
+          "action": "Extreme close-up of a rusty nut on a wooden workbench",
+          "camera": "detail",
+          "references": [
+            "anchor2"
+          ],
+          "prompt": "Extreme close-up of a rusty nut on a wooden workbench, wooden workbench, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "El timbre del taller",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "dread",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "wooden workbench"
+        }
+      ]
+    }
+  },
+  "2026-12-01_09": {
+    "format": "cinematic-5",
+    "episode_number": 0,
+    "title": "La cera negra",
+    "hook": "La vela proyectaba una sombra que no existía.",
+    "narration": "La vela proyectaba una sombra que no existía. Había entrado en la capilla del cementerio para recordar a mi madre. Acercaba una flor a la llama cuando su silueta apareció en la pared. No desapareció al retirarla. Me incliné para apagar la vela. La sombra adquirió mi perfil. Apagué la llama. Mi silueta seguía en la pared, sosteniendo la flor. Yo ya no proyectaba sombra.",
+    "caption": "Una vela puede iluminar algo que no debería estar ahí. #UmbralTerror #RelatosDeTerror #TerrorPsicologico",
+    "image_seed_base": 58000,
+    "scenes": [
+      "Wide shot of a human silhouette cast behind a burning black wax candle, black wax candle, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of the narrow shouldered silhouette on a chapel wall, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Close-up of a flower held beside a black wax candle, black wax candle, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Profile close-up of a woman leaning toward a black wax candle, woman with short brown hair in a navy cardigan, black wax candle, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+      "Wide shot of a woman standing beside the chapel exit, woman with short brown hair in a navy cardigan, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text."
+    ],
+    "storyboard": {
+      "version": 1,
+      "continuity": {
+        "anchor1": "black wax candle",
+        "anchor2": "narrow stone chapel",
+        "anchor0": "woman with short brown hair in a navy cardigan"
+      },
+      "shots": [
+        {
+          "action": "Wide shot of a human silhouette cast behind a burning black wax candle",
+          "references": [
+            "anchor1",
+            "anchor2"
+          ],
+          "camera": "wide",
+          "narration": "La vela proyectaba una sombra que no existía.",
+          "prompt": "Wide shot of a human silhouette cast behind a burning black wax candle, black wax candle, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La cera negra",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "wide",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "black wax candle, narrow stone chapel"
+        },
+        {
+          "action": "Close-up of the narrow shouldered silhouette on a chapel wall",
+          "references": [
+            "anchor2"
+          ],
+          "camera": "detail",
+          "narration": "Había entrado en la capilla del cementerio para recordar a mi madre.",
+          "prompt": "Close-up of the narrow shouldered silhouette on a chapel wall, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La cera negra",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "narrow stone chapel"
+        },
+        {
+          "action": "Close-up of a flower held beside a black wax candle",
+          "references": [
+            "anchor1"
+          ],
+          "camera": "detail",
+          "narration": "Acercaba una flor a la llama cuando su silueta apareció en la pared. No desapareció al retirarla.",
+          "prompt": "Close-up of a flower held beside a black wax candle, black wax candle, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La cera negra",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "black wax candle"
+        },
+        {
+          "action": "Profile close-up of a woman leaning toward a black wax candle",
+          "references": [
+            "anchor0",
+            "anchor1"
+          ],
+          "camera": "detail",
+          "narration": "Me incliné para apagar la vela. La sombra adquirió mi perfil.",
+          "prompt": "Profile close-up of a woman leaning toward a black wax candle, woman with short brown hair in a navy cardigan, black wax candle, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La cera negra",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "suspense",
+          "framing": "detail",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "woman with short brown hair in a navy cardigan, black wax candle"
+        },
+        {
+          "action": "Wide shot of a woman standing beside the chapel exit",
+          "references": [
+            "anchor0",
+            "anchor2"
+          ],
+          "camera": "wide",
+          "narration": "Apagué la llama. Mi silueta seguía en la pared, sosteniendo la flor. Yo ya no proyectaba sombra.",
+          "prompt": "Wide shot of a woman standing beside the chapel exit, woman with short brown hair in a navy cardigan, narrow stone chapel, realistic cinematic horror photograph, motivated low-key lighting, visible subject, natural textures, vertical composition, no text.",
+          "location": "La cera negra",
+          "lighting": "motivated low-key practical lighting",
+          "emotion": "dread",
+          "framing": "wide",
+          "wardrobe": "consistent with original storyboard",
+          "characters": "first-person narrator or offscreen",
+          "objects": "woman with short brown hair in a navy cardigan, narrow stone chapel"
+        }
+      ]
+    }
+  }
+}
