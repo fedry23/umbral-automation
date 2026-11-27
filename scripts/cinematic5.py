@@ -120,7 +120,7 @@ def render_preview(story, out, *, episode_number=0, music_gain=1.0):
         clips.append(clip)
     (out/"clips.txt").write_text("".join(f"file '{p.name}'\n" for p in clips))
     # Separate text file avoids filter injection from episode titles.
-    title = f"{episode_number:02d} · {story[\"title\"]}" if episode_number else story["title"]
+    title = f"{episode_number:02d} · {story['title']}" if episode_number else story["title"]
     (out/"title.txt").write_text(title,encoding="utf-8")
     font = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
     overlay = (f"drawtext=fontfile={font}:textfile=title.txt:expansion=none:fontsize=46:fontcolor=white:borderw=2:x=65:y=230:enable=\'lt(t,2)\',"
