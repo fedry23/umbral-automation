@@ -162,7 +162,13 @@ def extract_run_zip(raw, date):
             comparison_keys = ("title", "episode_number", "narration")
         variant = story.get("cinematic_render")
         if variant is not None:
-            indexed = json.loads(Path("cinematic5/scheduled.json").read_text(encoding="utf-8")).get(date + "_09")
+            try:
+                from .cinematic5_policy import enabled, indexed_cut
+            except ImportError:
+                from cinematic5_policy import enabled, indexed_cut
+            if not enabled():
+                raise ValueError("Cinematic rollout disabled; recover original format")
+            indexed = indexed_cut(date,"09")
             if (not isinstance(variant, dict) or variant != indexed
                     or variant.get("title") != story.get("title")
                     or variant.get("caption") != story.get("caption")

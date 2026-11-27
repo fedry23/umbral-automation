@@ -341,8 +341,17 @@ def render_metadata(day, story):
     editorial = story.get("editorial_protocol")
     if editorial is not None and editorial != "fixed-v1":
         raise ValueError("Unknown editorial protocol")
-    return {"slot": SLOT, "technical_profile": profile, "duration_seconds": duration,
-            "editorial_protocol": editorial}
+    metadata = {"slot": SLOT, "technical_profile": profile, "duration_seconds": duration,
+                "editorial_protocol": editorial}
+    if story.get("cinematic_render") is not None:
+        try:
+            from .cinematic5_policy import indexed_cut
+        except ImportError:
+            from cinematic5_policy import indexed_cut
+        if story["cinematic_render"] != indexed_cut(day,SLOT) or not 25 <= duration <= 35:
+            raise ValueError("Stale cinematic render metadata")
+        metadata["render_format"] = "cinematic-5"
+    return metadata
 
 
 def check_episode(day, number):
@@ -378,6 +387,10 @@ def persist_intent(day, data):
                                "title": data.get("title"), "technical_profile": data.get("technical_profile"),
                                "duration_seconds": data.get("duration_seconds"), "editorial_protocol": data.get("editorial_protocol"),
                                "cover_url": data.get("cover_url")}, indent=2))
+    if "render_format" in data:
+        record = json.loads(path.read_text())
+        record["render_format"] = data["render_format"]
+        path.write_text(json.dumps(record,indent=2))
     for args in (["git","add",str(path)],
                  ["git","commit","-m","UMBRAL: registrar intento antes de publicar " + day],
                  ["git","push","origin","HEAD:main"]):
@@ -390,7 +403,7 @@ def record_verified(day, media_id, data):
               "episode_number":data.get("episode_number"),
               "instagram_media_id":media_id,"published_at":now_local().isoformat(),
               "verification":"pending","cover_url_sent":data.get("cover_url")}
-    for key in ("slot", "technical_profile", "duration_seconds", "editorial_protocol"):
+    for key in ("slot", "technical_profile", "duration_seconds", "editorial_protocol", "render_format"):
         if key in data:
             output[key] = data[key]
     path = OUT / "published.json"

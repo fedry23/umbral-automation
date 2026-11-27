@@ -12,6 +12,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from scripts.umbral3_release_policy import approved_slot
+from scripts.cinematic5_policy import selected as cinematic_selected
 
 ROOT = Path(__file__).resolve().parents[1]
 MADRID = ZoneInfo("Europe/Madrid")
@@ -104,6 +105,8 @@ def eligible(day, slot, root=ROOT, now=None, override=None):
         raise ValueError("Timezone-aware clock required")
     if now.astimezone(MADRID).date().isoformat() != day:
         return False
+    if cinematic_selected(day,slot,root):
+        return False  # Cinematic uses the existing legacy publishing route.
     override = os.getenv("UMBRAL3_ROLLOUT_OVERRIDE", "") if override is None else override
     if override == "false":
         return False  # Emergency stop from GitHub Variables; legacy remains live.
@@ -126,6 +129,8 @@ def eligible(day, slot, root=ROOT, now=None, override=None):
 
 
 def route_legacy(day, slot, event, schedule, root=ROOT, now=None, override=None):
+    if cinematic_selected(day,slot,root):
+        return True  # Single selected route, same account-wide lock and durable intent.
     # External rescue after the intended hour must not yield to an absent cron.
     clock = (now or dt.datetime.now(MADRID)).astimezone(MADRID)
     if event == "push" and clock.date().isoformat() == day and clock.hour >= int(slot):

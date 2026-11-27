@@ -7,6 +7,7 @@ import subprocess
 from pathlib import Path
 
 from scripts.storyboard import validate_storyboard, shot_boundaries
+from scripts.cinematic5_policy import enabled, indexed_cut
 
 MIN_WORDS, MAX_WORDS = 55, 85
 MIN_SECONDS, MAX_SECONDS = 25, 35
@@ -44,7 +45,7 @@ def validate_timing(cues, duration):
         raise ValueError("Measured runtime outside 25–35s")
     if not cues or not 0 <= cues[0][0] <= .35:
         raise ValueError("Opening voice must start within 350ms")
-    if any(not (0 <= a < b <= duration + .01) for a, b, _ in cues):
+    if any(not (0 <= a < b <= duration + .01) for a, b, _ in cues) or any(b[0] < a[1] for a,b in zip(cues,cues[1:])):
         raise ValueError("Cue outside duration")
 
 
@@ -137,6 +138,11 @@ def render_preview(story, out, *, episode_number=0, music_gain=1.0):
     a=next(s for s in probe["streams"] if s["codec_type"]=="audio")
     if (v["width"],v["height"],v["codec_name"],v["pix_fmt"],a["codec_name"],a["sample_rate"]) != (1080,1920,"h264","yuv420p","aac","48000"):
         raise ValueError("Export format mismatch")
+    n,d=map(int,v["avg_frame_rate"].split("/"))
+    if not d or not 23 <= n/d <= 60 or a.get("channels") not in (1,2):
+        raise ValueError("Invalid frame rate or audio channels")
+    if target.stat().st_size < 100000:
+        raise ValueError("Suspiciously small export")
     if abs(float(probe["format"]["duration"])-duration)>.3:
         raise ValueError("Export duration mismatch")
     subprocess.run(["ffmpeg","-v","error","-xerror","-i",str(target),"-f","null","-"],check=True)
@@ -146,8 +152,9 @@ def render_preview(story, out, *, episode_number=0, music_gain=1.0):
 
 def scheduled_variant(story, day, slot):
     """Only explicitly authored dated cuts are eligible; originals remain intact."""
-    index = Path(__file__).resolve().parents[1]/"cinematic5"/"scheduled.json"
-    variant = json.loads(index.read_text(encoding="utf-8")).get(f"{day}_{slot}")
+    if not enabled():
+        return None
+    variant = indexed_cut(day,slot)
     if variant is None or variant.get("title") != story.get("title"):
         return None
     validate(variant)
@@ -177,10 +184,11 @@ def render_scheduled(story, variant, out, date, filename, music_gain=1.0):
         make_thumbnail({**variant,"episode_number":number,"cover_scene_index":0},images,folder/"cover.jpg")
         # Compatibility files for existing artifact readers, not visible in the Reel.
         make_brand_cards({**variant,"episode_number":number},folder)
-        sheet=Image.new("RGB",(612,664),"#111111")
+        rows=(len(images)+2)//3
+        sheet=Image.new("RGB",(624,12+rows*332),"#111111")
         for idx,path in enumerate(images):
             with Image.open(path) as src:
-                sheet.paste(ImageOps.fit(src.convert("RGB"),(192,320)),(12+(idx%3)*204,8+(idx//3)*328))
+                sheet.paste(ImageOps.fit(src.convert("RGB"),(192,320)),(12+(idx%3)*204,12+(idx//3)*332))
         sheet.save(folder/"scene_contact_sheet.jpg",quality=85)
         official={**story,"date":str(date),"caption":variant["caption"],"cinematic_render":variant}
         (folder/"story_used.json").write_text(json.dumps(official,ensure_ascii=False,indent=2),encoding="utf-8")

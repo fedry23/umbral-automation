@@ -57,9 +57,9 @@ class RolloutTests(unittest.TestCase):
         self.assertTrue(read_auto_policy(ROOT,override=""))
         self.assertFalse(read_auto_policy(ROOT,override="false"))
         day="2026-11-28"
-        with patch("scripts.umbral3_rollout.machine_eligible",return_value=False):
+        with patch("scripts.umbral3_rollout.cinematic_selected",return_value=False), patch("scripts.umbral3_rollout.machine_eligible",return_value=False):
             self.assertFalse(eligible(day,"09",ROOT,self.now(day),override=""))
-        with patch("scripts.umbral3_rollout.machine_eligible",return_value=True):
+        with patch("scripts.umbral3_rollout.cinematic_selected",return_value=False), patch("scripts.umbral3_rollout.machine_eligible",return_value=True):
             self.assertTrue(eligible(day,"09",ROOT,self.now(day),override=""))
         self.assertFalse(machine_eligible(day,"09",ROOT,checker=lambda *_:False,override=""))
         self.assertTrue(machine_eligible(day,"09",ROOT,checker=lambda *_:True,override=""))
@@ -68,7 +68,8 @@ class RolloutTests(unittest.TestCase):
     def test_future_routing_yields_primary_but_legacy_backups_remain_independent(self):
         for day in ("2026-11-28", "2026-11-29"):
             with self.subTest(day=day):
-                self.assertFalse(route_legacy(day,"09","schedule","17 5 * * *",ROOT,self.now(day),override=""))
+                with patch("scripts.umbral3_rollout.cinematic_selected",return_value=False):
+                    self.assertFalse(route_legacy(day,"09","schedule","17 5 * * *",ROOT,self.now(day),override=""))
                 self.assertTrue(route_legacy(day,"09","schedule","0 7 * * *",ROOT,self.now(day),override=""))
                 self.assertTrue(route_legacy(day,"09","schedule","17 5 * * *",ROOT,self.now(day),override="false"))
                 with patch.dict("os.environ",{"UMBRAL3_AUTO_QA_ENABLED":"false"}):
