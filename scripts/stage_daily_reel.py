@@ -83,7 +83,7 @@ def verify_story(story, caption, date):
     return True
 
 
-def validate_mp4(path):
+def validate_mp4(path, cinematic=False):
     info = json.loads(subprocess.check_output(
         ["ffprobe", "-v", "error", "-show_streams", "-show_format",
          "-of", "json", str(path)], text=True))
@@ -91,8 +91,8 @@ def validate_mp4(path):
     audio = next(x for x in info["streams"] if x["codec_type"] == "audio")
     duration = float(info["format"]["duration"])
     if (video.get("codec_name") != "h264" or audio.get("codec_name") != "aac"
-            or (video.get("width"), video.get("height")) != (720, 1280)
-            or not 15 <= duration <= 180):
+            or (video.get("width"), video.get("height")) != ((1080, 1920) if cinematic else (720, 1280))
+            or not (24.7 <= duration <= 35.3 if cinematic else 15 <= duration <= 180)):
         raise ValueError("Formato audiovisual no válido para UMBRAL")
     if path.stat().st_size < 100000:
         raise ValueError("Vídeo sospechosamente pequeño")
@@ -160,6 +160,15 @@ def extract_run_zip(raw, date):
             comparison_keys = ("title", "narration", "caption", "scenes", "editorial_protocol")
         else:
             comparison_keys = ("title", "episode_number", "narration")
+        variant = story.get("cinematic_render")
+        if variant is not None:
+            indexed = json.loads(Path("cinematic5/scheduled.json").read_text(encoding="utf-8")).get(date + "_21")
+            if (not isinstance(variant, dict) or variant != indexed
+                    or variant.get("title") != story.get("title")
+                    or variant.get("caption") != story.get("caption")
+                    or not 55 <= len(variant.get("narration", "").split()) <= 85):
+                raise ValueError("Invalid dated cinematic cut")
+            comparison_keys = tuple(key for key in comparison_keys if key != "caption")
         if len(scheduled_stories) != 1 or any(
             story.get(key) != scheduled_stories[0].get(key)
             for key in comparison_keys
@@ -172,10 +181,18 @@ def extract_run_zip(raw, date):
             (OUT / filename).write_bytes(z.read(filename))
     validate_cover(OUT / "cover.jpg")
     marks = json.loads((OUT / "branding_timing.json").read_text(encoding="utf-8"))
-    if not (0 < marks.get("intro_end", 0) < marks.get("outro_start", 0)
+    cinematic = story.get("cinematic_render") is not None
+    if cinematic:
+        if not (marks.get("format") == "cinematic-5" and marks.get("intro_end") == 0
+                and 25 <= marks.get("duration", 0) <= 35
+                and 0 < marks["duration"] - marks.get("outro_start", 0) <= 2):
+            raise ValueError("Invalid cinematic timing")
+    elif not (0 < marks.get("intro_end", 0) < marks.get("outro_start", 0)
             < marks.get("duration", 0)):
         raise ValueError('Marcas temporales intro/outro incompatibles')
-    duration = validate_mp4(OUT / expected)
+    duration = validate_mp4(OUT / expected, cinematic=cinematic) if cinematic else validate_mp4(OUT / expected)
+    if cinematic and abs(duration-marks["duration"]) > .3:
+        raise ValueError("Cinematic timing mismatch")
     return {"title": story["title"], "duration": round(duration, 2),
             "file": str(OUT / expected), "date": date}
 
