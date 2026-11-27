@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-27",
+  "container": "17940220758185965",
+  "status": "publish_intent",
+  "episode_number": 27,
+  "slot": "09",
+  "title": "Las huellas de sal",
+  "technical_profile": {
+    "experiment": "music-balance-v1",
+    "arm": "control",
+    "music_gain": 1.0
+  },
+  "duration_seconds": 70.807125,
+  "editorial_protocol": "fixed-v1",
+  "cover_url": "https://fedry23.github.io/umbral-automation/reels/2026-11-27_09.jpg"
+}
