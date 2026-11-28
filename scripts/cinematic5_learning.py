@@ -62,7 +62,7 @@ def compare(rows,hours):
         def summary(arm):
             items=valid[arm]
             return {"posts":len(items),"reach":sum(r["reach"] for r in items),
-                    **{k:statistics.mean(vals) if (vals:=[r[k] for r in items if r.get(k) is not None]) else None for k in METRICS}}
+                    **{k:statistics.mean(vals) if (vals:=[r[k] for r in items if r.get(k) is not None]) else None for k in METRICS if k != "reach"}}
         stats={arm:summary(arm) for arm in arms}
         enough=all(x["posts"]>=10 and x["reach"]>=500 for x in stats.values())
         verdict="insufficient_data"
