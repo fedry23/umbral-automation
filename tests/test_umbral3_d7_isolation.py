@@ -91,7 +91,10 @@ class D7IsolationTests(unittest.TestCase):
             self.assertTrue(140 <= len(story["narration"].split()) <= 170)
             self.assertNotIn("episode_number", story)
             ids.add(story_key(story))
-            with self.assertRaisesRegex(RuntimeError, "No exact owner-approved artwork"):
-                approved_slot(day, slot, ROOT, dt.datetime(2026, 11, 21, 22, 0,
-                              tzinfo=ZoneInfo("Europe/Madrid")))
+            # Isolate the historical pre-publication scenario from live receipts.
+            from unittest.mock import patch
+            with patch("scripts.umbral3_release_policy.inventory", return_value=(0, {})):
+                with self.assertRaisesRegex(RuntimeError, "No exact owner-approved artwork"):
+                    approved_slot(day, slot, ROOT, dt.datetime(2026, 11, 21, 22, 0,
+                                  tzinfo=ZoneInfo("Europe/Madrid")))
         self.assertEqual(len(ids), 2)
