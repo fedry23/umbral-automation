@@ -17,3 +17,5 @@
 2026-11-26 | comprobación preventiva 18:20, slot oficial 21:00; La radio del sótano; reconciliar, bloqueo compartido, regenerar si procede, no publicar antes de hora
 
 2026-11-27 | comprobación preventiva 18:20, slot oficial 21:00; El abrigo de la consigna; reconciliar, bloqueo compartido, regenerar si procede, no publicar antes de hora
+
+2026-11-28 | recuperación nocturna oficial autorizada por propietario; El cristal empañado; descripción revisada; reconciliar Meta, bloqueo compartido y validar fecha, regenerar si procede; no duplicar.
